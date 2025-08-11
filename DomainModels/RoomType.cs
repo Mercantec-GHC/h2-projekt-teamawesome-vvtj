@@ -1,10 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainModels
 {
-    public class Type
+    public class RoomType
     {
-        //[ForeignKey]
+        [Key]
         public int Id { get; set; }
         public string TypeofRoom { get; set; }
         public int MaxCapacity { get; set; }
