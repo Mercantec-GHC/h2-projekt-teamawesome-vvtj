@@ -10,7 +10,7 @@ public class Booking
 	public int RoomId { get; set; }
 	[ForeignKey("RoomId")]
 	public Room RoomBooked { get; set; }
-	
+
 	public required DateTime CheckIn { get; set; }
 	public required DateTime CheckOut { get; set; }
 	public int NightsCount { get; set; } 

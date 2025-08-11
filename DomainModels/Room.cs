@@ -7,11 +7,11 @@ namespace DomainModels
     {
         [Key]
         public int Id { get; set; }
-        public required int RoomNumber { get; set; }
-        public int GuestCount { get; set; }
+        public int RoomNumber { get; set; }
+        public required int GuestCount { get; set; }
         public bool IsAvailable { get; set; }
-        public bool IsBreakfast { get; set; }
-        public DateTime Availablefrom { get; set; }
+        public required bool IsBreakfast { get; set; }
+        public DateTime AvailableFrom { get; set; }
 
         public int TypeId { get; set; }
         [ForeignKey("TypeId")]
@@ -21,8 +21,5 @@ namespace DomainModels
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; }
 
-        public int BookingId { get; set; }
-        [ForeignKey("BookingId")]
-        public Booking BookingPeriod { get; set; }
     }
 }
