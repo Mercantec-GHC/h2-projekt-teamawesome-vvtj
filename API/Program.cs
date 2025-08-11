@@ -1,5 +1,6 @@
 using System.Reflection;
-using Microsoft.OpenApi.Models;
+using API.Data;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 namespace API;
@@ -9,7 +10,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+       
         // Add services to the container.
         builder.Services.AddControllers();
 
@@ -47,6 +48,14 @@ public class Program
         // Tilføj basic health checks
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), ["live"]);
+
+        IConfiguration Configuration = builder.Configuration;
+        string connectionString = Configuration.GetConnectionString("DefaultConnection")
+            ?? Environment.GetEnvironmentVariable("DefaultConnection");
+
+        builder.Services.AddDbContext<AppDBContext>(options =>
+                options.UseNpgsql(connectionString));
+
 
         var app = builder.Build();
 
