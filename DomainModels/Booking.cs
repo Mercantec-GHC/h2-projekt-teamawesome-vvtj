@@ -1,10 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainModels;
 public class Booking
 {
+	[Key]
 	public required int Id { get; set; }
-	//public Room RoomBooked { get; set; }
+	
+	public int RoomId { get; set; }
+	[ForeignKey("RoomId")]
+	public Room RoomBooked { get; set; }
+
 	public required DateTime CheckIn { get; set; }
 	public required DateTime CheckOut { get; set; }
 	public int NightsCount { get; set; } 
