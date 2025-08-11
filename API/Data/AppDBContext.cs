@@ -19,4 +19,5 @@ namespace API.Data
 
 //INFO : For update and add migrations: View/OtherWindows/Package Manager Console.
 //Add migration:add-migration "name-migration". Migrate: dotnet ef database update.
-//If feil with migrations, ensure you have run the following commands: dotnet ef database update --project "Project path". Right-click on the API project and copy Path.
+//If feil with migrations,
+//ensure you have run the following commands: dotnet ef database update --project "Project path". Right-click on the API project and copy Path.
