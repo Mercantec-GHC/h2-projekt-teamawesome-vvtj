@@ -10,9 +10,9 @@ public class UserController : ControllerBase
 {
     IUserService _userService;
     
-    public UserController(IUserService apiService)
+    public UserController(IUserService userService)
     {
-        _userService = apiService;
+        _userService = userService;
     }
 
     [HttpPost]
