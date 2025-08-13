@@ -1,6 +1,6 @@
 ﻿namespace DomainModels.Dto.RoleDto;
 
-public class RoleCreateDto
+public class RolePostDto
 {
 	public required string RoleName { get; set; } = default!;
 }
