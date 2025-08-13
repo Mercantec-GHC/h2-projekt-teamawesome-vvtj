@@ -1,7 +1,9 @@
-using System.Reflection;
 using API.Data;
+using API.Interfaces;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Reflection;
 
 namespace API;
 
@@ -10,9 +12,10 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-       
-        // Add services to the container.
         builder.Services.AddControllers();
+
+        //Add Interfaces and Services
+        builder.Services.AddScoped<IUserService, UserService>();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>

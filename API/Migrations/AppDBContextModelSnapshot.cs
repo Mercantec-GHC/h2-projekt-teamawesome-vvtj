@@ -171,15 +171,17 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastLogin")
+                    b.Property<DateTime?>("LastLogin")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordBackdoor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Salt")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
