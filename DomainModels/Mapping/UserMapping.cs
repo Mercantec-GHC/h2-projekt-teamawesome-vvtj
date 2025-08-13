@@ -1,4 +1,5 @@
 ﻿using DomainModels.Dto.UserDto;
+using DomainModels.Models;
 
 namespace DomainModels.Mapping;
 
@@ -10,7 +11,7 @@ public class UserMapping
 		{
 			Id = user.Id,
 			Email = user.Email,
-			UserName = user.Username,
+			UserName = user.UserName,
 			LastLogin = user.LastLogin,
 			Role = user.UserRole?.RoleName ?? string.Empty
 		};
@@ -22,7 +23,7 @@ public class UserMapping
 		{
 			Id = 0, 
 			Email = userPostDto.Email,
-			Username = userPostDto.UserName,
+			UserName = userPostDto.UserName,
 			HashedPassword = userPostDto.Password, 
 			Salt = string.Empty, 
 			UserRoleId = userPostDto.UserRoleId,

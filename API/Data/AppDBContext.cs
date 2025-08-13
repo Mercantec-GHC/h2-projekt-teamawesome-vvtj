@@ -1,4 +1,4 @@
-﻿using DomainModels;
+﻿using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
@@ -21,7 +21,7 @@ public class AppDBContext : DbContext
 		modelBuilder.Entity<User>(entity =>
 		{
 			entity.HasIndex(u => u.Email).IsUnique();
-			entity.HasIndex(u => u.Username).IsUnique();
+			entity.HasIndex(u => u.UserName).IsUnique();
 			entity.HasOne(u => u.UserRole)
 				.WithMany(r => r.Users)
 				.HasForeignKey(u => u.UserRoleId)

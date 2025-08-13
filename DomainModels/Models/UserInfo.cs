@@ -1,4 +1,4 @@
-﻿namespace DomainModels;
+﻿namespace DomainModels.Models;
 
 public class UserInfo:Common
 {

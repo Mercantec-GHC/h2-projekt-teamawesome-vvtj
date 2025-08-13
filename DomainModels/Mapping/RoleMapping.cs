@@ -1,4 +1,5 @@
 ﻿using DomainModels.Dto.RoleDto;
+using DomainModels.Models;
 
 namespace DomainModels.Mapping;
 

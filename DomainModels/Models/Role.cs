@@ -1,4 +1,4 @@
-﻿namespace DomainModels;
+﻿namespace DomainModels.Models;
 public class Role : Common
 {
 	public required string? RoleName { get; set; }
