@@ -35,6 +35,10 @@ public class CleaningController : ControllerBase
         }
     }
 
+
+    /// <summary>
+    /// Endpoint marks rooms as cleaned based on the provided room numbers.
+    /// </summary>
     [HttpPut]
     public  async Task<IActionResult> MarkRoomAsCleaned(List<int> roomNumbers)
     {
@@ -45,14 +49,14 @@ public class CleaningController : ControllerBase
                 return BadRequest("Room numbers cannot be null or empty.");
             }
 
-            var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumber);
+            var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumbers);
             if (result)
             {
-                return NoContent(); 
+                return Ok("Rooms were marked as cleaned today"); 
             }
             else
             {
-                return NotFound($"Room with number {roomNumbers} not found or already cleaned.");
+                return NotFound($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
             }
         }
         catch (Exception ex)

@@ -19,24 +19,35 @@ namespace API.Services
         {
             await using var connection = new NpgsqlConnection(_connectionString);
             await connection.OpenAsync();
-            await using var transaction = await connection.BeginTransactionAsync(); 
+            await using var transaction = await connection.BeginTransactionAsync();
 
-            IEnumerable<Room> rooms = await GetRooms(connection);
-            IEnumerable<Booking> booking = await GetBookings(connection);
+            try
+            {
+                IEnumerable<Room> rooms = await GetRooms(connection);
+                IEnumerable<Booking> booking = await GetBookings(connection);
 
-            var roomsToClean = rooms
-                .Where(r =>!r.LastCleaned.HasValue || r.LastCleaned.Value <= DateTime.Now.AddDays(-3) ||
-                    booking.Any(b =>
-                        b.RoomId == r.Id && b.CheckOut <= DateTime.UtcNow))
-                .ToList();
+                // Filter rooms that need cleaning
+                var roomsToClean = rooms
+                    .Where(r => !r.LastCleaned.HasValue || (DateTime.UtcNow - r.LastCleaned.Value).TotalDays >= 3 ||
+                        booking.Any(b => b.RoomId == r.Id && b.CheckOut <= DateTime.UtcNow))
+                    .ToList();
 
-            var roomToCleanDtos = roomsToClean.Select(r => new RoomToCleanDto { 
-                RoomNumber = r.RoomNumber,
-                RoomType = r.RoomType.TypeofRoom,
-                HotelName = r.Hotel.HotelName
-            });
+                var roomToCleanDtos = roomsToClean.Select(r => new RoomToCleanDto
+                {
+                    RoomNumber = r.RoomNumber,
+                    RoomType = r.RoomType.TypeofRoom,
+                    HotelName = r.Hotel.HotelName
+                });
 
-            return roomToCleanDtos;
+                return roomToCleanDtos;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
+                Console.WriteLine($"Error updating rooms: {ex.Message}");
+                return Enumerable.Empty<RoomToCleanDto>();
+            }
         }
 
         public async Task<bool> MarkRoomAsCleanedAsync(List<int> roomNumbers)
@@ -50,7 +61,7 @@ namespace API.Services
                 const string query = @"
                     UPDATE ""Rooms""
                     SET ""LastCleaned"" = @LastCleaned
-                    WHERE ""RoomNumber"" = @RoomNumbers";
+                    WHERE ""RoomNumber"" = ANY(@RoomNumbers)";
 
                 var parameters = new
                 {
@@ -80,7 +91,6 @@ namespace API.Services
                 return false;
             }
         }
-
 
         // These temporary methods that i will change to methods that will create Tetyana and Jasmin.
         private async Task<IEnumerable<Room>> GetRooms(NpgsqlConnection connection)
