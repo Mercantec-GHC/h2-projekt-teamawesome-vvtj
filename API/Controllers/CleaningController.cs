@@ -17,18 +17,48 @@ public class CleaningController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<RoomToCleanDto>> GetAllRoomsToClean()
+    public async Task<ActionResult<IEnumerable<RoomToCleanDto>>> GetAllRoomsToClean()
     {
         try
         {
             var rooms = await _cleaningService.GetAllRoomsToCleanAsync();
-            return rooms;
+            if (rooms == null || !rooms.Any())
+            {
+                return NotFound("No rooms to clean found.");
+            }
+
+            return Ok(rooms);
         }
         catch (Exception ex)
         {
-            // Log the exception (not implemented here)
-            //return StatusCode(500, $"Internal server error: {ex.Message}");
-            return Enumerable.Empty<RoomToCleanDto>(); // Return an empty list in case of error
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpPut]
+    public  async Task<IActionResult> MarkRoomAsCleaned(List<int> roomNumbers)
+    {
+        try
+        {
+            if (roomNumbers == null || !roomNumbers.Any())
+            {
+                return BadRequest("Room numbers cannot be null or empty.");
+            }
+
+            var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumber);
+            if (result)
+            {
+                return NoContent(); 
+            }
+            else
+            {
+                return NotFound($"Room with number {roomNumbers} not found or already cleaned.");
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
 }
