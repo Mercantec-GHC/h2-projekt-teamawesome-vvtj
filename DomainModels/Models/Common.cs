@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DomainModels
+namespace DomainModels.Models
 {
     public class Common
     {
