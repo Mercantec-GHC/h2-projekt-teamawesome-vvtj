@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    [Migration("20250811122039_tables")]
-    partial class tables
+    [Migration("20250814101431_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DomainModels.Booking", b =>
+            modelBuilder.Entity("DomainModels.Models.Booking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +66,7 @@ namespace API.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("DomainModels.Hotel", b =>
+            modelBuilder.Entity("DomainModels.Models.Hotel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,7 +94,32 @@ namespace API.Migrations
                     b.ToTable("Hotels");
                 });
 
-            modelBuilder.Entity("DomainModels.Room", b =>
+            modelBuilder.Entity("DomainModels.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleName")
+                        .IsUnique();
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.Room", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -117,6 +142,9 @@ namespace API.Migrations
                     b.Property<bool>("IsBreakfast")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastCleaned")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("RoomNumber")
                         .HasColumnType("integer");
 
@@ -132,7 +160,7 @@ namespace API.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("DomainModels.RoomType", b =>
+            modelBuilder.Entity("DomainModels.Models.RoomType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -155,7 +183,7 @@ namespace API.Migrations
                     b.ToTable("RoomTypes");
                 });
 
-            modelBuilder.Entity("DomainModels.User", b =>
+            modelBuilder.Entity("DomainModels.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -188,25 +216,92 @@ namespace API.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("UserInfoId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("UserRoleId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserInfoId")
+                        .IsUnique();
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.HasIndex("UserRoleId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DomainModels.Booking", b =>
+            modelBuilder.Entity("DomainModels.Models.UserInfo", b =>
                 {
-                    b.HasOne("DomainModels.Room", "RoomBooked")
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserInfos");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.Booking", b =>
+                {
+                    b.HasOne("DomainModels.Models.Room", "RoomBooked")
                         .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DomainModels.User", "User")
-                        .WithMany()
+                    b.HasOne("DomainModels.Models.User", "User")
+                        .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -216,15 +311,15 @@ namespace API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DomainModels.Room", b =>
+            modelBuilder.Entity("DomainModels.Models.Room", b =>
                 {
-                    b.HasOne("DomainModels.Hotel", "Hotel")
+                    b.HasOne("DomainModels.Models.Hotel", "Hotel")
                         .WithMany()
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DomainModels.RoomType", "RoomType")
+                    b.HasOne("DomainModels.Models.RoomType", "RoomType")
                         .WithMany()
                         .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -233,6 +328,40 @@ namespace API.Migrations
                     b.Navigation("Hotel");
 
                     b.Navigation("RoomType");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.User", b =>
+                {
+                    b.HasOne("DomainModels.Models.UserInfo", "UserInfo")
+                        .WithOne("User")
+                        .HasForeignKey("DomainModels.Models.User", "UserInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DomainModels.Models.Role", "UserRole")
+                        .WithMany("Users")
+                        .HasForeignKey("UserRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UserInfo");
+
+                    b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.Role", b =>
+                {
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.User", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("DomainModels.Models.UserInfo", b =>
+                {
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
