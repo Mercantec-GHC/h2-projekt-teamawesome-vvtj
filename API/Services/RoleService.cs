@@ -51,6 +51,7 @@ public class RoleService:IRoleService
 			RoleName = newRole.RoleName
 		};
 	}
+	
 	public async Task<bool> DeleteRoleAsync(int id)
 	{
 		var role = await _context.Roles.FindAsync(id);

@@ -13,14 +13,15 @@ namespace API.Services
 		{
 			_context = context;
 		}
+
 		public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync()
 		{
-			var users = await _context.Users.ToListAsync();
+			var users = await _context.Users.Include(u => u.UserRole).ToListAsync();
 			return users.Select(u => new UserGetDto
 			{
 				Id = u.Id,
 				Email = u.Email,
-				Role = u.UserRole.RoleName
+				Role = u.UserRole?.RoleName ?? string.Empty
 			});
 		}
 
@@ -36,7 +37,7 @@ namespace API.Services
 				Id = user.Id,
 				Email = user.Email,
 				UserName = user.UserName,
-				Role = user.UserRole.RoleName,
+				Role = user.UserRole.RoleName ?? string.Empty,
 				LastLogin = user.LastLogin
 			};
 		}

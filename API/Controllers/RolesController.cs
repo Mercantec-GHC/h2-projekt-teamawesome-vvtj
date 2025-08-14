@@ -1,7 +1,9 @@
-﻿using API.Data;
-using API.Interfaces;
+﻿using API.Interfaces;
+using API.Services;
 using DomainModels.Dto.RoleDto;
+using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace API.Controllers;
 
@@ -17,14 +19,18 @@ public class RolesController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> GetRolesAsync()
+	public async Task<ActionResult<IEnumerable<RoleGetDto>>> GetRolesAsync()
 	{
 		var roles = await _roleService.GetAllRolesAsync();
+		if (roles == null || !roles.Any())
+		{
+			return NotFound();
+		}
 		return Ok(roles);
 	}
 
 	[HttpGet("{id:int}")]
-	public async Task<IActionResult> GetRoleByIdAsync(int id)
+	public async Task<ActionResult<RoleGetDto>> GetRoleByIdAsync(int id)
 	{
 		var role = await _roleService.GetRoleByIdAsync(id);
 		if (role == null)
@@ -51,13 +57,15 @@ public class RolesController : ControllerBase
 	[HttpDelete("{id:int}")]
 	public async Task<IActionResult> DeleteRole(int id)
 	{
+		if (id <= 0)
+		{
+			return BadRequest("Need a valid role id.");
+		}
 		var deleted = await _roleService.DeleteRoleAsync(id);
 		if (!deleted)
 		{
 			return NotFound();
 		}
 		return NoContent();
-
 	}
-
 }

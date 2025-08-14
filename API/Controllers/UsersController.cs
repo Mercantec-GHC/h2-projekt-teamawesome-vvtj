@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -17,13 +18,18 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> GetUsers()
+	public async Task<ActionResult<IEnumerable<UserGetDto>>> GetUsers()
 	{
 		var users = await _userService.GetAllUsersAsync();
+		if(users == null || !users.Any())
+		{
+			return NotFound("No users found.");
+		}
 		return Ok(users);
 	}
+
 	[HttpGet("{id:int}")]
-	public async Task<IActionResult> GetUserById(int id)
+	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
 	{
 		var user = await _userService.GetUserByIdAsync(id);
 		if (user == null)
@@ -60,6 +66,7 @@ public class UsersController : ControllerBase
 		}
 		return NoContent();
 	}
+
 	[HttpDelete("{email}")]
 	public async Task<IActionResult> DeleteUserByEmail(string email)
 	{
@@ -74,5 +81,4 @@ public class UsersController : ControllerBase
 		}
 		return NoContent();
 	}
-
 }
