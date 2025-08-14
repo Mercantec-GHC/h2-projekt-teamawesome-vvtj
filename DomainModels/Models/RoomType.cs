@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DomainModels
+namespace DomainModels.Models
 {
     public class RoomType
     {

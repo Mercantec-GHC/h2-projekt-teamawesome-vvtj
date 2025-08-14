@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DomainModels
+namespace DomainModels.Models
 {
     public class Room 
     {
@@ -20,6 +20,6 @@ namespace DomainModels
         public int HotelId { get; set; }
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; }
-
-    }
+        public DateTime? LastCleaned { get; set; }
+	}
 }
