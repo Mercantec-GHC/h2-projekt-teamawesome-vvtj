@@ -17,6 +17,10 @@ public class Program
         //Add Interfaces and Services
         builder.Services.AddScoped<IUserService, UserService>();
 
+
+
+        builder.Services.AddScoped<IBookingInterface, BookingService>();
+
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
         {

@@ -1,5 +1,6 @@
 ﻿using DomainModels;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace API.Data
 {
@@ -15,7 +16,10 @@ namespace API.Data
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
     }
-}
+
+   
+    }
+    
 
 //INFO : For update and add migrations: View/OtherWindows/Package Manager Console.
 //Add migration:add-migration "name-migration". Migrate: dotnet ef database update.
