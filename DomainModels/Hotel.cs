@@ -3,18 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainModels
 {
-    public class Hotel
+    public class Hotel : Common
     {
-        [Key]
-        public int Id { get; set; }
         public string HotelName { get; set; }
         public required string CityName { get; set; }
         public string Address { get; set; }
         public string? Description { get; set; }
 
         public List<Room> Rooms { get; set; } = new(); // 1:n
-        //public DateTime CreatedAt { get; set; }
-        //public DateTime UpdatedAt { get; set; }
     }
 
 }
