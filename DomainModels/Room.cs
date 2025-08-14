@@ -20,7 +20,6 @@ namespace DomainModels
         public int HotelId { get; set; }
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; }
-        public DateTime? LastCleaned { get; set; }
 
     }
 }
