@@ -21,7 +21,9 @@ public class Program
         builder.Services.AddScoped<RoomTypeService>();
         builder.Services.AddScoped<ICleaningService, CleaningService>();
 
-		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddScoped<IBookingInterface, BookingService>();
+
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
         {
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
