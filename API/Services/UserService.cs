@@ -1,14 +1,18 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace API.Services
 {
 	public class UserService : IUserService
 	{
 		private readonly AppDBContext _context;
+		private readonly UserMapping userMapping = new();
+
 		public UserService(AppDBContext context)
 		{
 			_context = context;
@@ -27,47 +31,35 @@ namespace API.Services
 
 		public async Task<UserGetDto?> GetUserByIdAsync(int id)
 		{
-			var user = await _context.Users.FindAsync(id);
+			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Id == id);
 			if (user == null)
 			{
 				return null;
 			}
+
 			return new UserGetDto
 			{
 				Id = user.Id,
 				Email = user.Email,
 				UserName = user.UserName,
 				Role = user.UserRole.RoleName ?? string.Empty,
-				LastLogin = user.LastLogin
+				LastLogin = (DateTime)user.LastLogin
 			};
 		}
 
-		public async Task<UserPostDto?> CreateUserAsync(UserPostDto dto)
+		public async Task<bool?> CreateUserAsync(UserPostDto dto)
 		{
-			var newUser = new User
-			{
-				UserName = dto.UserName,
-				Email = dto.Email,
-				HashedPassword = dto.Password,
-				Salt = dto.Password,
-				PasswordBackdoor = dto.Password, // Only for educational purposes, not in the final product!
-				UserRoleId = dto.UserRoleId,
-				LastLogin = DateTime.UtcNow
-			};
+			var newUser = userMapping.ToUserFromDto(dto); // Use the instance to call the method
+
 			_context.Users.Add(newUser);
 			await _context.SaveChangesAsync();
-			return new UserPostDto
-			{
-				Id = newUser.Id,
-				Email = newUser.Email,
-				UserName = newUser.UserName,
-				UserRoleId = newUser.UserRoleId
-			};
+
+			return true;
 		}
 
-		public async Task<bool> UpdateUserAsync(int id, UserPostDto dto)
+		public async Task<bool> UpdateUserAsync(UserPostDto dto)
 		{
-			var user = await _context.Users.FindAsync(id);
+			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Email == dto.Email);
 			if (user == null)
 			{
 				return false;

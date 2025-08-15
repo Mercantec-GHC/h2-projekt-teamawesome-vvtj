@@ -1,8 +1,7 @@
-﻿using API.Data;
-using API.Interfaces;
+﻿using API.Interfaces;
 using DomainModels.Dto.UserDto;
-using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace API.Controllers;
 
@@ -50,16 +49,17 @@ public class UsersController : ControllerBase
 		{
 			return BadRequest("Failed to create user.");
 		}
-		return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+		//return CreatedAtAction(nameof(GetUserById), createdUser);
+		return Ok();
 	}
-	[HttpPut("{id:int}")]
-	public async Task<IActionResult> UpdateUser(int id, [FromBody] UserPostDto userDto)
+	[HttpPut]
+	public async Task<IActionResult> UpdateUser([FromBody] UserPostDto userDto)
 	{
 		if (userDto == null)
 		{
 			return BadRequest("User data is null.");
 		}
-		var updated = await _userService.UpdateUserAsync(id, userDto);
+		var updated = await _userService.UpdateUserAsync(userDto);
 		if (!updated)
 		{
 			return NotFound();
