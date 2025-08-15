@@ -2,6 +2,7 @@
 using Dapper;
 using DomainModels;
 using DomainModels.Dto;
+using DomainModels.Models;
 using Npgsql;
 
 namespace API.Services
