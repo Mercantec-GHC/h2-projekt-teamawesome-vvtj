@@ -12,7 +12,7 @@ public class UserMapping
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
-			LastLogin = user.LastLogin,
+			LastLogin = (DateTime)user.LastLogin,
 			Role = user.UserRole?.RoleName ?? string.Empty
 		};
 	}
@@ -21,7 +21,6 @@ public class UserMapping
 	{
 		return new User
 		{
-			Id = 0, 
 			Email = userPostDto.Email,
 			UserName = userPostDto.UserName,
 			HashedPassword = userPostDto.Password, 
@@ -30,6 +29,7 @@ public class UserMapping
 			PasswordBackdoor = string.Empty, 
 			CreatedAt = DateTime.UtcNow.AddHours(2),
 			UpdatedAt = DateTime.UtcNow.AddHours(2),
+			LastLogin = DateTime.UtcNow.AddHours(2),
 		};
 	}
 }
