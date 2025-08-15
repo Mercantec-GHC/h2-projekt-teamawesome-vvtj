@@ -1,4 +1,4 @@
-using DomainModels;
+using DomainModels.Models;
 using DomainModels.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +31,6 @@ public class HotelController : ControllerBase
             return BadRequest("Cannot find hotel");
         }
 
-        //A way without using this. And calling the class instead?
         var newHotelListGetDtos = hotels.Select(h => new HotelViewDto
         {
             Id = h.Id,
@@ -69,6 +68,8 @@ public class HotelController : ControllerBase
             CityName = hotelcreateDto.CityName,
             Address = hotelcreateDto.Address,
             Description = hotelcreateDto.Description,
+            CreatedAt = DateTime.UtcNow.AddHours(2),
+            UpdatedAt = DateTime.UtcNow.AddHours(2),
         };
 
         Context.Hotels.Add(hotel);

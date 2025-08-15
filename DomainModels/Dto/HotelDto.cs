@@ -1,15 +1,6 @@
 namespace DomainModels.Dto
 {
-    public class HotelDto
-    {
-        public string HotelName { get; set; }
-        public required string CityName { get; set; }
-        public string Address { get; set; }
-        public string? Description { get; set; }
-
-        //Get - Read
-
-    }
+    //Get - Read
     public class HotelViewDto
     {
         public int Id { get; set; }
