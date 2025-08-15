@@ -1,6 +1,9 @@
-using System.Reflection;
-using Microsoft.OpenApi.Models;
+using API.Data;
+using API.Interfaces;
+using API.Services;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Reflection;
 
 namespace API;
 
@@ -9,9 +12,16 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container.
         builder.Services.AddControllers();
+
+        //Add Interfaces and Services
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IRoleService, RoleService>();
+        builder.Services.AddScoped<RoomService>();
+        builder.Services.AddScoped<RoomTypeService>();
+        builder.Services.AddScoped<ICleaningService, CleaningService>();
+
+        builder.Services.AddScoped<IBookingInterface, BookingService>();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
@@ -47,6 +57,14 @@ public class Program
         // Tilføj basic health checks
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), ["live"]);
+
+        IConfiguration Configuration = builder.Configuration;
+        string connectionString = Configuration.GetConnectionString("DefaultConnection")
+            ?? Environment.GetEnvironmentVariable("DefaultConnection");
+
+        builder.Services.AddDbContext<AppDBContext>(options =>
+                options.UseNpgsql(connectionString));
+
 
         var app = builder.Build();
 
