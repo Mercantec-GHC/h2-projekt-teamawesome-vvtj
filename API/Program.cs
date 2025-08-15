@@ -19,6 +19,7 @@ public class Program
         builder.Services.AddScoped<IRoleService, RoleService>();
         builder.Services.AddScoped<RoomService>();
         builder.Services.AddScoped<RoomTypeService>();
+        builder.Services.AddScoped<ICleaningService, CleaningService>();
 
 		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
