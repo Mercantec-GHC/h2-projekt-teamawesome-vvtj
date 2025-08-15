@@ -2,6 +2,7 @@
 using API.Interfaces;
 using DomainModels;
 using DomainModels.Dto;
+using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,10 +22,10 @@ public class BookingController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateBooking([FromBody] BookingDto bookingDto)
+    public async Task<IActionResult> CreateBooking( Booking booking)
     {
         
-        return await _bookingService.CreateBooking(bookingDto);
+        return await _bookingService.CreateBooking(booking);
     }
 
     [HttpGet]

@@ -1,10 +1,11 @@
 ﻿using API.Data;
 using API.Interfaces;
-using DomainModels;
+using DomainModels.Models;
 using DomainModels.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Grpc.Core;
+using DomainModels.Models;
 
 
 namespace API.Services
@@ -13,30 +14,42 @@ namespace API.Services
     public class BookingService : IBookingInterface
     {
         private readonly AppDBContext _dbContext;
-
-
-        public async Task<IActionResult> CreateBooking(BookingDto bookingDto)
+        public BookingService(AppDBContext context)
         {
-            if (bookingDto == null)
+            _dbContext = context;
+        }
+
+
+
+        public async Task<IActionResult> CreateBooking(Booking booking)
+        {
+            if (booking == null)
             {
                 return new BadRequestObjectResult("User data is required.");
             }
 
-            var nights = (int)(bookingDto.CheckOut.Date - bookingDto.CheckIn.Date).TotalDays;
+            booking.Id = 0;
 
-            var booking = new Booking
+            booking.NightsCount = (int)(booking.CheckOut.Date - booking.CheckIn.Date).TotalDays;
+
+            var newBooking = new Booking
             {
-                RoomId = bookingDto.RoomId,
-                UserId = bookingDto.UserId,
-                CheckIn = bookingDto.CheckIn,
-                CheckOut = bookingDto.CheckOut,
-                NightsCount = nights,
+                RoomId = booking.RoomId,
+                UserId = booking.UserId,
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut,
+                NightsCount = booking.NightsCount,
+                GuestsCount = booking.GuestsCount,
+                IsPaid = booking.IsPaid,
+                Payment = booking.Payment,
             };
 
             try
             {
                 _dbContext.Bookings.Add(booking);
                 await _dbContext.SaveChangesAsync();
+               
+                await _dbContext.Entry(booking).Reference(b => b.User).LoadAsync();
 
                 return new OkObjectResult("Booking created successfully.");
             }
@@ -49,6 +62,8 @@ namespace API.Services
         public async Task<IEnumerable<BookingDto>> GetAllBookings()
         {
             // TODO:to make yhis available only for admin-role
+            var bookingsdb = await _dbContext.Bookings.ToListAsync(); 
+
             var bookings = await _dbContext.Bookings
                 .Select(b => new BookingDto
                 {
@@ -77,7 +92,7 @@ namespace API.Services
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
                     GuestsCount = b.GuestsCount,
-                    PaymentMethod = b.PaymentMethod,
+                    Payment = b.Payment,
                     IsPaid = b.IsPaid
 
                 })
@@ -96,7 +111,7 @@ namespace API.Services
             // TODO: check role (user, who booked, or admin, or receptionist)
             booking.NightsCount = dto.NightsCount;
             booking.GuestsCount = dto.GuestsCount;
-            booking.PriceForNight = dto.PriceForNight;
+           // booking.PriceForNight = dto.PriceForNight; //does not exist in the db
 
             await _dbContext.SaveChangesAsync(); 
 
@@ -108,7 +123,7 @@ namespace API.Services
                 RoomId = booking.RoomId,
                 NightsCount = booking.NightsCount,
                 GuestsCount = booking.GuestsCount,
-                PriceForNight = booking.PriceForNight,
+           //     PriceForNight = booking.PriceForNight,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                  

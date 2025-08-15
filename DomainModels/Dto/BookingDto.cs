@@ -16,8 +16,8 @@ namespace DomainModels.Dto
         public int NightsCount { get; set; }
       
         public int GuestsCount { get; set; }
-        public double PriceForNight { get; set; }
-        public string? PaymentMethod { get; set; }
+ //       public double PriceForNight { get; set; }
+        public string? Payment { get; set; }
         public bool IsPaid { get; set; }
     }
 }
