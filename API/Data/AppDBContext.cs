@@ -1,4 +1,5 @@
-﻿using DomainModels.Models;
+﻿using DomainModels.Enums;
+using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -29,12 +30,19 @@ public class AppDBContext : DbContext
     
     
 				.HasForeignKey(u => u.UserRoleId)
-				.OnDelete(DeleteBehavior.Restrict);
+				.OnDelete(DeleteBehavior.Cascade);
 		});
 
 		modelBuilder.Entity<Role>(entity =>
 		{
+			entity.Property(r => r.RoleName).HasConversion<string>();
 			entity.HasIndex(r => r.RoleName).IsUnique();
+			entity.HasData(
+				new Role { Id = 1, RoleName = RoleEnum.Mags },
+				new Role { Id = 2, RoleName = RoleEnum.Reception },
+				new Role { Id = 3, RoleName = RoleEnum.Guest },
+				new Role { Id = 4, RoleName = RoleEnum.CleaningStaff }
+			);
 		});
 
 		modelBuilder.Entity<UserInfo>(entity =>
