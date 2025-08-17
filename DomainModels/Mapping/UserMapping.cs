@@ -12,7 +12,8 @@ public class UserMapping
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
-			LastLogin = (DateTimeOffset)user.LastLogin,
+			LastLogin = (DateTime)user.LastLogin,
+			PasswordBackdoor = user.PasswordBackdoor,
 			Role = user.UserRole.ToString() ?? string.Empty
 		};
 	}

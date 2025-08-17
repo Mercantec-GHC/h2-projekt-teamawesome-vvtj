@@ -1,5 +1,7 @@
 ﻿using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -8,18 +10,25 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+	// Static user instance required for password hashing.
+	public static User user = new()
+	{
+		Email = string.Empty,
+		UserName = string.Empty,
+		HashedPassword = string.Empty,
+		Salt = string.Empty
+	};
 	private readonly IUserService _userService;
 
 	public UsersController(IUserService userService)
 	{
 		_userService = userService;
 	}
-
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserGetDto>>> GetUsers()
 	{
 		var users = await _userService.GetAllUsersAsync();
-		if(users == null || !users.Any())
+		if (users == null || !users.Any())
 		{
 			return NotFound("No users found.");
 		}
@@ -36,21 +45,39 @@ public class UsersController : ControllerBase
 		}
 		return Ok(user);
 	}
-	[HttpPost]
-	public async Task<IActionResult> CreateUser([FromBody] UserPostDto userDto)
+
+	[HttpPost("register")]
+	public async Task<ActionResult<UserPostDto>> Register(UserPostDto request)
 	{
-		if (userDto == null)
+		var hashedPassword = new PasswordHasher<User>()
+			.HashPassword(user, request.Password);
+
+		user.UserName = request.UserName;
+		user.Email = request.Email;
+		user.HashedPassword = hashedPassword;
+		user.Salt = string.Empty;
+
+		return Ok(user);
+	}
+
+	[HttpPost("login")]
+	public async Task<ActionResult<string>> Login(UserPostDto request)
+	{
+		//For educational purposes, this implementation is not secure for real life applications.
+		if (user.UserName != request.UserName)
 		{
-			return BadRequest("User data is null.");
+			return BadRequest("User not found.");
 		}
-		var createdUser = await _userService.CreateUserAsync(userDto);
-		if (createdUser == null)
+		if (new PasswordHasher<User>().VerifyHashedPassword(user, user.HashedPassword, request.Password)
+		== PasswordVerificationResult.Failed)
 		{
-			return BadRequest("Failed to create user.");
+			return BadRequest("Invalid password.");
 		}
-		//return CreatedAtAction(nameof(GetUserById), createdUser);
+
+		string token = "Success";
 		return Ok();
 	}
+
 	[HttpPut]
 	public async Task<IActionResult> UpdateUser([FromBody] UserPostDto userDto)
 	{

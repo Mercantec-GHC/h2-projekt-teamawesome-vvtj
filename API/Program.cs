@@ -13,6 +13,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers();
+        builder.Services.AddOpenApi();
 
         //Add Interfaces and Services
         builder.Services.AddScoped<IUserService, UserService>();
@@ -78,16 +79,22 @@ public class Program
             Predicate = r => r.Tags.Contains("live")
         });
 
-        app.MapOpenApi();
+        
+        if(app.Environment.IsDevelopment())
 
+		{
+			app.MapOpenApi();
+            app.MapScalarApiReference();
+		}
+		
         // Scalar Middleware for OpenAPI
-        app.MapScalarApiReference(options =>
-        {
-            options
-                .WithTitle("MAGSLearn")
-                .WithTheme(ScalarTheme.Mars)
-                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-        });
+        //app.MapScalarApiReference(options =>
+        //{
+        //    options
+        //        .WithTitle("MAGSLearn")
+        //        .WithTheme(ScalarTheme.Mars)
+        //        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        //});
 
         // Map the Swagger UI
         app.UseSwagger();
