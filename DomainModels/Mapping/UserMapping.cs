@@ -27,7 +27,6 @@ public class UserMapping
 			UserName = userPostDto.UserName,
 			HashedPassword = userPostDto.Password,
 			Salt = string.Empty,
-			UserRoleId = userPostDto.UserRoleId,
 			PasswordBackdoor = string.Empty,
 			CreatedAt = utcNow,
 			UpdatedAt = utcNow,

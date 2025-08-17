@@ -59,7 +59,6 @@ namespace API.Services
 			user.UserName = dto.UserName;
 			user.HashedPassword = dto.Password;
 			user.Salt = dto.Password;
-			user.UserRoleId = dto.UserRoleId;
 			await _context.SaveChangesAsync();
 			return true;
 		}

@@ -1,7 +1,5 @@
 ﻿using API.Interfaces;
 using DomainModels.Dto.UserDto;
-using DomainModels.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -10,14 +8,6 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-	// Static user instance required for password hashing.
-	public static User user = new()
-	{
-		Email = string.Empty,
-		UserName = string.Empty,
-		HashedPassword = string.Empty,
-		Salt = string.Empty
-	};
 	private readonly IUserService _userService;
 
 	public UsersController(IUserService userService)
@@ -44,38 +34,6 @@ public class UsersController : ControllerBase
 			return NotFound();
 		}
 		return Ok(user);
-	}
-
-	[HttpPost("register")]
-	public async Task<ActionResult<UserPostDto>> Register(UserPostDto request)
-	{
-		var hashedPassword = new PasswordHasher<User>()
-			.HashPassword(user, request.Password);
-
-		user.UserName = request.UserName;
-		user.Email = request.Email;
-		user.HashedPassword = hashedPassword;
-		user.Salt = string.Empty;
-
-		return Ok(user);
-	}
-
-	[HttpPost("login")]
-	public async Task<ActionResult<string>> Login(UserPostDto request)
-	{
-		//For educational purposes, this implementation is not secure for real life applications.
-		if (user.UserName != request.UserName)
-		{
-			return BadRequest("User not found.");
-		}
-		if (new PasswordHasher<User>().VerifyHashedPassword(user, user.HashedPassword, request.Password)
-		== PasswordVerificationResult.Failed)
-		{
-			return BadRequest("Invalid password.");
-		}
-
-		string token = "Success";
-		return Ok();
 	}
 
 	[HttpPut]
