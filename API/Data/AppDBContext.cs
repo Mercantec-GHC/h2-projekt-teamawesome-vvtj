@@ -1,7 +1,6 @@
 ﻿using DomainModels.Enums;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace API.Data;
 public class AppDBContext : DbContext
@@ -27,8 +26,7 @@ public class AppDBContext : DbContext
 			entity.HasOne(u => u.UserRole)
 				.WithMany(r => r.Users)
         
-    
-    
+
 				.HasForeignKey(u => u.UserRoleId)
 				.OnDelete(DeleteBehavior.Cascade);
 		});

@@ -1,5 +1,6 @@
 ﻿using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -24,7 +25,7 @@ public class UsersController : ControllerBase
 		}
 		return Ok(users);
 	}
-
+	[Authorize(Roles = "Admin, MAGS")]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
 	{

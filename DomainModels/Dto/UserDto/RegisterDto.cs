@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DomainModels.Enums;
 
 namespace DomainModels.Dto.UserDto;
 
@@ -28,4 +29,9 @@ public class RegisterDto
 	[Compare(nameof(Password), ErrorMessage = "Password doesn't match")]
 	[Display(Name = "Confirm password")]
 	public string ConfirmPassword { get; set; } = string.Empty;
+
+	[Required(ErrorMessage = "Role is required")]
+	[Display(Name = "Role")]
+	
+	public RoleEnum role { get; set; } 
 }
