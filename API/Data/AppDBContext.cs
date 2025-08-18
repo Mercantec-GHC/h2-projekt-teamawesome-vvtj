@@ -25,8 +25,6 @@ public class AppDBContext : DbContext
 			entity.HasIndex(u => u.UserName).IsUnique();
 			entity.HasOne(u => u.UserRole)
 				.WithMany(r => r.Users)
-        
-
 				.HasForeignKey(u => u.UserRoleId)
 				.OnDelete(DeleteBehavior.Cascade);
 		});
