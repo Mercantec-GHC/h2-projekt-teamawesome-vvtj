@@ -38,7 +38,8 @@ public class AppDBContext : DbContext
 			entity.Property(r => r.RoleName).HasConversion<string>();
 			entity.HasIndex(r => r.RoleName).IsUnique();
 			entity.HasData(
-				new Role { Id = 1, RoleName = RoleEnum.Mags },
+				new Role { Id = 0, RoleName = RoleEnum.Unknown }, 
+				new Role { Id = 1, RoleName = RoleEnum.Admin },
 				new Role { Id = 2, RoleName = RoleEnum.Reception },
 				new Role { Id = 3, RoleName = RoleEnum.Guest },
 				new Role { Id = 4, RoleName = RoleEnum.CleaningStaff }
