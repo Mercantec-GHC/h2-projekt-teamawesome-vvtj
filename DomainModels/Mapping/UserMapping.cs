@@ -1,4 +1,5 @@
 ﻿using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 using DomainModels.Models;
 
 namespace DomainModels.Mapping;
@@ -12,9 +13,9 @@ public class UserMapping
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
-			LastLogin = (DateTimeOffset)user.LastLogin,
-			Role = user.UserRole != null ? user.UserRole.RoleName : 0
-		};
+			LastLogin = (DateTimeOffset?)user.LastLogin,
+			Role = user.UserRole != null ? user.UserRole.RoleName : RoleEnum.Unknown
+        };
 	}
 
 	public User ToUserFromDto(UserPostDto userPostDto)
