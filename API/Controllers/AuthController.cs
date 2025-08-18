@@ -15,7 +15,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService, AppDBContext _context  /*IConfiguration configuration*/) : ControllerBase
+public class AuthController(IAuthService authService /*IConfiguration configuration*/) : ControllerBase
 {
 	//The first part of the code(everything commented in) is to test the authentication without a database.
 	//For learning purposes, I decided to leave both options with and without sending data to a database.
@@ -92,6 +92,7 @@ public class AuthController(IAuthService authService, AppDBContext _context  /*I
 	//*********************TESTING CODE WITHOUT A DATABASE ENDS HERE*********************
 	//--------------------------------------------------------------------------------------
 
+	private readonly AppDBContext _context;
 
 	[HttpPost("register")]
 	public async Task<ActionResult<RegisterDto>> Register(RegisterDto request)
@@ -104,6 +105,7 @@ public class AuthController(IAuthService authService, AppDBContext _context  /*I
 
 		return Ok(user);
 	}
+
 	[HttpPost("login")]
 	public async Task<ActionResult<string>> Login(LoginDto request)
 	{
@@ -118,28 +120,28 @@ public class AuthController(IAuthService authService, AppDBContext _context  /*I
 
 	//Can't test it without a database...
 
-	//[Authorize]
-	//[HttpGet("/me")]
-	//	public IActionResult GetCurrentUser()
-	//{
-	//	var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	[Authorize]
+	[HttpGet("/me")]
+	public IActionResult GetCurrentUser()
+	{
+		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-	//	if (userId == null)
-	//		return Unauthorized("Bruger-ID ikke fundet i token.");
+		if (userId == null)
+			return Unauthorized("Bruger-ID ikke fundet i token.");
 
-	//	// 2. Slå brugeren op i databasen
-	//	var user = _context.Users
-	//		.FirstOrDefault(u => u.Id.ToString() == userId);
+		// 2. Slå brugeren op i databasen
+		var user = _context.Users
+			.FirstOrDefault(u => u.Id.ToString() == userId);
 
-	//	if (user == null)
-	//		return NotFound("Brugeren blev ikke fundet i databasen.");
+		if (user == null)
+			return NotFound("Brugeren blev ikke fundet i databasen.");
 
-	//	// 3. Returnér ønskede data - fx til profilsiden
-	//	return Ok(new
-	//	{
-	//		Id = user.Id,
-	//		Email = user.Email,
-	//		CreatedAt = user.CreatedAt
-	//	});
-	//}
+		// 3. Returnér ønskede data - fx til profilsiden
+		return Ok(new
+		{
+			Id = user.Id,
+			Email = user.Email,
+			CreatedAt = user.CreatedAt
+		});
+	}
 }
