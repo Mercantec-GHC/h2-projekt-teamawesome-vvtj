@@ -13,7 +13,7 @@ public class UserMapping
 			Email = user.Email,
 			UserName = user.UserName,
 			LastLogin = (DateTimeOffset)user.LastLogin,
-			Role = user.UserRole.ToString() ?? string.Empty
+			Role = user.UserRole != null ? user.UserRole.RoleName : 0
 		};
 	}
 
