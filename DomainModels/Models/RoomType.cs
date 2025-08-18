@@ -12,5 +12,6 @@ namespace DomainModels.Models
         public decimal PricePerNight { get; set; }
         public int MaxCapacity { get; set; }
         public string? Description { get; set; }
+        public double? PricePerNight { get; set; }
     }
 }

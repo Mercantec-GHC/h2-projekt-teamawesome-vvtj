@@ -17,6 +17,8 @@ public class Program
         //Add Interfaces and Services
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IRoleService, RoleService>();
+        builder.Services.AddScoped<RoomService>();
+        builder.Services.AddScoped<RoomTypeService>();
         builder.Services.AddScoped<ICleaningService, CleaningService>();
 
 

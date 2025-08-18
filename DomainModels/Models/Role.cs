@@ -1,6 +1,9 @@
-﻿namespace DomainModels.Models;
-public class Role : Common
+﻿using DomainModels.Enums;
+
+namespace DomainModels.Models;
+public class Role
 {
-	public required string? RoleName { get; set; }
+	public int Id { get; set; }
+	public RoleEnum RoleName { get; set; }
 	public ICollection<User> Users { get; set; } = new List<User>();
 }

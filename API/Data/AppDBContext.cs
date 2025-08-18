@@ -1,4 +1,5 @@
-﻿using DomainModels.Models;
+﻿using DomainModels.Enums;
+using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -17,25 +18,30 @@ public class AppDBContext : DbContext
     public DbSet<RoomType> RoomTypes { get; set; }
     public DbSet<Hotel> Hotels { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasIndex(u => u.Email).IsUnique();
-            entity.HasIndex(u => u.UserName).IsUnique();
-            entity.HasOne(u => u.UserRole)
-                .WithMany(r => r.Users)
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+		modelBuilder.Entity<User>(entity =>
+		{
+			entity.HasIndex(u => u.Email).IsUnique();
+			entity.HasIndex(u => u.UserName).IsUnique();
+			entity.HasOne(u => u.UserRole)
+				.WithMany(r => r.Users)
+				.HasForeignKey(u => u.UserRoleId)
+				.OnDelete(DeleteBehavior.Cascade);
+		});
 
-
-
-                .HasForeignKey(u => u.UserRoleId)
-                .OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasIndex(r => r.RoleName).IsUnique();
-        });
+		modelBuilder.Entity<Role>(entity =>
+		{
+			entity.Property(r => r.RoleName).HasConversion<string>();
+			entity.HasIndex(r => r.RoleName).IsUnique();
+			entity.HasData(
+				new Role { Id = 1, RoleName = RoleEnum.Unknown }, 
+				new Role { Id = 2, RoleName = RoleEnum.Admin },
+				new Role { Id = 3, RoleName = RoleEnum.Reception },
+				new Role { Id = 4, RoleName = RoleEnum.Guest },
+				new Role { Id = 5, RoleName = RoleEnum.CleaningStaff }
+			);
+		});
 
         modelBuilder.Entity<UserInfo>(entity =>
         {
