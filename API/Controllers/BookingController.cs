@@ -2,7 +2,7 @@
 using API.Interfaces;
 using DomainModels;
 using DomainModels.Dto;
-using DomainModels.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,8 +13,8 @@ namespace API.Controllers;
 
 public class BookingController : ControllerBase
 {
-    private readonly IBookingInterface _bookingService;
-    public BookingController(IBookingInterface bookingService)
+    private readonly IBookingService _bookingService;
+    public BookingController(IBookingService bookingService)
     {
         _bookingService = bookingService;
     }
@@ -22,10 +22,13 @@ public class BookingController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateBooking( Booking booking)
+    public async Task<BookingDto> CreateBooking(BookingDto bookingDto)
     {
         
-        return await _bookingService.CreateBooking(booking);
+        if (bookingDto == null)
+            throw new ArgumentNullException(nameof(bookingDto), "Booking data is required.");
+        var created = await _bookingService.CreateBooking(bookingDto); 
+        return created;
     }
 
     [HttpGet]
@@ -54,7 +57,14 @@ public class BookingController : ControllerBase
     public async Task<IActionResult> DeleteBooking(int id)
     {
         var success = await _bookingService.DeleteBookingById(id);
-        
-        return NoContent(); // 204 success
+
+        return success ? NoContent() : NotFound(); // 204 success
+    }
+
+    [HttpGet("hotel/{hotelId}")]
+    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByHotel(int hotelId)
+    {
+        var bookings = await _bookingService.GetBookingByHotel(hotelId);
+        return Ok(bookings);
     }
 }

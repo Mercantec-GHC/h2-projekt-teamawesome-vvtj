@@ -4,14 +4,13 @@ using DomainModels.Models;
 using DomainModels.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Grpc.Core;
-using DomainModels.Models;
+
 
 
 namespace API.Services
 {
 
-    public class BookingService : IBookingInterface
+    public class BookingService : IBookingService
     {
         private readonly AppDBContext _dbContext;
         public BookingService(AppDBContext context)
@@ -21,48 +20,78 @@ namespace API.Services
 
 
 
-        public async Task<IActionResult> CreateBooking(Booking booking)
+        public async Task<BookingDto> CreateBooking(BookingDto bookingDto)
         {
-            if (booking == null)
-            {
-                return new BadRequestObjectResult("User data is required.");
-            }
+            if (bookingDto == null)
+                throw new ArgumentNullException(nameof(bookingDto), "User data is required.");
 
-            booking.Id = 0;
 
-            booking.NightsCount = (int)(booking.CheckOut.Date - booking.CheckIn.Date).TotalDays;
+            //  bookingDto.Id = 0;
 
+            bookingDto.NightsCount = (int)(bookingDto.CheckOut.Date - bookingDto.CheckIn.Date).TotalDays;
+
+
+
+
+            var room = await _dbContext.Rooms
+      .Include(r => r.RoomType)
+      .Include(r => r.Hotel)
+      .FirstOrDefaultAsync(r => r.Id == bookingDto.RoomId);
+
+            if (room == null)
+                throw new InvalidOperationException("Room not found.");
+
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == bookingDto.UserId);
+
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
+
+            var pricePerNight = room.RoomType?.PricePerNight ?? 0m;     // decimal
+            var total = (double)pricePerNight * bookingDto.NightsCount;
             var newBooking = new Booking
             {
-                RoomId = booking.RoomId,
-                UserId = booking.UserId,
-                CheckIn = booking.CheckIn,
-                CheckOut = booking.CheckOut,
-                NightsCount = booking.NightsCount,
-                GuestsCount = booking.GuestsCount,
-                IsPaid = booking.IsPaid,
-                Payment = booking.Payment,
+                RoomId = bookingDto.RoomId,
+                UserId = bookingDto.UserId,
+                CheckIn = bookingDto.CheckIn,
+                CheckOut = bookingDto.CheckOut,
+                NightsCount = bookingDto.NightsCount,
+                GuestsCount = bookingDto.GuestsCount,
+                TotalPrice = total,
+                IsPaid = bookingDto.IsPaid,
+                Payment = bookingDto.Payment
             };
 
-            try
-            {
-                _dbContext.Bookings.Add(booking);
-                await _dbContext.SaveChangesAsync();
-               
-                await _dbContext.Entry(booking).Reference(b => b.User).LoadAsync();
 
-                return new OkObjectResult("Booking created successfully.");
-            }
-            catch (Exception ex)
+            _dbContext.Bookings.Add(newBooking);
+            await _dbContext.SaveChangesAsync();
+
+            return new BookingDto
+
             {
-                return new ObjectResult($"Internal server error: {ex.Message}") { StatusCode = 500 };
-            }
+                Id = newBooking.Id,
+                UserId = user.Id,
+                UserName = user.UserName,
+                RoomId = room.Id,
+                RoomType = room.RoomType?.TypeofRoom ?? string.Empty,
+                HotelId = room.HotelId,
+                HotelName = room.Hotel.HotelName,
+                CheckIn = newBooking.CheckIn,
+                CheckOut = newBooking.CheckOut,
+                NightsCount = newBooking.NightsCount,
+                GuestsCount = newBooking.GuestsCount,
+                TotalPrice = newBooking.TotalPrice
+            };
+
+
+
+
         }
 
         public async Task<IEnumerable<BookingDto>> GetAllBookings()
         {
             // TODO:to make yhis available only for admin-role
-            var bookingsdb = await _dbContext.Bookings.ToListAsync(); 
+            var bookingsdb = await _dbContext.Bookings.ToListAsync();
 
             var bookings = await _dbContext.Bookings
                 .Select(b => new BookingDto
@@ -103,7 +132,7 @@ namespace API.Services
         public async Task<BookingDto?> UpdateBooking(int bookingId, BookingDto dto)
         {
             var booking = await _dbContext.Bookings.FindAsync(bookingId);
-          
+
 
             if (booking == null)
                 return null;
@@ -111,11 +140,11 @@ namespace API.Services
             // TODO: check role (user, who booked, or admin, or receptionist)
             booking.NightsCount = dto.NightsCount;
             booking.GuestsCount = dto.GuestsCount;
-           // booking.PriceForNight = dto.PriceForNight; //does not exist in the db
+            // booking.PriceForNight = dto.PriceForNight; //does not exist in the db
 
-            await _dbContext.SaveChangesAsync(); 
+            await _dbContext.SaveChangesAsync();
 
-           
+
             return new BookingDto
             {
                 Id = booking.Id,
@@ -123,16 +152,16 @@ namespace API.Services
                 RoomId = booking.RoomId,
                 NightsCount = booking.NightsCount,
                 GuestsCount = booking.GuestsCount,
-           //     PriceForNight = booking.PriceForNight,
+                //     PriceForNight = booking.PriceForNight,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
-                 
-    };
+
+            };
         }
         public async Task<bool> DeleteBookingById(int id)
         {
             var booking = await _dbContext.Bookings.FindAsync(id);
-           
+
             // TODO: check admin-role, or maybe user, who made booking
             _dbContext.Bookings.Remove(booking);
             await _dbContext.SaveChangesAsync();// not sure, if it nessesary
@@ -140,21 +169,22 @@ namespace API.Services
         }
 
 
-        //public async Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId)
-        //{
-        //    var hotelBookings = await _dbContext.Bookings
-        //        .Include(b => b.RoomId) // took Room to get HotelId there
-        //        .Where(b => b.RoomId.HotelId == hotelId)
-        //        .Select(b => new BookingDto
-        //        {
-        //            Id = b.Id,
-        //            UserId = b.UserId,
-        //            RoomId = b.RoomId,
-        //            NightsCount = b.NightsCount,
+        public async Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId)
+        {
+            var hotelBookings = await _dbContext.Bookings
+                .Include(b => b.RoomId) // took Room to get HotelId there
+                .Where(b => b.Room.HotelId == hotelId)
+                .Select(b => new BookingDto
+                {
+                    Id = b.Id,
+                    UserId = b.UserId,
+                    RoomId = b.RoomId,
+                    CheckIn = b.CheckIn,
+                    CheckOut = b.CheckOut,
 
-        //        })
-        //        .ToListAsync();
-        //    return hotelBookings;
-        //}
+                })
+                .ToListAsync();
+            return hotelBookings;
+        }
     }
 }

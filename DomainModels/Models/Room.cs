@@ -17,9 +17,12 @@ namespace DomainModels.Models
         [ForeignKey("TypeId")]
         public RoomType RoomType { get; set; }
 
+
         public int HotelId { get; set; }
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; }
         public DateTime? LastCleaned { get; set; }
-	}
+
+        public List<Booking> Bookings { get; set; } = new();
+    }
 }
