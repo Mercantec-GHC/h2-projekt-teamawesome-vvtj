@@ -2,8 +2,9 @@
 
 public enum RoleEnum
 {
-	Mags = 1,
-	Reception = 2,
-	Guest = 3,
-	CleaningStaff = 4,
+	Unknown = 1,
+	Admin = 2,
+	Reception = 3,
+	Guest = 4,
+	CleaningStaff = 5
 }

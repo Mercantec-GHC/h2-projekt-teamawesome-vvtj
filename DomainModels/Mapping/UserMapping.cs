@@ -12,6 +12,8 @@ public class UserMapping
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
+			LastLogin = (DateTimeOffset)user.LastLogin,
+			Role = user.UserRole != null ? user.UserRole.RoleName : 0
 			LastLogin = (DateTime)user.LastLogin,
 			PasswordBackdoor = user.PasswordBackdoor,
 			Role = user.UserRole.ToString() ?? string.Empty
