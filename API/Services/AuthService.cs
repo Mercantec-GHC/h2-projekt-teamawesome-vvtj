@@ -65,7 +65,7 @@ public class AuthService(AppDBContext context, IConfiguration configuration) : I
 		{
 			new Claim(ClaimTypes.Email, user.Email),
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-			new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString())
+			//new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString())
 		};
 
 		var key = new SymmetricSecurityKey(

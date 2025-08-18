@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 using DomainModels.Mapping;
 using Microsoft.EntityFrameworkCore;
 
@@ -55,10 +56,10 @@ namespace API.Services
 			{
 				return false;
 			}
-			user.Email = dto.Email;
-			user.UserName = dto.UserName;
-			user.HashedPassword = dto.Password;
-			user.Salt = dto.Password;
+			user.Email = !string.IsNullOrEmpty(dto.Email) ? dto.Email : user.Email;
+			user.UserName = !string.IsNullOrEmpty(dto.UserName) ? dto.UserName : user.UserName;
+			user.HashedPassword = !string.IsNullOrEmpty(dto.NewPassword) ? dto.NewPassword : user.HashedPassword;
+			user.UserRoleId = dto.UserRole != null ? (int)dto.UserRole : (int)RoleEnum.Unknown;
 			await _context.SaveChangesAsync();
 			return true;
 		}

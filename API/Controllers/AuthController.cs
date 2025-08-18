@@ -120,7 +120,7 @@ public class AuthController(IAuthService authService /*IConfiguration configurat
 
 	//Can't test it without a database...
 
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("/me")]
 	public IActionResult GetCurrentUser()
 	{

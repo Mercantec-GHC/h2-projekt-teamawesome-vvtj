@@ -25,7 +25,7 @@ public class UsersController : ControllerBase
 		}
 		return Ok(users);
 	}
-	[Authorize(Roles = "Admin, MAGS")]
+	
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
 	{
