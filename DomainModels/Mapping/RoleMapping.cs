@@ -10,7 +10,7 @@ public class RoleMapping
 		return new RoleDto
 		{
 			Id = role.Id,
-			RoleName = role.RoleName.ToString()
+			RoleName = role.RoleName
 		};
 	}
 }

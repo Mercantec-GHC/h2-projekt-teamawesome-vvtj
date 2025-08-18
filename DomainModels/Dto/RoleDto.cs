@@ -1,7 +1,9 @@
-﻿namespace DomainModels.Dto;
+﻿using DomainModels.Enums;
+
+namespace DomainModels.Dto;
 
 public class RoleDto
 {
 	public int Id { get; set; }
-	public string RoleName { get; set; } = string.Empty;
+	public RoleEnum RoleName { get; set; } 
 }
