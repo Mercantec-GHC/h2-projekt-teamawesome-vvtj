@@ -23,7 +23,7 @@ namespace DomainModels.Dto
         public DateTime CheckOut { get; set; }
         public int NightsCount { get; set; }
         public int GuestsCount { get; set; }
-        public double TotalPrice { get; set; }
+        public decimal? TotalPrice { get; set; }
 
         public string? Payment { get; set; }
         public bool IsPaid { get; set; }

@@ -18,19 +18,15 @@ namespace API.Services
             _dbContext = context;
         }
 
-
-
         public async Task<BookingDto> CreateBooking(BookingDto bookingDto)
         {
             if (bookingDto == null)
                 throw new ArgumentNullException(nameof(bookingDto), "User data is required.");
 
 
-            //  bookingDto.Id = 0;
-
-            bookingDto.NightsCount = (int)(bookingDto.CheckOut.Date - bookingDto.CheckIn.Date).TotalDays;
-
-
+            var nights = (bookingDto.CheckOut.Date - bookingDto.CheckIn.Date).Days;
+            if (nights <= 0)
+                throw new InvalidOperationException("Check-out must be after check-in.");
 
 
             var room = await _dbContext.Rooms
@@ -47,8 +43,15 @@ namespace API.Services
             if (user == null)
                 throw new InvalidOperationException("User not found.");
 
-            var pricePerNight = room.RoomType?.PricePerNight ?? 0m;     // decimal
-            var total = (double)pricePerNight * bookingDto.NightsCount;
+            var rt = room.RoomType ?? throw new InvalidOperationException("Room type not found.");
+            if (bookingDto.CheckIn.Date < DateTime.UtcNow.Date)
+                throw new InvalidOperationException("Check-in date cannot be in the past.");
+
+            var guests = bookingDto.GuestsCount > 0 ? bookingDto.GuestsCount : 1;
+            
+            decimal pricePerNight = (decimal)room.RoomType!.PricePerNight;
+            decimal total = pricePerNight * bookingDto.NightsCount;
+            
             var newBooking = new Booking
             {
                 RoomId = bookingDto.RoomId,
@@ -60,6 +63,7 @@ namespace API.Services
                 TotalPrice = total,
                 IsPaid = bookingDto.IsPaid,
                 Payment = bookingDto.Payment
+                
             };
 
 
@@ -78,35 +82,34 @@ namespace API.Services
                 HotelName = room.Hotel.HotelName,
                 CheckIn = newBooking.CheckIn,
                 CheckOut = newBooking.CheckOut,
-                NightsCount = newBooking.NightsCount,
-                GuestsCount = newBooking.GuestsCount,
-                TotalPrice = newBooking.TotalPrice
+               
+                TotalPrice = (decimal)newBooking.TotalPrice,
             };
-
-
-
 
         }
 
-        public async Task<IEnumerable<BookingDto>> GetAllBookings()
+        public async Task<IEnumerable<GetBookingsDto>> GetAllBookings()
         {
             // TODO:to make yhis available only for admin-role
-            var bookingsdb = await _dbContext.Bookings.ToListAsync();
-
+            
             var bookings = await _dbContext.Bookings
-                .Select(b => new BookingDto
+                .Select(b => new GetBookingsDto
                 {
                     Id = b.Id,
                     UserId = b.UserId,
+                    UserName = b.User.UserName,
                     RoomId = b.RoomId,
+                    RoomType = b.Room.RoomType.TypeofRoom,
+                    HotelId = b.Room.HotelId,
+                    HotelName = b.Room.Hotel.HotelName,
                     CheckIn = b.CheckIn,
-                    CheckOut = b.CheckOut,
-
+                    CheckOut = b.CheckOut
                 })
-
                 .ToListAsync();
+
             return bookings;
         }
+        
 
         public async Task<IEnumerable<BookingDto>> GetBookingByUser(int userId)
         {
@@ -136,11 +139,22 @@ namespace API.Services
 
             if (booking == null)
                 return null;
+            booking.NightsCount = (int)(booking.CheckOut.Date - booking.CheckIn.Date).TotalDays;
+
+
+
+
+            var room = await _dbContext.Rooms
+      .Include(r => r.RoomType)
+      .Include(r => r.Hotel)
+      .FirstOrDefaultAsync(r => r.Id == booking.RoomId);
 
             // TODO: check role (user, who booked, or admin, or receptionist)
-            booking.NightsCount = dto.NightsCount;
+            booking.CheckIn = dto.CheckIn;
+            booking.CheckOut = dto.CheckOut;
             booking.GuestsCount = dto.GuestsCount;
-            // booking.PriceForNight = dto.PriceForNight; //does not exist in the db
+            decimal pricePerNight = (decimal)room.RoomType!.PricePerNight;
+            decimal total = pricePerNight * booking.NightsCount;
 
             await _dbContext.SaveChangesAsync();
 
@@ -149,42 +163,53 @@ namespace API.Services
             {
                 Id = booking.Id,
                 UserId = booking.UserId,
-                RoomId = booking.RoomId,
+                RoomId = booking.RoomId, 
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut, 
                 NightsCount = booking.NightsCount,
                 GuestsCount = booking.GuestsCount,
-                //     PriceForNight = booking.PriceForNight,
-                CheckIn = booking.CheckIn,
-                CheckOut = booking.CheckOut,
-
+               
             };
-        }
-        public async Task<bool> DeleteBookingById(int id)
-        {
-            var booking = await _dbContext.Bookings.FindAsync(id);
-
-            // TODO: check admin-role, or maybe user, who made booking
-            _dbContext.Bookings.Remove(booking);
-            await _dbContext.SaveChangesAsync();// not sure, if it nessesary
-            return true;
-        }
-
-
+        } 
         public async Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId)
         {
-            var hotelBookings = await _dbContext.Bookings
-                .Include(b => b.RoomId) // took Room to get HotelId there
-                .Where(b => b.Room.HotelId == hotelId)
+            
+         var today = DateTime.UtcNow.Date; 
+
+            var query = _dbContext.Bookings
+                .Where(b => b.Room.HotelId == hotelId
+                            && b.CheckOut.Date > today) 
                 .Select(b => new BookingDto
                 {
-                    Id = b.Id,
-                    UserId = b.UserId,
-                    RoomId = b.RoomId,
-                    CheckIn = b.CheckIn,
-                    CheckOut = b.CheckOut,
+            Id = b.Id,
+            UserId = b.UserId,
+            IsPaid = b.IsPaid,
+            UserName = b.User.UserName,
+             RoomId = b.RoomId,
+             CheckIn = b.CheckIn,
+            CheckOut = b.CheckOut,
+            GuestsCount = b.GuestsCount,
+            HotelId = b.Room.HotelId,
+            HotelName = b.Room.Hotel.HotelName,
+            RoomType = b.Room.RoomType.TypeofRoom,
+           
+        })
+        .AsNoTracking();
 
-                })
-                .ToListAsync();
-            return hotelBookings;
+            return await query.ToListAsync();
+           
         }
+
+    
+        public async Task<bool> DeleteBookingById(int id) 
+        {
+            var affected = await _dbContext.Bookings
+        .Where(b => b.Id == id)
+        .ExecuteDeleteAsync();   //Deletes directly in the database with a single SQL statement, without creating an entity
+
+            return affected > 0;
+        }
+
+      
     }
 }

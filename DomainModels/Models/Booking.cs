@@ -14,7 +14,7 @@ public class Booking
     public required DateTime CheckOut { get; set; }
     public int NightsCount { get; set; } = 1;
     public int GuestsCount { get; set; } = 1;
-    public double? TotalPrice { get; set; }
+    public decimal TotalPrice { get; set; }
     public string? Payment { get; set; } = default!;
     public bool IsPaid { get; set; }
     public int UserId { get; set; }

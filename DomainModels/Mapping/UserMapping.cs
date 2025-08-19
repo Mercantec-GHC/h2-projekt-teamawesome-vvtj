@@ -26,8 +26,15 @@ public class UserMapping
 		{
 			Email = userPostDto.Email,
 			UserName = userPostDto.UserName,
+<<<<<<< Updated upstream
 			HashedPassword = userPostDto.NewPassword,
 			UserRoleId = (int)RoleEnum.Unknown,
+=======
+			HashedPassword = userPostDto.Password,
+			Salt = string.Empty,
+			UserRoleId = userPostDto.UserRoleId,
+			//PasswordBackdoor = string.Empty,
+>>>>>>> Stashed changes
 			CreatedAt = utcNow,
 			UpdatedAt = utcNow,
 			LastLogin = utcNow,

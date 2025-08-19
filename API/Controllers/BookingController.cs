@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
-
+/// <summary>
+/// Controller til håndtering af booking-relaterede operationer.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 
@@ -20,7 +22,10 @@ public class BookingController : ControllerBase
     }
 
 
-
+    /// <summary>
+    /// Create a new booking.
+    /// </summary>
+    /// <returns>En liste af brugere.</returns>
     [HttpPost]
     public async Task<BookingDto> CreateBooking(BookingDto bookingDto)
     {
@@ -30,14 +35,26 @@ public class BookingController : ControllerBase
         var created = await _bookingService.CreateBooking(bookingDto); 
         return created;
     }
-
+    /// <summary>
+    /// Get all bookings from the system. Only available to administrators and receptionists.
+    /// </summary>
+    /// <returns>A list of all bookings with user and room information, check-in and out.</returns>
+    /// /// TODO: 
+    /// <response code="200">Bookingerne blev hentet succesfuldt.</response>
+    /// <response code="401">Ikke autoriseret - manglende eller ugyldig token.</response>
+    /// <response code="403">Forbudt - kun administratorer har adgang.</response>
+    /// <response code="500">Der opstod en intern serverfejl.</response>
+    //[Authorize(Roles = "Admin", "Receptionist")]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BookingDto>>> GetAllBookings()
+    public async Task<ActionResult<IEnumerable<GetBookingsDto>>> GetAllBookings()
     {
         var bookings = await _bookingService.GetAllBookings();
         return Ok(bookings);
     }
-
+    /// <summary>
+    /// Gets all bookings of a user by user´s ID. Only available to administrators.
+    /// </summary>
+     //[Authorize(Roles = "Admin")]
     [HttpGet("user")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
     {
@@ -45,6 +62,11 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
 
+    /// <summary>
+    /// Allow to change check-in/out dates, amount of guests. Available to administrators, receptionists.
+    /// </summary>
+    /// <returns>An updated booking with new NightsCount, GuestsCount and TotalPrice.</returns>
+     //[Authorize(Roles = "Admin", "Reciptionist")]
     [HttpPut]
     public async Task<ActionResult<BookingDto>> UpdateBooking(int bookingId, BookingDto dto)
     {
@@ -52,7 +74,16 @@ public class BookingController : ControllerBase
        
         return Ok(updated);
     }
-
+    /// <summary>
+    /// Delete a booking from a system.
+    /// </summary>
+    /// <param name="id">ID should be deleted.</param>
+    /// <returns>Confirmation of deletion.</returns>
+      /// <response code="204">Bookingen blev slettet succesfuldt.</response>
+    /// <response code="401">Ikke autoriseret - manglende eller ugyldig token.</response>
+    /// <response code="403">Forbudt - kan kun slette egne bookinger.</response>
+    /// <response code="404">Booking med det angivne ID blev ikke fundet.</response>
+    /// <response code="500">Der opstod en intern serverfejl.</response>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBooking(int id)
     {
@@ -60,7 +91,10 @@ public class BookingController : ControllerBase
 
         return success ? NoContent() : NotFound(); // 204 success
     }
-
+    /// Gets all of current or future hotel´s booking. Available to administrators, receptionists.
+    /// </summary>
+    /// <returns>A list of bookings</returns>
+    //[Authorize(Roles = "Admin", "Reciptionist")]
     [HttpGet("hotel/{hotelId}")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByHotel(int hotelId)
     {

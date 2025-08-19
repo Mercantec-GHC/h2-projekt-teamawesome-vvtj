@@ -9,9 +9,9 @@ namespace DomainModels.Models
         public int Id { get; set; }
         public required string TypeofRoom { get; set; }
 
-        public decimal PricePerNight { get; set; }
+        public double PricePerNight { get; set; }// = 100.0;
         public int MaxCapacity { get; set; }
         public string? Description { get; set; }
-        public double? PricePerNight { get; set; }
+        
     }
 }
