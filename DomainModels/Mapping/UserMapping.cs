@@ -14,8 +14,8 @@ public class UserMapping
 			Email = user.Email,
 			UserName = user.UserName,
 			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
-			PasswordBackdoor = user.HashedPassword != null ? user.HashedPassword : string.Empty,
-			UserRoleId = user.UserRoleId 
+			PasswordBackdoor = user.PasswordBackdoor ?? string.Empty,
+			UserRoleId = user.UserRoleId
 		};
 	}
 

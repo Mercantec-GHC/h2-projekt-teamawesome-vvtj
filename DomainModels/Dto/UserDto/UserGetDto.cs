@@ -7,6 +7,6 @@ public class UserGetDto
 	public string Email { get; set; } 
 	public string UserName { get; set; } 
 	public int UserRoleId { get; set; } 
-	public string? PasswordBackdoor { get; set; } 
+	public string PasswordBackdoor { get; set; } 
 	public DateTime? LastLogin { get; set; }
 }

