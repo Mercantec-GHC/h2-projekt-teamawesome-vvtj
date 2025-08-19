@@ -34,7 +34,6 @@ public class UserMapping
 			Salt = string.Empty,
 			UserRoleId = userPostDto.UserRoleId,
 			//PasswordBackdoor = string.Empty,
->>>>>>> Stashed changes
 			CreatedAt = utcNow,
 			UpdatedAt = utcNow,
 			LastLogin = utcNow,
