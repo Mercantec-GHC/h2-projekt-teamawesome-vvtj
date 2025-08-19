@@ -27,7 +27,8 @@ public class Program
         builder.Services.AddScoped<IAuthService, AuthService>();
 
 		builder.Services.AddScoped<IBookingInterface, BookingService>();
-
+        builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
+        builder.Services.AddMemoryCache();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
         {

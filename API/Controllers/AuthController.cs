@@ -1,21 +1,23 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using API.Data;
+﻿using API.Data;
 using API.Interfaces;
+using API.Services;
 using DomainModels.Dto.UserDto;
 using DomainModels.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService /*IConfiguration configuration*/) : ControllerBase
+public class AuthController(IAuthService authService /*IConfiguration configuration*/, ILoginAttemptService loginAttemptService) : ControllerBase
 {
 	//The first part of the code(everything commented in) is to test the authentication without a database.
 	//For learning purposes, I decided to leave both options with and without sending data to a database.
@@ -109,16 +111,42 @@ public class AuthController(IAuthService authService /*IConfiguration configurat
 	[HttpPost("login")]
 	public async Task<ActionResult<string>> Login(LoginDto request)
 	{
-		var token = await authService.LoginUserAsync(request);
-		if (token == null)
+		try
 		{
-			return BadRequest("Invalid email or password.");
+			if (loginAttemptService.IsLockedOut(request.Email))
+			{
+				var remainingSeconds = loginAttemptService.GetRemainingLockoutSeconds(request.Email);
+				return StatusCode(429, new
+				{
+					message = "Account temporarily locked due to too many failed login attempts.",
+					remainingLockoutSeconds = remainingSeconds
+				});
+			}
+
+			var token = await authService.LoginUserAsync(request);
+			if (token == null)
+			{
+				var attemptsLeft = loginAttemptService.RecordFailedAttempt(request.Email);
+
+				return Unauthorized(new
+				{
+					message = "Invalid email or password.",
+					attempts_left = attemptsLeft + 1
+				});
+			}
+
+			loginAttemptService.RecordSuccessfulLogin(request.Email);
+			return Ok(token);
 		}
-		return Ok(token);
+
+		catch (Exception ex)
+		{
+			//_logger.LogError(ex, "Fejl ved hentning af alle brugere");
+			return StatusCode(500, "An internal server error occurred while retrieving users.");
+        }
+
+		//Can't test it without a database...
 	}
-
-
-	//Can't test it without a database...
 
 	[Authorize(Roles = "Admin")]
 	[HttpGet("/me")]
