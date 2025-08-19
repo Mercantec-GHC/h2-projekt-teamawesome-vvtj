@@ -1,5 +1,6 @@
 ﻿using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -14,18 +15,17 @@ public class UsersController : ControllerBase
 	{
 		_userService = userService;
 	}
-
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserGetDto>>> GetUsers()
 	{
 		var users = await _userService.GetAllUsersAsync();
-		if(users == null || !users.Any())
+		if (users == null || !users.Any())
 		{
 			return NotFound("No users found.");
 		}
 		return Ok(users);
 	}
-
+	
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
 	{
@@ -36,21 +36,7 @@ public class UsersController : ControllerBase
 		}
 		return Ok(user);
 	}
-	[HttpPost]
-	public async Task<IActionResult> CreateUser([FromBody] UserPostDto userDto)
-	{
-		if (userDto == null)
-		{
-			return BadRequest("User data is null.");
-		}
-		var createdUser = await _userService.CreateUserAsync(userDto);
-		if (createdUser == null)
-		{
-			return BadRequest("Failed to create user.");
-		}
-		//return CreatedAtAction(nameof(GetUserById), createdUser);
-		return Ok();
-	}
+
 	[HttpPut]
 	public async Task<IActionResult> UpdateUser([FromBody] UserPostDto userDto)
 	{
