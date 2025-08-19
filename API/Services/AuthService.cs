@@ -15,25 +15,21 @@ public class AuthService(AppDBContext context, IConfiguration configuration) : I
 {
 	public async Task<User?> RegisterUserAsync(RegisterDto request)
 	{
-		if(await context.Users.AnyAsync(u => u.Email == request.Email.ToLower()))
+		if(await context.Users.AnyAsync(u => u.Email == request.Email))
 		{
 			return null; // User already exists
 		}
 		var user = new User
 		{
-			Email = request.Email.ToLower(),
+			Email = request.Email,
 			UserName = request.Username,
-			HashedPassword = string.Empty, 
-			Salt = string.Empty 
+			HashedPassword = string.Empty
 		};
 
 		var hashedPassword = new PasswordHasher<User>()
 			.HashPassword(user, request.Password);
 
-		user.UserName = request.Username;
-		user.Email = request.Email;
 		user.HashedPassword = hashedPassword;
-		user.Salt = string.Empty;
 
 		context.Users.Add(user);
 		await context.SaveChangesAsync();

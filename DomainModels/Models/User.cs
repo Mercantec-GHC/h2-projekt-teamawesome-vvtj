@@ -1,12 +1,13 @@
-﻿namespace DomainModels.Models;
+﻿using DomainModels.Enums;
+
+namespace DomainModels.Models;
 public class User : Common
 {
 	public required string Email { get; set; }
 	public required string UserName { get; set; }
 	public required string HashedPassword { get; set; }
-	public string? Salt { get; set; }
-	public DateTime? LastLogin { get; set; } 
-	public int? UserRoleId { get; set; }
+	public DateTime? LastLogin { get; set; }
+	public int UserRoleId { get; set; } = (int)RoleEnum.Unknown;
 	public Role UserRole { get; set; } = default!;
 	public int? UserInfoId { get; set; }
 	public UserInfo? UserInfo { get; set; } 
