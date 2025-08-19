@@ -1,9 +1,12 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using System.Reflection;
+using System.Text;
 
 namespace API;
 
@@ -13,6 +16,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddControllers();
+        builder.Services.AddOpenApi();
 
         //Add Interfaces and Services
         builder.Services.AddScoped<IUserService, UserService>();
@@ -20,8 +24,9 @@ public class Program
         builder.Services.AddScoped<RoomService>();
         builder.Services.AddScoped<RoomTypeService>();
         builder.Services.AddScoped<ICleaningService, CleaningService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
-        builder.Services.AddScoped<IBookingInterface, BookingService>();
+		builder.Services.AddScoped<IBookingInterface, BookingService>();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
@@ -65,8 +70,24 @@ public class Program
         builder.Services.AddDbContext<AppDBContext>(options =>
                 options.UseNpgsql(connectionString));
 
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+                    ValidAudience = builder.Configuration["AppSettings:Audience"],
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),
+                    ValidateIssuerSigningKey = true,
+                };
+            })
+            ;
 
-        var app = builder.Build();
+		var app = builder.Build();
 
         // Brug CORS - skal være før anden middleware
         app.UseCors("AllowSpecificOrigins");
@@ -78,16 +99,22 @@ public class Program
             Predicate = r => r.Tags.Contains("live")
         });
 
-        app.MapOpenApi();
+        
+        if(app.Environment.IsDevelopment())
 
+		{
+			app.MapOpenApi();
+            app.MapScalarApiReference();
+		}
+		
         // Scalar Middleware for OpenAPI
-        app.MapScalarApiReference(options =>
-        {
-            options
-                .WithTitle("MAGSLearn")
-                .WithTheme(ScalarTheme.Mars)
-                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-        });
+        //app.MapScalarApiReference(options =>
+        //{
+        //    options
+        //        .WithTitle("MAGSLearn")
+        //        .WithTheme(ScalarTheme.Mars)
+        //        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        //});
 
         // Map the Swagger UI
         app.UseSwagger();

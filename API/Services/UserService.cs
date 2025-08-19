@@ -1,7 +1,10 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 using DomainModels.Mapping;
+using DomainModels.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
@@ -40,7 +43,7 @@ namespace API.Services
 
 		public async Task<bool?> CreateUserAsync(UserPostDto dto)
 		{
-			var newUser = _userMapping.ToUserFromDto(dto); // Use the instance to call the method
+			var newUser = _userMapping.ToUserFromDto(dto);
 
 			_context.Users.Add(newUser);
 			await _context.SaveChangesAsync();
@@ -55,11 +58,26 @@ namespace API.Services
 			{
 				return false;
 			}
-			user.Email = dto.Email;
-			user.UserName = dto.UserName;
-			user.HashedPassword = dto.Password;
-			user.Salt = dto.Password;
-			user.UserRoleId = dto.UserRoleId;
+			if (!string.IsNullOrEmpty(dto.Email))
+				user.Email = dto.Email;
+
+			//for some reason it overwrites the username with an empty string if nothing is provided in PUT.
+			//If you testing this, make sure to provide a username in the PUT request. I will investigate this later.
+			if (!string.IsNullOrWhiteSpace(dto.UserName))
+				user.UserName = dto.UserName;
+
+			if (!string.IsNullOrEmpty(dto.NewPassword))
+			{
+				var hashedPassword = new PasswordHasher<User>()
+					.HashPassword(user, dto.NewPassword);
+				user.HashedPassword = hashedPassword;
+			}
+
+			if (dto.UserRole != RoleEnum.Unknown)
+			{
+				user.UserRoleId = (int)dto.UserRole;
+			}
+
 			await _context.SaveChangesAsync();
 			return true;
 		}

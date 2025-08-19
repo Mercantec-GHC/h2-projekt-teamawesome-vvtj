@@ -1,7 +1,6 @@
 ﻿using DomainModels.Enums;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace API.Data;
 public class AppDBContext : DbContext
