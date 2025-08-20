@@ -7,13 +7,14 @@ namespace DomainModels.Dto
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Hotel name is required")]
-        public required string HotelName { get; set; }
+		[Display(Name = "Hotel name")]
+		public required string HotelName { get; set; }
 
         [Required(ErrorMessage = "City name is required")]
         public required string CityName { get; set; }
 
         [Required(ErrorMessage = "Address is required")]
-        public string Address { get; set; }
+		public required string Address { get; set; }
         public string? Description { get; set; }
     }
 
