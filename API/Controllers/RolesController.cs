@@ -1,9 +1,6 @@
 ﻿using API.Interfaces;
-using API.Services;
-using DomainModels.Dto.RoleDto;
-using DomainModels.Models;
+using DomainModels.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace API.Controllers;
 
@@ -15,11 +12,11 @@ public class RolesController : ControllerBase
 
 	public RolesController(IRoleService roleService)
 	{
-		roleService = _roleService;
+		_roleService = roleService;
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<RoleGetDto>>> GetRolesAsync()
+	public async Task<ActionResult<IEnumerable<RoleDto>>> GetRolesAsync()
 	{
 		var roles = await _roleService.GetAllRolesAsync();
 		if (roles == null || !roles.Any())
@@ -30,7 +27,7 @@ public class RolesController : ControllerBase
 	}
 
 	[HttpGet("{id:int}")]
-	public async Task<ActionResult<RoleGetDto>> GetRoleByIdAsync(int id)
+	public async Task<ActionResult<RoleDto>> GetRoleByIdAsync(int id)
 	{
 		var role = await _roleService.GetRoleByIdAsync(id);
 		if (role == null)
@@ -39,33 +36,7 @@ public class RolesController : ControllerBase
 		}
 		return Ok(role);
 	}
-	[HttpPost]
-	public async Task<IActionResult> CreateRoleAsync([FromBody] RolePostDto roleDto)
-	{
-		if (roleDto == null)
-		{
-			return BadRequest("Role's data is null.");
-		}
-		var createdRole = await _roleService.CreateRoleAsync(roleDto);
-		if (createdRole == null)
-		{
-			return BadRequest("Failed to create role.");
-		}
-		return CreatedAtAction(nameof(GetRoleByIdAsync), new { id = createdRole.Id }, createdRole);
-	}
-
-	[HttpDelete("{id:int}")]
-	public async Task<IActionResult> DeleteRole(int id)
-	{
-		if (id <= 0)
-		{
-			return BadRequest("Need a valid role id.");
-		}
-		var deleted = await _roleService.DeleteRoleAsync(id);
-		if (!deleted)
-		{
-			return NotFound();
-		}
-		return NoContent();
-	}
 }
+//We are going to use Roles as enums. 
+//We are not going to have a Post method for Role because we are not going to create roles through the API.
+//We are not going to implement the Delete method for Role because we are not going to delete roles through the API for safety reasons.
