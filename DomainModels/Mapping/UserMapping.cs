@@ -27,7 +27,6 @@ public class UserMapping
 		{
 			Email = userPostDto.Email,
 			UserName = userPostDto.UserName,
-<<<<<<< Updated upstream
 			HashedPassword = userPostDto.NewPassword,
 			UserRoleId = (int)RoleEnum.Unknown,
 			UpdatedAt = utcNow,
