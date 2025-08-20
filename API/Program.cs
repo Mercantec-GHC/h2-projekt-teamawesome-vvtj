@@ -26,11 +26,12 @@ public class Program
 		builder.Services.AddScoped<RoomTypeService>();
 		builder.Services.AddScoped<ICleaningService, CleaningService>();
 		builder.Services.AddScoped<IAuthService, AuthService>();
-
 		builder.Services.AddScoped<IBookingInterface, BookingService>();
+        builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
+        builder.Services.AddMemoryCache();
 
-		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-		builder.Services.AddSwaggerGen(c =>
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddSwaggerGen(c =>
 		{
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
