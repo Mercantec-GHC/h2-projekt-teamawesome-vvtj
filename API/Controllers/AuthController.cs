@@ -17,6 +17,8 @@ namespace API.Controllers;
 public class AuthController : ControllerBase
 {
 	private readonly IAuthService _authService;
+	private readonly ILoginAttemptService _loginAttemptService;
+	private readonly ILogger<AuthController> _logger;
 	private readonly AppDBContext _context;
 
 	/// <summary>
@@ -24,10 +26,12 @@ public class AuthController : ControllerBase
 	/// </summary>
 	/// <param name="authService">Authentication service.</param>
 	/// <param name="context">Database context.</param>
-	public AuthController(IAuthService authService, AppDBContext context)
+	public AuthController(IAuthService authService, ILoginAttemptService loginAttemptService , ILogger<AuthController> logger,  AppDBContext context)
 	{
 		_authService = authService;
-		_context = context;
+		_loginAttemptService = loginAttemptService;
+		_logger = logger;
+        _context = context;
 	}
 
 	/// <summary>
@@ -55,20 +59,46 @@ public class AuthController : ControllerBase
 	[HttpPost("login")]
 	public async Task<ActionResult<string>> Login(LoginDto request)
 	{
-		var token = await _authService.LoginUserAsync(request);
-		if (token == null)
+		try
 		{
-			return BadRequest("Invalid email or password.");
+			if (_loginAttemptService.IsLockedOut(request.Email))
+			{
+				var remainingSeconds = _loginAttemptService.GetRemainingLockoutSeconds(request.Email);
+				return StatusCode(429, new
+				{
+					message = "Account temporarily locked due to too many failed login attempts.",
+					remainingLockoutSeconds = remainingSeconds
+				});
+			}
+
+			var token = await _authService.LoginUserAsync(request);
+			if (token == null)
+			{
+				var attemptsLeft = _loginAttemptService.RecordFailedAttempt(request.Email);
+
+				return Unauthorized(new
+				{
+					message = "Invalid email or password.",
+					attempts_left = attemptsLeft + 1
+				});
+			}
+
+			_loginAttemptService.RecordSuccessfulLogin(request.Email);
+			return Ok(token);
 		}
 
-		return Ok(token);
-	}
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Login failed for email {Email}", request.Email);
+            return StatusCode(500, "An internal error occurred. Please try again later.");
+        }
+    }
 
-	/// <summary>
-	/// Gets the current authenticated user.
-	/// </summary>
-	/// <returns>User data or error.</returns>
-	[Authorize]
+    /// <summary>
+    /// Gets the current authenticated user.
+    /// </summary>
+    /// <returns>User data or error.</returns>
+    [Authorize]
 	[HttpGet("/me")]
 	public IActionResult GetCurrentUser()
 	{
