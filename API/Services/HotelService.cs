@@ -68,28 +68,28 @@ namespace API.Services
         }
 
         
-        public async Task<HotelDto> PostHotel(HotelDto hotelCreateDto)
+        public async Task<Hotel> PostHotel(HotelDto hotelCreateDto)
         {
-            Hotel newHotel = new Hotel
+            //Check if hotel.name already exists in our database
+            if (await _context.Hotels.AnyAsync(h => h.HotelName == hotelCreateDto.HotelName))
+            {
+                return null;
+            }
+            var newHotel = new Hotel
             {
                 HotelName = hotelCreateDto.HotelName,
                 CityName = hotelCreateDto.CityName,
                 Address = hotelCreateDto.Address,
-                Description = hotelCreateDto.Description
+                Description = hotelCreateDto.Description,
+                CreatedAt = DateTime.UtcNow.AddHours(2),
+                UpdatedAt = DateTime.UtcNow.AddHours(2)
             };
             _context.Hotels.Add(newHotel);
 
             await _context.SaveChangesAsync();
 
             //Return new Hotel as Dto
-            return new HotelDto
-            {
-                Id = newHotel.Id,
-                HotelName = newHotel.HotelName,
-                CityName = newHotel.CityName,
-                Address = newHotel.Address,
-                Description = newHotel.Description,
-            };
+            return newHotel;
         }
 
         public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)

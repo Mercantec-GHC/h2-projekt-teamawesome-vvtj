@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Services;
 using DomainModels.Models;
+using System.ComponentModel.DataAnnotations;
 
 
 
@@ -78,22 +79,24 @@ public class HotelController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
+        
         try
         {
             var newHotel = await _hotelService.PostHotel(hotelcreateDto);
+            
 
-            if (hotelcreateDto.HotelName == null && hotelcreateDto.CityName == null)
+            if (newHotel == null)
             {
                 return BadRequest();
             }
 
-            return Created();
+            return Ok(newHotel);
         }
         catch (Exception ex)
         {
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
-        
+
     }
 
     //Only Admin
@@ -109,7 +112,7 @@ public class HotelController : ControllerBase
     {
         try
         {
-            var _updatedHotel = _hotelService.PutHotel(updateHotel);
+            var _updatedHotel = await _hotelService.PutHotel(updateHotel);
             await _context.SaveChangesAsync();
 
             return Ok(_updatedHotel);

@@ -1,11 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace DomainModels.Dto
 {
     public class HotelDto
     {
         public int Id { get; set; }
+
+        [Required(ErrorMessage = "Hotel name is required")]
         public required string HotelName { get; set; }
+
+        [Required(ErrorMessage = "City name is required")]
         public required string CityName { get; set; }
-        public string? Address { get; set; }
+
+        [Required(ErrorMessage = "Address is required")]
+        public string Address { get; set; }
         public string? Description { get; set; }
     }
 
