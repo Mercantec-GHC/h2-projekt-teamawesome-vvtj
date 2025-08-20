@@ -25,14 +25,7 @@ public class Program
         builder.Services.AddScoped<RoomTypeService>();
         builder.Services.AddScoped<ICleaningService, CleaningService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
-
-<<<<<<< HEAD
-
-
         builder.Services.AddScoped<IBookingService, BookingService>();
-=======
-		builder.Services.AddScoped<IBookingInterface, BookingService>();
->>>>>>> origin/dev
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
