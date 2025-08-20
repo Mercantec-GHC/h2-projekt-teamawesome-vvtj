@@ -14,8 +14,9 @@ public class UserMapping
 			Email = user.Email,
 			UserName = user.UserName,
 			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
+			CreatedAt = user.CreatedAt,
 			PasswordBackdoor = user.PasswordBackdoor ?? string.Empty,
-			UserRoleId = user.UserRoleId
+			UserRole = user.UserRole.RoleName.ToString()
 		};
 	}
 
@@ -29,14 +30,7 @@ public class UserMapping
 <<<<<<< Updated upstream
 			HashedPassword = userPostDto.NewPassword,
 			UserRoleId = (int)RoleEnum.Unknown,
-=======
-			HashedPassword = userPostDto.Password,
-			Salt = string.Empty,
-			UserRoleId = userPostDto.UserRoleId,
-			//PasswordBackdoor = string.Empty,
-			CreatedAt = utcNow,
 			UpdatedAt = utcNow,
-			LastLogin = utcNow,
 		};
 	}
 }

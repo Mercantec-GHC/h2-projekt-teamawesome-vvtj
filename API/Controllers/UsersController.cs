@@ -15,6 +15,7 @@ public class UsersController : ControllerBase
 	{
 		_userService = userService;
 	}
+
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserGetDto>>> GetUsers()
 	{
@@ -25,7 +26,7 @@ public class UsersController : ControllerBase
 		}
 		return Ok(users);
 	}
-	
+	[Authorize]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
 	{
@@ -36,7 +37,7 @@ public class UsersController : ControllerBase
 		}
 		return Ok(user);
 	}
-
+	[Authorize(Roles = "Admin,Reception")]
 	[HttpPut]
 	public async Task<IActionResult> UpdateUser([FromBody] UserPostDto userDto)
 	{
@@ -51,7 +52,7 @@ public class UsersController : ControllerBase
 		}
 		return NoContent();
 	}
-
+	[Authorize(Roles = "Admin")]
 	[HttpDelete("{email}")]
 	public async Task<IActionResult> DeleteUserByEmail(string email)
 	{
