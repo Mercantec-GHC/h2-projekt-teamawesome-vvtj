@@ -6,15 +6,15 @@ namespace API.Services
 {
     public class RoomService
     {
-        private readonly AppDBContext context;
-        public RoomService(AppDBContext _context)
+        private readonly AppDBContext _context;
+        public RoomService(AppDBContext context)
         {
-            context = _context;
+            this._context = context;
         }
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
         {
-            var rooms = await context.Rooms.Include(r => r.RoomType).ToListAsync();
+            var rooms = await _context.Rooms.Include(r => r.RoomType).Include(r => r.Hotel).ToListAsync();
             return rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
@@ -23,7 +23,8 @@ namespace API.Services
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
                 RoomType = r.RoomType,
-                TypeId = r.TypeId
+                Hotel = r.Hotel
+                
             });
         }
 
@@ -34,7 +35,7 @@ namespace API.Services
                 return null;
             }
 
-            var room = await context.Rooms.FindAsync(id);
+            var room = await _context.Rooms.FindAsync(id);
 
             RoomsDto getRoom = new RoomsDto
             {

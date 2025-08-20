@@ -25,9 +25,9 @@ public class AppDBContext : DbContext
 			entity.HasIndex(u => u.UserName).IsUnique();
 			entity.HasOne(u => u.UserRole)
 				.WithMany(r => r.Users)
-        
-    
-    
+
+
+
 				.HasForeignKey(u => u.UserRoleId)
 				.OnDelete(DeleteBehavior.Restrict);
 		});
@@ -41,13 +41,20 @@ public class AppDBContext : DbContext
 		{
 			entity.HasKey(ui => ui.UserId);
 		});
-        
-        modelBuilder.Entity<Hotel>()
-         .HasMany(h => h.Rooms)
-         .WithOne(r => r.Hotel)
-         .HasForeignKey(r => r.HotelId);
+
+		modelBuilder.Entity<Hotel>()
+		 .HasMany(h => h.Rooms)
+		 .WithOne(r => r.Hotel)
+		 .HasForeignKey(r => r.HotelId);
 
 		base.OnModelCreating(modelBuilder);
+
+		modelBuilder.Entity<Room>(entity =>
+		{
+			entity.HasOne(r => r.Hotel)
+			.WithMany(h => h.Rooms)
+			.HasForeignKey(h => h.HotelId);
+		});
 	}
 }
 
