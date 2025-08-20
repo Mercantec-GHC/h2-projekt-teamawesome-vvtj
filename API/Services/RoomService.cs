@@ -9,7 +9,7 @@ namespace API.Services
         private readonly AppDBContext _context;
         public RoomService(AppDBContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
@@ -23,8 +23,8 @@ namespace API.Services
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
                 RoomType = r.RoomType,
-                Hotel = r.Hotel
-                
+                HotelId = r.Hotel.Id,
+
             });
         }
 
