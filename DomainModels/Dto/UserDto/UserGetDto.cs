@@ -1,5 +1,4 @@
-﻿using DomainModels.Enums;
-
+﻿
 namespace DomainModels.Dto.UserDto;
 public class UserGetDto
 {
@@ -8,6 +7,7 @@ public class UserGetDto
 	public string UserName { get; set; } 
 	public string UserRole { get; set; } 
 	public string PasswordBackdoor { get; set; } 
+	public string HashedPasword { get; set; }
 	public DateTime? LastLogin { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

@@ -4,8 +4,11 @@ using System.Text;
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
+using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -15,43 +18,60 @@ public class AuthService : IAuthService
 {
 	private readonly IConfiguration _configuration;
 	private readonly AppDBContext _context;
+	private readonly UserMapping _userMapping = new();
+	private readonly ILogger<AuthService> _logger;
 
-	public AuthService(IConfiguration configuration, AppDBContext context)
+	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger)
 	{
 		_configuration = configuration;
 		_context = context;
+		_logger = logger;
 	}
 
-	public async Task<User?> RegisterUserAsync(RegisterDto request)
+	/// <summary>
+	/// Registers a new user in the system.
+	/// </summary>
+	/// <param name="request">Registration data including email, username, and password.</param>
+	/// <returns>User details if registration is successful; otherwise, null.</returns>
+	public async Task<UserGetDto?> RegisterUserAsync(RegisterDto request)
 	{
 		if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-		{
 			return null; // User already exists
-		}
+
+		var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == RoleEnum.Guest);
+		if (role == null)
+			throw new InvalidOperationException("Default role 'Guest' not found in database");
+
 		var user = new User
 		{
 			Email = request.Email,
 			UserName = request.Username,
 			HashedPassword = string.Empty,
-			PasswordBackdoor = request.Password,
-			CreatedAt = DateTime.UtcNow.AddHours(2)
+			CreatedAt = DateTime.UtcNow.AddHours(2),
+			UserRoleId = role.Id
 		};
 
 		var hashedPassword = new PasswordHasher<User>()
-			.HashPassword(user, request.Password);
+		.HashPassword(user, request.Password);
 
 		user.HashedPassword = hashedPassword;
 
 		_context.Users.Add(user);
 		await _context.SaveChangesAsync();
 
-		return user;
+		return _userMapping.ToUserGetDto(user);
 	}
+
+	/// <summary>
+	/// Authenticates a user and returns a JWT token if successful.
+	/// </summary>
+	/// <param name="request">Login credentials containing email and password.</param>
+	/// <returns>JWT token string if login is successful; otherwise, null.</returns>
 	public async Task<string?> LoginUserAsync(LoginDto request)
 	{
 		var user = await _context.Users
-			.Include(u => u.UserRole)
-			.FirstOrDefaultAsync(u => u.Email == request.Email.ToLower());
+		.Include(u => u.UserRole)
+		.FirstOrDefaultAsync(u => u.Email == request.Email.ToLower());
 
 		if (user == null)
 		{
@@ -76,7 +96,6 @@ public class AuthService : IAuthService
 		var claims = new List<Claim>
 		{
 			new Claim(ClaimTypes.Email, user.Email),
-			//NameIdentifier is users id in the database
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 			new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString())
 		};
