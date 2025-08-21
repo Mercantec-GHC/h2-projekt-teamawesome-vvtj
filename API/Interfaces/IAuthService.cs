@@ -12,7 +12,7 @@ public interface IAuthService
 	/// </summary>
 	/// <param name="request">Registration data.</param>
 	/// <returns>User details if registration is successful; otherwise, null.</returns>
-	Task<UserGetDto?> RegisterUserAsync(RegisterDto request);
+	Task<UserDto?> RegisterUserAsync(RegisterDto request);
 
 	/// <summary>
 	/// Authenticates a user and returns a JWT token if successful.
@@ -20,4 +20,6 @@ public interface IAuthService
 	/// <param name="request">Login credentials.</param>
 	/// <returns>JWT token string if login is successful; otherwise, null.</returns>
 	Task<string?> LoginUserAsync(LoginDto request);
+
+	Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword);
 }

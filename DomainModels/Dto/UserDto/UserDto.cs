@@ -1,6 +1,6 @@
 ﻿
 namespace DomainModels.Dto.UserDto;
-public class UserGetDto
+public class UserDto
 {
 	public int Id { get; set; }
 	public string Email { get; set; } 

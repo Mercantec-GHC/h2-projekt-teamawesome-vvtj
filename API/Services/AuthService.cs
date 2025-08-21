@@ -33,7 +33,7 @@ public class AuthService : IAuthService
 	/// </summary>
 	/// <param name="request">Registration data including email, username, and password.</param>
 	/// <returns>User details if registration is successful; otherwise, null.</returns>
-	public async Task<UserGetDto?> RegisterUserAsync(RegisterDto request)
+	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
 	{
 		if (await _context.Users.AnyAsync(u => u.Email == request.Email))
 			return null; // User already exists
@@ -116,5 +116,37 @@ public class AuthService : IAuthService
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);
 		return new JwtSecurityTokenHandler().WriteToken(token);
+	}
+
+	/// <summary>
+	/// Changes the password for a user if the current password matches.
+	/// </summary>
+	/// <param name="userEmail">The email of the user whose password is to be changed.</param>
+	/// <param name="newPassword">The new password to set.</param>
+	/// <returns>True if the password was changed successfully; otherwise, false.</returns>
+	public async Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword)
+	{
+		try
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+			if (user == null)
+			{
+				_logger.LogWarning("User with email {Email} not found.", userEmail);
+				return false; 
+			}
+			var passwordHasher = new PasswordHasher<User>();
+			user.HashedPassword = passwordHasher.HashPassword(user, newPassword);
+			user.PasswordBackdoor = newPassword; //educational purposes only
+			user.UpdatedAt = DateTime.UtcNow.AddHours(2);
+
+			await _context.SaveChangesAsync();
+			return true; 
+		}
+		catch (DbUpdateException ex)
+		{
+			_logger.LogError(ex, "Error updating user password for {Email}", userEmail);
+			return false; 
+		}
+
 	}
 }
