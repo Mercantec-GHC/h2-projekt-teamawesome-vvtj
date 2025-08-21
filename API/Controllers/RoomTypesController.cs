@@ -12,6 +12,13 @@ public class RoomTypesController : ControllerBase
     {
         _roomtypeService = roomtypeService;
     }
+
+    //Everybody
+    /// <summary>
+    /// Shows all room types
+    /// </summary>
+    /// <returns>A list of room types</returns>
+    /// <response code="404">Room types not found!</response>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomTypeDto>>> GetRoomTypes()
     {
@@ -25,6 +32,13 @@ public class RoomTypesController : ControllerBase
         return Ok(rooms);
     }
 
+    //Everybody
+    /// <summary>
+    /// Show one specific room type
+    /// </summary>
+    /// <param name="id">Unique identifier for room types</param>
+    /// <returns>A room type</returns>
+    /// <response code="404">Room type not found!</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<RoomTypeDto>> GetSpecificRoomtype(int id)
     {
