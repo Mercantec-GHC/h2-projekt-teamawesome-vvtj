@@ -1,13 +1,14 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DomainModels.Dto
 {
-    public class BookingDto
+    public class GetBookingsDto
     {
         public int Id { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
 
         public int UserId { get; set; }
         public string UserName { get; set; } = null!;
@@ -18,13 +19,9 @@ namespace DomainModels.Dto
         public int HotelId { get; set; }
         public string HotelName { get; set; } = null!;
 
+        public int GuestsCount { get; set; } = 1;
+
         public DateTime CheckIn { get; set; }
         public DateTime CheckOut { get; set; }
-        public int NightsCount { get; set; }
-        public int GuestsCount { get; set; }
-        public decimal? TotalPrice { get; set; }
-
-        public string? Payment { get; set; }
-        public bool IsPaid { get; set; }
     }
 }
