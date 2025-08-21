@@ -10,17 +10,20 @@ public class Booking : Common
     public int RoomId { get; set; }
     public Room? Room { get; set; } = default!;
 
+    [Required]
+
     public required DateTime CheckIn { get; set; }
     public required DateTime CheckOut { get; set; }
-    public int NightsCount { get; set; } = 0;
-    public int GuestsCount { get; set; } = 0;
+    public int NightsCount { get; set; } 
+    public int GuestsCount { get; set; } 
     public decimal? TotalPrice { get; set; }
     public string? Payment { get; set; } = default!;
-    public bool IsPaid { get; set; }
-    public int UserId { get; set; }
+     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
     public User? User { get; set; }
+
+    public string? UserName { get; set; } 
 
 
 }

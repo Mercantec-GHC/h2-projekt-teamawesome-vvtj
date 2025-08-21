@@ -24,7 +24,7 @@ namespace API.Services
                 AvailableFrom = r.AvailableFrom,
                 RoomType = r.RoomType,
                 Hotel = r.Hotel
-                
+
             });
         }
 
@@ -40,6 +40,7 @@ namespace API.Services
             RoomsDto getRoom = new RoomsDto
             {
                 Id = room.Id,
+
                 GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,

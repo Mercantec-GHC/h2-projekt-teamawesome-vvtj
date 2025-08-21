@@ -10,16 +10,11 @@ namespace DomainModels.Dto
     {
         public int Id { get; set; }
 
-        public int UserId { get; set; }
-        public string UserName { get; set; } = null!;
-
+        public string UserName { get; set; } 
         public int RoomId { get; set; }
-        public string RoomType { get; set; } = null!;
+        public int RoomNumber { get; set; }
 
-        public int HotelId { get; set; }
-        public string HotelName { get; set; } = null!;
-
-        public int GuestsCount { get; set; } = 1;
+         public string HotelName { get; set; } 
 
         public DateTime CheckIn { get; set; }
         public DateTime CheckOut { get; set; }

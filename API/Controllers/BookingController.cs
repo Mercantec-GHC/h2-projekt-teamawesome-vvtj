@@ -2,13 +2,13 @@
 using API.Interfaces;
 using DomainModels;
 using DomainModels.Dto;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 /// <summary>
-/// Controller til håndtering af booking-relaterede operationer.
+/// Controller for handling booking-related operations.
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -23,32 +23,55 @@ public class BookingController : ControllerBase
 
 
     /// <summary>
-    /// Opretter en ny booking i systemet.
+    /// Creates a new booking in the system.
     /// </summary>
-    /// <param name="bookingPostDto">Data for den nye booking.</param>
-    /// <returns>Den oprettede booking.</returns>
-    /// <response code="201">Bookingen blev oprettet succesfuldt.</response>
-    /// <response code="400">Ugyldig forespørgsel eller booking overlap.</response>
-    /// <response code="401">Ikke autoriseret - manglende eller ugyldig token.</response>
-    /// <response code="500">Der opstod en intern serverfejl.</response>
+    /// <param name="CreateBookingDto">The booking data from the client.</param>
+    /// <returns>Returns a success message or an error if the booking cannot be completed.</returns>
+    /// <response code="200">OK with <see cref="BookingResponseDto"/>.</response>
+    /// <response code="400">Bad Request if the input is invalid or required entities/room are not found.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [HttpPost]
-    public async Task<BookingDto> CreateBooking(BookingDto bookingDto)
+    public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
+        if (dto == null || string.IsNullOrWhiteSpace(dto.UserName))
+        {
+            return BadRequest("Invalid booking data.");
+        }
 
-        if (bookingDto == null)
-            throw new ArgumentNullException(nameof(bookingDto), "Booking data is required.");
-        var created = await _bookingService.CreateBooking(bookingDto);
-        return created;
+       
+        if (dto.CheckOut.Date <= dto.CheckIn.Date)
+        {
+            return BadRequest("Check-out date must be after check-in date.");
+        }
+
+     
+        try
+        {
+            var result = await _bookingService.CreateBooking(dto);
+            if (result == null)
+            {
+                return BadRequest("Booking could not be created.");
+            }
+
+            return Ok(result); 
+
+
+        }
+
+
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred: {ex.Message}");
+        }
     }
     /// <summary>
     /// Get all bookings from the system. Only available to administrators and receptionists.
     /// </summary>
     /// <returns>A list of all bookings with user and room information, check-in and out.</returns>
-   /// <response code="200">Bookingen blev tilføjet succesfuldt.</response>
-    /// <response code="401">Ikke autoriseret - manglende eller ugyldig token.</response>
-    /// <response code="403">Forbudt - kun  bruger har adgang.</response>
-    /// <response code="500">Der opstod en intern serverfejl.</response>
-    //[Authorize(Roles = "Admin", "Receptionist")]
+    /// <response code="200">OK with list of <see cref="GetBookingsDto"/>.</response>
+    /// <response code="400">Bad request.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetBookingsDto>>> GetAllBookings()
     {
@@ -68,30 +91,27 @@ public class BookingController : ControllerBase
     }
 
     /// <summary>
-    /// Allow to change check-in/out dates, amount of guests. Available to administrators, receptionists.
+    /// Allows to update check-in and check-out dates.
     /// </summary>
     /// <param name="id">Requires BookingID</param>
-    /// <returns>An updated booking with new NightsCount, GuestsCount and TotalPrice.</returns>
-     //[Authorize(Roles = "Admin", "Reciptionist")]
-    [HttpPut]
-    public async Task<BookingDto?> UpdateBooking(int bookingId, BookingDto dto)
+    /// <returns>Bool.</returns>
+    //[Authorize(Roles = "Admin", "Reciptionist", "User")]
+    [HttpPut("{id}/dates")]
+    public async Task<IActionResult> UpdateDates(int id, [FromBody] UpdateDatesDto dto)
     {
-        var updated = await _bookingService.UpdateBooking(bookingId, dto);
-        if (dto == null)
-            throw new ArgumentNullException(nameof(dto), "Booking data is required.");
-
-        return updated;
+        var success = await _bookingService.UpdateBookingDates(id, dto.CheckIn, dto.CheckOut);
+        if (!success) return BadRequest("Booking not updated.");
+        return Ok("Booking dates updated successfully.");
     }
     /// <summary>
     /// Delete a booking from a system.
     /// </summary>
-    /// <param name="id">ID should be deleted.</param>
+    /// <param name="id">BookingID.</param>
     /// <returns>Confirmation of deletion.</returns>
-    /// <response code="204">Bookingen blev slettet succesfuldt.</response>
-    /// <response code="401">Ikke autoriseret - manglende eller ugyldig token.</response>
-    /// <response code="403">Forbudt - kan kun slette egne bookinger.</response>
-    /// <response code="404">Booking med det angivne ID blev ikke fundet.</response>
-    /// <response code="500">Der opstod en intern serverfejl.</response>
+    /// <response code="204">The booking was deleted successfully.</response>
+    /// <response code="401">Not authorized - missing or invalid token.</response>
+    /// <response code="404">Booking with the specified ID was not found.</response>
+    /// <response code="500">>Internal server error.</response>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBooking(int id)
     {
@@ -99,10 +119,15 @@ public class BookingController : ControllerBase
 
         return success ? NoContent() : NotFound(); // 204 success
     }
+    /// <summary>
     /// Gets all of current or future hotel´s booking. Available to administrators, receptionists.
     /// </summary>
-    /// <returns>A list of bookings</returns>
-    //[Authorize(Roles = "Admin", "Reciptionist")]
+    /// <param name="id">HotelId</param>
+    /// <returns>A list of <see cref="BookingDto"/> for chosen hotel</returns>
+    ///  <response code="400">Bad request.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+
+    [Authorize(Roles = "Admin,Reception")]
     [HttpGet("hotel/{hotelId}")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByHotel(int hotelId)
     {
