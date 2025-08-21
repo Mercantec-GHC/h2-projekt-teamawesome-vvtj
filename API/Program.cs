@@ -1,8 +1,14 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -93,12 +99,31 @@ public class Program
 		builder.Services.AddHealthChecks()
 			.AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), ["live"]);
 
-		IConfiguration Configuration = builder.Configuration;
-		string connectionString = Configuration.GetConnectionString("DefaultConnection")
-			?? Environment.GetEnvironmentVariable("DefaultConnection");
+		if (builder.Environment.IsDevelopment())
+		{
+			IConfiguration Configuration = builder.Configuration;
+			string connectionString = Configuration.GetConnectionString("DefaultConnection")
+				?? Environment.GetEnvironmentVariable("DefaultConnection");
 
-		builder.Services.AddDbContext<AppDBContext>(options =>
-				options.UseNpgsql(connectionString));
+			builder.Services.AddDbContext<AppDBContext>(options =>
+					options.UseNpgsql(connectionString));
+
+		}
+
+		if (builder.Environment.IsProduction())
+		{
+			var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
+			var KeyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
+				builder.Configuration.AddAzureKeyVault(
+				keyVaultURL.Value!.ToString(),
+				new DefaultKeyVaultSecretManager()
+			); 
+
+			var client = new SecretClient(new Uri(keyVaultURL.Value!.ToString()), new DefaultAzureCredential());
+
+            builder.Services.AddDbContext<AppDBContext>(options =>
+                    options.UseNpgsql(client.GetSecret("dbconnection").Value.Value.ToString()));
+        }
 
 		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			.AddJwtBearer(options =>
