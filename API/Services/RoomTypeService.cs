@@ -6,14 +6,14 @@ namespace API.Services
 {
     public class RoomTypeService
     {
-        private readonly AppDBContext context;
-        public RoomTypeService(AppDBContext _context)
+        private readonly AppDBContext _context;
+        public RoomTypeService(AppDBContext context)
         {
-            context = _context;
+            this._context = context;
         }
         public async Task<IEnumerable<RoomTypeDto>> GetRoomTypes()
         {
-            var roomtypes = await context.RoomTypes.ToListAsync();
+            var roomtypes = await _context.RoomTypes.ToListAsync();
 
             if (roomtypes == null)
             {
@@ -32,7 +32,7 @@ namespace API.Services
 
         public async Task<RoomTypeDto> GetSpecificRoomType(int roomtypeId)
         {
-            var roomtype = await context.RoomTypes.FindAsync(roomtypeId);
+            var roomtype = await _context.RoomTypes.FindAsync(roomtypeId);
 
             RoomTypeDto getRoomType = new RoomTypeDto
             {
