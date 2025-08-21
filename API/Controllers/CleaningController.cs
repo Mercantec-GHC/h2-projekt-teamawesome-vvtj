@@ -51,27 +51,6 @@ public class CleaningController : ControllerBase
         }
     }
 
-    [HttpGet("copy")]
-    public async Task<ActionResult<IEnumerable<RoomToCleanDto>>> GetAllRoomsToCleanCopy()
-    {
-        try
-        {
-            var rooms = await _cleaningService.GetAllRoomsToCleanAsync();
-            if (rooms == null || !rooms.Any())
-            {
-                return NotFound("No rooms to clean found.");
-            }
-
-            return Ok(rooms);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-
-
-
     /// <summary>
     /// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date to the current UTC time.
     /// </summary>
