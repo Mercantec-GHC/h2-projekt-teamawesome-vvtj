@@ -1,11 +1,9 @@
-﻿using DomainModels.Dto.RoleDto;
+﻿using DomainModels.Dto;
 
 namespace API.Interfaces;
 
 public interface IRoleService
 {
-	Task<IEnumerable<RoleGetDto>> GetAllRolesAsync();
-	Task<RoleGetDto?> GetRoleByIdAsync(int id);
-	Task<RolePostDto?> CreateRoleAsync(RolePostDto roleDto);
-	Task<bool> DeleteRoleAsync(int id);
+	Task<IEnumerable<RoleDto>> GetAllRolesAsync();
+	Task<RoleDto?> GetRoleByIdAsync(int id);
 }

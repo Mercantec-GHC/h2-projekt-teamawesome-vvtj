@@ -3,6 +3,7 @@ using System;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDBContext))]
-    partial class AppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250818092126_update_users")]
+    partial class update_users
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,6 +159,9 @@ namespace API.Migrations
                     b.Property<DateTime>("AvailableFrom")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("GuestCount")
+                        .HasColumnType("integer");
+
                     b.Property<int>("HotelId")
                         .HasColumnType("integer");
 
@@ -191,44 +197,8 @@ namespace API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Area")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<bool?>("HasAirCondition")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasBalcony")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasExtraTowels")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasGardenView")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasJacuzzi")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasKettle")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasKitchenette")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasMiniFridge")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasSeaView")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasTV")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("HasVault")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("MaxCapacity")
                         .HasColumnType("integer");
@@ -270,6 +240,9 @@ namespace API.Migrations
                     b.Property<string>("PasswordBackdoor")
                         .HasColumnType("text");
 
+                    b.Property<string>("Salt")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -280,7 +253,7 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserRoleId")
+                    b.Property<int?>("UserRoleId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -388,8 +361,7 @@ namespace API.Migrations
                     b.HasOne("DomainModels.Models.Role", "UserRole")
                         .WithMany("Users")
                         .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("UserInfo");
 
