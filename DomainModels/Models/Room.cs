@@ -8,7 +8,7 @@ namespace DomainModels.Models
         [Key]
         public int Id { get; set; }
         public int RoomNumber { get; set; }
-        public required int GuestCount { get; set; }
+        //public required int GuestCount { get; set; }
         public bool IsAvailable { get; set; }
         public bool IsBreakfast { get; set; }
         public DateTime AvailableFrom { get; set; }
