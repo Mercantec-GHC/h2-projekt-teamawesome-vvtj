@@ -1,4 +1,5 @@
 ﻿using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 using DomainModels.Models;
 
 namespace DomainModels.Mapping;
@@ -12,24 +13,23 @@ public class UserMapping
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
-			LastLogin = (DateTime)user.LastLogin,
-			Role = user.UserRole?.RoleName ?? string.Empty
+			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
+			CreatedAt = user.CreatedAt,
+			PasswordBackdoor = user.PasswordBackdoor ?? string.Empty,
+			UserRole = user.UserRole.RoleName.ToString()
 		};
 	}
 
 	public User ToUserFromDto(UserPostDto userPostDto)
 	{
+		var utcNow = DateTime.UtcNow.AddHours(2);
 		return new User
 		{
 			Email = userPostDto.Email,
 			UserName = userPostDto.UserName,
-			HashedPassword = userPostDto.Password, 
-			Salt = string.Empty, 
-			UserRoleId = userPostDto.UserRoleId,
-			PasswordBackdoor = string.Empty, 
-			CreatedAt = DateTime.UtcNow.AddHours(2),
-			UpdatedAt = DateTime.UtcNow.AddHours(2),
-			LastLogin = DateTime.UtcNow.AddHours(2),
+			HashedPassword = userPostDto.NewPassword,
+			UserRoleId = (int)RoleEnum.Unknown,
+			UpdatedAt = utcNow,
 		};
 	}
 }
