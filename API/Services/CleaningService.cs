@@ -36,7 +36,7 @@ namespace API.Services
                 var roomToCleanDtos = roomsToClean.Select(r => new RoomToCleanDto
                 {
                     RoomNumber = r.RoomNumber,
-                    RoomType = r.RoomType.TypeofRoom,
+                    RoomType = r.RoomType.TypeofRoom.ToString(),
                     HotelName = r.Hotel.HotelName
                 });
 

@@ -37,7 +37,7 @@ public class AppDBContext : DbContext
 			entity.Property(r => r.RoleName).HasConversion<string>();
 			entity.HasIndex(r => r.RoleName).IsUnique();
 			entity.HasData(
-				new Role { Id = 1, RoleName = RoleEnum.Unknown }, 
+				new Role { Id = 1, RoleName = RoleEnum.Unknown },
 				new Role { Id = 2, RoleName = RoleEnum.Admin },
 				new Role { Id = 3, RoleName = RoleEnum.Reception },
 				new Role { Id = 4, RoleName = RoleEnum.Guest },
@@ -63,6 +63,7 @@ public class AppDBContext : DbContext
 			.WithMany(h => h.Rooms)
 			.HasForeignKey(h => h.HotelId);
 		});
+		
 	}
 }
 

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Dynamic;
+using DomainModels.Enums;
 
 namespace DomainModels.Models
 {
@@ -8,7 +9,7 @@ namespace DomainModels.Models
     {
         [Key]
         public int Id { get; set; }
-        public required string TypeofRoom { get; set; }
+        public required RoomTypeEnum TypeofRoom { get; set; }
         public int MaxCapacity { get; set; }
         public string? Description { get; set; }
         public double? PricePerNight { get; set; }

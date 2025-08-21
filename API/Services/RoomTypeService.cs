@@ -1,6 +1,7 @@
 using DomainModels.Models;
 using API.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Services
 {
@@ -44,26 +45,35 @@ namespace API.Services
 
             return getRoomType;
         }
+        
+        // var type = _context.RoomTypes.Find((int)roomTypeDto.TypeofRoom);
+        //     if (type == null)
+        //     {
+        //         return null;
+        //     }
 
-        public async Task<RoomType> PostRoomType(RoomTypeDto roomTypeDto)
-        {
-            if (await _context.RoomTypes.AnyAsync(rt => rt.Id == roomTypeDto.Id))
-            {
-                return null;
-            }
+        // public async Task<RoomType> PostRoomType(RoomTypeDto roomTypeDto)
+        // {
+        //     if (await _context.RoomTypes.AnyAsync(rt => rt.Id == roomTypeDto.Id))
+        //     {
+        //         return null;
+        //     }
 
-            var newRoomType = new RoomType
-            {
-                Id = roomTypeDto.Id,
-                TypeofRoom = roomTypeDto.TypeofRoom,
-                MaxCapacity = roomTypeDto.MaxCapacity,
-                Description = roomTypeDto.Description
-            };
-            _context.RoomTypes.Add(newRoomType);
-            await _context.SaveChangesAsync();
+        //     
 
-            return newRoomType;
-        }
+        //     var newRoomType = new RoomType
+        //     {
+        //         Id = roomTypeDto.Id,
+        //         TypeofRoom = type.TypeofRoom,
+        //         MaxCapacity = roomTypeDto.MaxCapacity,
+        //         Description = roomTypeDto.Description,
+        //     };
+
+        //     _context.RoomTypes.Add(newRoomType);
+        //     await _context.SaveChangesAsync();
+
+        //     return newRoomType;
+        // }
 
     }
 }

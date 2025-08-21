@@ -1,6 +1,6 @@
 using DomainModels.Enums;
 
-public class RoomTypeDto
+public class RoomTypePutDto
 {
     public int Id { get; set; }
     public required RoomTypeEnum TypeofRoom { get; set; }

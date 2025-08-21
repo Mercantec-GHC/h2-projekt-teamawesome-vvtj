@@ -22,7 +22,7 @@ namespace API.Services
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
-                RoomType = r.RoomType,
+                RoomTypeId = r.RoomType.TypeofRoom,
                 HotelId = r.Hotel.Id,
 
             });
@@ -44,7 +44,7 @@ namespace API.Services
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
-                RoomType = room.RoomType,
+                RoomTypeId = room.RoomType.TypeofRoom,
             };
 
             return getRoom;
@@ -57,16 +57,21 @@ namespace API.Services
             {
                 return null;
             }
+            var type = _context.RoomTypes.Find((int)room.RoomTypeId);
+            if (type == null)
+            {
+                return null;
+            }
 
             var newRoom = new Room
             {
                 Id = room.Id,
-                GuestCount = room.GuestCount,
+                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 RoomNumber = room.RoomNumber,
-                RoomType = room.RoomType,
-                HotelId = room.Hotel.Id,
+                TypeId = type.Id,
+                HotelId = room.HotelId,
             };
             _context.Rooms.Add(newRoom);
             await _context.SaveChangesAsync();
