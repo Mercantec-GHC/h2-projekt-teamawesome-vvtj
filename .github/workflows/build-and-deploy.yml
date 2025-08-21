@@ -10,7 +10,7 @@ env:
   AZURE_WEBAPP_NAME: prod-novahotels-api-mercantec-tech
   AZURE_WEBAPP_PACKAGE_PATH: "./API/publish"
   DOTNET_VERSION: "9.x"
-  SOLUTION_PATH: "API.sln"
+  SOLUTION_PATH: "H2-Projekt.sln"
   API_PROJECT_PATH: "API"
   PUBLISH_DIR: "./publish"
 
