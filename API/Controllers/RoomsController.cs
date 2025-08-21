@@ -45,5 +45,17 @@ public class RoomsController : ControllerBase
         var room = await _roomService.GetRoomByID(id);
         return Ok(room);
     }
+    
+    [HttpPost]
+    public async Task<ActionResult> CreateRoom(RoomsDto createRoom)
+    {
+        var newRoom = await _roomService.PostRoom(createRoom);
+        if (newRoom == null)
+        {
+            return BadRequest();
+        }
+
+        return Ok(newRoom);
+    }
 
 }

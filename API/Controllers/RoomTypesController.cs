@@ -36,6 +36,17 @@ public class RoomTypesController : ControllerBase
         var room = await _roomtypeService.GetSpecificRoomType(id);
         return Ok(room);
     }
+    [HttpPost]
+    public async Task<ActionResult> CreateRoomType(RoomTypeDto roomTypeDto)
+    {
+        var newRoomType = await _roomtypeService.PostRoomType(roomTypeDto);
+        if (newRoomType == null)
+        {
+            return BadRequest();
+        }
+
+        return Ok(newRoomType);
+    }
 }
 
     
