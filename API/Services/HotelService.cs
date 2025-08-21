@@ -67,7 +67,7 @@ namespace API.Services
             return getHotel;
         }
 
-        
+        //Use type Hotel instead of HotelDto, as we want the new hotel into the DB
         public async Task<Hotel> PostHotel(HotelDto hotelCreateDto)
         {
             //Check if hotel.name already exists in our database
@@ -88,7 +88,7 @@ namespace API.Services
 
             await _context.SaveChangesAsync();
 
-            //Return new Hotel as Dto
+            //Return new Hotel into db
             return newHotel;
         }
 

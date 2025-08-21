@@ -20,6 +20,11 @@ public class RoomsController : ControllerBase
     }
 
     //Everybody
+    /// <summary>
+    /// Shows all rooms
+    /// </summary>
+    /// <returns> A list of rooms</returns>
+    /// <response code="404">Rooms not found!</response>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomsDto>>> GetRooms()
     {
@@ -34,6 +39,12 @@ public class RoomsController : ControllerBase
     }
 
     //Everybody
+    /// <summary>
+    /// Show one specific room
+    /// </summary>
+    /// <param name="id">Unique identifier for room</param>
+    /// <returns>A room</returns>
+    /// <response code="404">Rooms not found!</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<RoomsDto>> GetSpecificRoom(int id)
     {
