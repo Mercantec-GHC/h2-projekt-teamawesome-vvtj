@@ -2,6 +2,8 @@
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
+using DomainModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -128,6 +130,8 @@ public class AuthController : ControllerBase
 		if (user == null)
 			return NotFound("Brugeren blev ikke fundet i databasen.");
 
+		var roleEnum = (RoleEnum)user.UserRoleId;
+
 		return Ok(new
 		{
 			Id = user.Id,
@@ -136,6 +140,9 @@ public class AuthController : ControllerBase
 			CreatedAt = user.CreatedAt,
 			LastLogin = user.LastLogin,
 			Role = user.UserRole.RoleName.ToString(),
+			Description = roleEnum.GetDescription(),
+			UpdatedAt = DateTime.UtcNow.AddHours(2),
+			UpdatedBy = userId,
 		});
 	}
 

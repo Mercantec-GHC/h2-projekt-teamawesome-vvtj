@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DomainModels.Enums;
 
 namespace DomainModels.Dto.UserDto;
 

@@ -31,7 +31,7 @@ public class AuthService : IAuthService
 	/// <summary>
 	/// Registers a new user in the system.
 	/// </summary>
-	/// <param name="request">Registration data including email, username, and password.</param>
+	/// <param name="request">Registration data including email, username, and password. Default role is Guest</param>
 	/// <returns>User details if registration is successful; otherwise, null.</returns>
 	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
 	{
@@ -48,13 +48,13 @@ public class AuthService : IAuthService
 			UserName = request.Username,
 			HashedPassword = string.Empty,
 			CreatedAt = DateTime.UtcNow.AddHours(2),
-			UserRoleId = role.Id
 		};
 
 		var hashedPassword = new PasswordHasher<User>()
 		.HashPassword(user, request.Password);
 
 		user.HashedPassword = hashedPassword;
+		user.UserRole = role;
 
 		_context.Users.Add(user);
 		await _context.SaveChangesAsync();
