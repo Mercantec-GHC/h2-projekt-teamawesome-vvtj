@@ -59,7 +59,7 @@ public class AuthService : IAuthService
 		_context.Users.Add(user);
 		await _context.SaveChangesAsync();
 
-		return _userMapping.ToUserGetDto(user);
+		return _userMapping.ToUserDto(user);
 	}
 
 	/// <summary>
@@ -136,7 +136,6 @@ public class AuthService : IAuthService
 			}
 			var passwordHasher = new PasswordHasher<User>();
 			user.HashedPassword = passwordHasher.HashPassword(user, newPassword);
-			user.PasswordBackdoor = newPassword; //educational purposes only
 			user.UpdatedAt = DateTime.UtcNow.AddHours(2);
 
 			await _context.SaveChangesAsync();

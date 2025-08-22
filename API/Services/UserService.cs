@@ -1,34 +1,47 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
-using DomainModels.Enums;
 using DomainModels.Mapping;
-using DomainModels.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
+	/// <summary>
+	/// Service for managing user-related operations.
+	/// </summary>
 	public class UserService : IUserService
 	{
 		private readonly AppDBContext _context;
 		private readonly UserMapping _userMapping = new();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="UserService"/> class.
+		/// </summary>
+		/// <param name="context">The database context.</param>
 		public UserService(AppDBContext context)
 		{
 			_context = context;
 		}
 
+		/// <summary>
+		/// Retrieves all users from the database.
+		/// </summary>
+		/// <returns>A collection of <see cref="UserDto"/> objects.</returns>
 		public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
 		{
 			var users = await _context.Users
 				.Include(u => u.UserRole)
 				.ToListAsync();
 
-			var userDtos = users.Select(u => _userMapping.ToUserGetDto(u)).ToList();
+			var userDtos = users.Select(u => _userMapping.ToUserDto(u)).ToList();
 			return userDtos;
 		}
 
+		/// <summary>
+		/// Retrieves a user by their unique identifier.
+		/// </summary>
+		/// <param name="id">The user's unique identifier.</param>
+		/// <returns>A <see cref="UserDto"/> if found; otherwise, <c>null</c>.</returns>
 		public async Task<UserDto?> GetUserByIdAsync(int id)
 		{
 			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Id == id);
@@ -37,10 +50,15 @@ namespace API.Services
 				return null;
 			}
 
-			var userDto = _userMapping.ToUserGetDto(user);
+			var userDto = _userMapping.ToUserDto(user);
 			return userDto;
 		}
 
+		/// <summary>
+		/// Deletes a user by their email address.
+		/// </summary>
+		/// <param name="email">The user's email address.</param>
+		/// <returns><c>true</c> if the user was deleted; otherwise, <c>false</c>.</returns>
 		public async Task<bool> DeleteUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
