@@ -6,7 +6,7 @@ namespace DomainModels.Mapping;
 
 public class UserMapping
 {
-	public UserDto ToUserGetDto(User user)
+	public UserDto ToUserDto(User user)
 	{
 		return new UserDto
 		{
