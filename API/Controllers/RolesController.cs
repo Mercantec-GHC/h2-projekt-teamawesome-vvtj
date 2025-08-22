@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+/// <summary>
+/// Provides API endpoints for managing roles and assigning roles to users.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class RolesController : ControllerBase
@@ -20,6 +23,16 @@ public class RolesController : ControllerBase
 		_logger = logger;
 	}
 
+	/// <summary>
+	/// Retrieves all roles.
+	/// </summary>
+	/// <returns>
+	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="RoleDetailsDto"/> objects if roles exist;
+	/// otherwise, a 404 Not Found response.
+	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<RoleDetailsDto>>> GetRolesAsync()
@@ -32,6 +45,17 @@ public class RolesController : ControllerBase
 		return Ok(roles);
 	}
 
+	/// <summary>
+	/// Retrieves a role by its unique identifier.
+	/// </summary>
+	/// <param name="id">The unique identifier of the role.</param>
+	/// <returns>
+	/// An <see cref="ActionResult{T}"/> containing the <see cref="RoleDetailsDto"/> if found;
+	/// otherwise, a 404 Not Found response.
+	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<RoleDetailsDto>> GetRoleByIdAsync(int id)
@@ -44,6 +68,21 @@ public class RolesController : ControllerBase
 		return Ok(role);
 	}
 
+	/// <summary>
+	/// Assigns a new role to a user.
+	/// </summary>
+	/// <param name="id">The unique identifier of the user to update.</param>
+	/// <param name="newRole">The new role to assign to the user.</param>
+	/// <returns>
+	/// An <see cref="ActionResult"/> indicating the result of the operation:
+	/// <list type="bullet">
+	/// <item><description>200 OK if the role was successfully assigned.</description></item>
+	/// <item><description>500 Internal Server Error if an exception occurs.</description></item>
+	/// </list>
+	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpPut("{id:int}/assign-role-to-user")]
 	public async Task<ActionResult> AssignUserRole(int id, RoleEnum newRole)

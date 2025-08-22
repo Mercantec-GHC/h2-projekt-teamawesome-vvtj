@@ -61,7 +61,7 @@ namespace API.Services
 			{
 				throw new KeyNotFoundException("User not found.");
 			}
-			var userDto = _userMapping.ToUserGetDto(user);
+			var userDto = _userMapping.ToUserDto(user);
 			return userDto;
 		}
 

@@ -15,18 +15,16 @@ public class UsersController : ControllerBase
 {
 	private readonly IUserService _userService;
 	private readonly ILogger<UsersController> _logger;
-	private readonly AppDBContext _context;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UsersController"/> class.
 	/// </summary>
 	/// <param name="userService">The user service for user operations.</param>
 	/// <param name="logger">The logger instance for logging errors and information.</param>
-	public UsersController(IUserService userService, ILogger<UsersController> logger, AppDBContext context)
+	public UsersController(IUserService userService, ILogger<UsersController> logger)
 	{
 		_userService = userService;
 		_logger = logger;
-		_context = context;
 	}
 
 	/// <summary>
@@ -36,6 +34,10 @@ public class UsersController : ControllerBase
 	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="UserDto"/> objects if users exist;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
+	[Authorize(Roles = "Admin")]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
 	{
@@ -64,9 +66,9 @@ public class UsersController : ControllerBase
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
 	/// <remarks>
-	/// Requires authentication.
+	/// Requires authentication and Admin role.
 	/// </remarks>
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserDto>> GetUserById(int id)
 	{
