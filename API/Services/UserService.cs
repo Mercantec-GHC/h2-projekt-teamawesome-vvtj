@@ -41,6 +41,48 @@ namespace API.Services
 			return userDto;
 		}
 
+		public async Task<UserGetDto> GetUserByEmailAsync(string email)
+		{
+			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Email == email);
+			if (user == null)
+			{
+				throw new KeyNotFoundException("User not found.");
+			}
+			var userDto = _userMapping.ToUserGetDto(user);
+			return userDto;
+		}
+
+		public async Task<bool> UpdateUserAsync(UserPostDto dto)
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+			if (user == null)
+			{
+				return false;
+			}
+			if (!string.IsNullOrEmpty(dto.Email))
+				user.Email = dto.Email;
+
+			//for some reason it overwrites the username with an empty string if nothing is provided in PUT.
+			//If you testing this, make sure to provide a username in the PUT request. I will investigate this later.
+			if (!string.IsNullOrWhiteSpace(dto.UserName))
+				user.UserName = dto.UserName;
+
+			if (!string.IsNullOrEmpty(dto.NewPassword))
+			{
+				var hashedPassword = new PasswordHasher<User>()
+					.HashPassword(user, dto.NewPassword);
+				user.HashedPassword = hashedPassword;
+			}
+
+			if (dto.UserRole != RoleEnum.Unknown)
+			{
+				user.UserRoleId = (int)dto.UserRole;
+			}
+
+			await _context.SaveChangesAsync();
+			return true;
+		}
+
 		public async Task<bool> DeleteUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);

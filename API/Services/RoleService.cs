@@ -1,8 +1,8 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto;
+using DomainModels.Dto.UserDto;
 using DomainModels.Mapping;
-using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
@@ -32,5 +32,22 @@ public class RoleService:IRoleService
 
 		var roleDto = _roleMapping.ToRoleGetDto(role);
 		return roleDto;
+	}
+	public async Task<IEnumerable<UserGetDto>> GetUsersByRoleIdAsync(int roleId)
+	{
+		var users = await _context.Users
+			.Where(u => u.UserRoleId == roleId)
+			.ToListAsync();
+		if (users == null || !users.Any())
+		{
+			return Enumerable.Empty<UserGetDto>();
+		}
+		return users.Select(u => new UserGetDto
+		{
+			Id = u.Id,
+			UserName = u.UserName,
+			Email = u.Email,
+			UserRole = u.UserRole.RoleName.ToString(),
+		});
 	}
 }
