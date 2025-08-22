@@ -7,6 +7,6 @@ namespace API.Interfaces
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
 		Task<UserDto?> GetUserByIdAsync(int id);
 		Task<bool> DeleteUserByEmailAsync(string email);
-        Task<UserGetDto> GetUserByEmailAsync(string email);
+        Task<UserDto> GetUserByEmailAsync(string email);
 	}
 }
