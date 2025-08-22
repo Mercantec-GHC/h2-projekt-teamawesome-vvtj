@@ -45,7 +45,7 @@ namespace API.Services
             {
                 await transaction.RollbackAsync();
 
-                Console.WriteLine($"Error updating rooms: {ex.Message}");
+                _logger.LogError($"Error updating rooms: {ex.Message}");
                 return Enumerable.Empty<RoomToCleanDto>();
             }
         }
