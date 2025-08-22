@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers;
 
 /// <summary>
-/// Controller for authentication-related actions.
+/// Provides endpoints for user authentication, registration, and profile retrieval.
 /// </summary>
 
 [Route("api/[controller]")]
@@ -24,8 +24,10 @@ public class AuthController : ControllerBase
 	/// <summary>
 	/// Initializes a new instance of the <see cref="AuthController"/> class.
 	/// </summary>
-	/// <param name="authService">Authentication service.</param>
-	/// <param name="context">Database context.</param>
+	/// <param name="authService">Service for authentication logic.</param>
+	/// <param name="loginAttemptService">Service for tracking login attempts and lockouts.</param>
+	/// <param name="logger">Logger for authentication events.</param>
+	/// <param name="context">Database context for user data.</param>
 	public AuthController(IAuthService authService, ILoginAttemptService loginAttemptService , ILogger<AuthController> logger,  AppDBContext context)
 	{
 		_authService = authService;
@@ -35,10 +37,13 @@ public class AuthController : ControllerBase
 	}
 
 	/// <summary>
-	/// Registers a new user.
+	/// Registers a new user account.
 	/// </summary>
-	/// <param name="request">Registration data.</param>
-	/// <returns>Registered user data or error.</returns>
+	/// <param name="request">The registration details including email, username, password, and role.</param>
+	/// <returns>
+	/// <see cref="RegisterDto"/> with registered user data if successful;
+	/// otherwise, a <see cref="BadRequestObjectResult"/> if the user already exists.
+	/// </returns>
 	[HttpPost("register")]
 	public async Task<ActionResult<RegisterDto>> Register(RegisterDto request)
 	{
@@ -52,10 +57,15 @@ public class AuthController : ControllerBase
 	}
 
 	/// <summary>
-	/// Logs in a user.
+	/// Authenticates a user and returns a JWT token if credentials are valid.
 	/// </summary>
-	/// <param name="request">Login data.</param>
-	/// <returns>JWT token or error.</returns>
+	/// <param name="request">The login details including email and password.</param>
+	/// <returns>
+	/// JWT token as a string if login is successful;
+	/// <see cref="UnauthorizedObjectResult"/> if credentials are invalid;
+	/// <see cref="ObjectResult"/> with status code 429 if account is locked out;
+	/// <see cref="ObjectResult"/> with status code 500 if an internal error occurs.
+	/// </returns>
 	[HttpPost("login")]
 	public async Task<ActionResult<string>> Login(LoginDto request)
 	{
@@ -94,11 +104,15 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Gets the current authenticated user.
-    /// </summary>
-    /// <returns>User data or error.</returns>
-    [Authorize]
+	/// <summary>
+	/// Retrieves the currently authenticated user's profile information.
+	/// </summary>
+	/// <returns>
+	/// An object containing user ID, email, username, creation date, last login, and role if found;
+	/// <see cref="UnauthorizedObjectResult"/> if the user ID is not found in the token;
+	/// <see cref="NotFoundObjectResult"/> if the user does not exist in the database.
+	/// </returns>
+	[Authorize]
 	[HttpGet("/me")]
 	public IActionResult GetCurrentUser()
 	{

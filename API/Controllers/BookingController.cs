@@ -29,6 +29,8 @@ public class BookingController : ControllerBase
     /// <returns>Returns a success message or an error if the booking cannot be completed.</returns>
     /// <response code="200">OK with <see cref="BookingResponseDto"/>.</response>
     /// <response code="400">Bad Request if the input is invalid or required entities/room are not found.</response>
+    /// <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
@@ -69,7 +71,9 @@ public class BookingController : ControllerBase
     /// </summary>
     /// <returns>A list of all bookings with user and room information, check-in and out.</returns>
     /// <response code="200">OK with list of <see cref="GetBookingsDto"/>.</response>
-    /// <response code="400">Bad request.</response>
+    /// <response code="400">Bad request – invalid request or parameters.</response>
+    /// <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [Authorize(Roles = "Admin,Reception,CleaningStaff")]
     [HttpGet]
@@ -82,6 +86,12 @@ public class BookingController : ControllerBase
     /// Gets all bookings of a user by user´s ID. Only available to administrators.
     /// </summary>
     /// <param name="id">Requires UserID</param>
+    /// <response code="200">Successfully retrieved the bookings.</response>
+    /// <response code="400">Bad request – userId was not provided or is invalid.</response>
+    /// <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="403">Forbidden – the user does not have administrator privileges.</response>
+    /// <response code="404">Not found – user with specified ID does not exist or has no bookings.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
      //[Authorize(Roles = "Admin")]
     [HttpGet("user")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
@@ -94,7 +104,12 @@ public class BookingController : ControllerBase
     /// Allows to update check-in and check-out dates.
     /// </summary>
     /// <param name="id">Requires BookingID</param>
-    /// <returns>Bool.</returns>
+    /// <returns> Returns a success message if the update was successful, or an error message if it failed.</returns>
+    /// <response code="200">Booking dates were successfully updated.</response>
+    /// <response code="400">Bad request – invalid input data, invalid dates, or booking not found.</response>
+    /// <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="404">Not found – booking with the specified ID does not exist.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred while processing the request.</response>
     //[Authorize(Roles = "Admin", "Reciptionist", "User")]
     [HttpPut("{id}/dates")]
     public async Task<IActionResult> UpdateDates(int id, [FromBody] UpdateDatesDto dto)
@@ -124,7 +139,8 @@ public class BookingController : ControllerBase
     /// </summary>
     /// <param name="id">HotelId</param>
     /// <returns>A list of <see cref="BookingDto"/> for chosen hotel</returns>
-    ///  <response code="400">Bad request.</response>
+    ///  <response code="400">Bad request - HotelId was not provided or is invalid.</response>
+    ///   <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
 
     [Authorize(Roles = "Admin,Reception")]

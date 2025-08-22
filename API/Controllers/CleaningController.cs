@@ -51,7 +51,6 @@ public class CleaningController : ControllerBase
         }
     }
 
-
     /// <summary>
     /// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date to the current UTC time.
     /// </summary>

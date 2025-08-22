@@ -7,7 +7,7 @@ namespace DomainModels.Models
     {
 
         public int RoomNumber { get; set; }
-        public Booking GuestCount { get; set; }
+        //public required int GuestCount { get; set; }
         public bool IsAvailable { get; set; }
         public bool IsBreakfast { get; set; }
         public DateTime AvailableFrom { get; set; }
