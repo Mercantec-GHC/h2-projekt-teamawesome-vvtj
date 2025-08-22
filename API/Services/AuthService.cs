@@ -8,12 +8,14 @@ using DomainModels.Enums;
 using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
+/// <summary>
+/// Provides authentication and registration services for users, including JWT token generation and password management.
+/// </summary>
 public class AuthService : IAuthService
 {
 	private readonly IConfiguration _configuration;
@@ -32,41 +34,66 @@ public class AuthService : IAuthService
 	/// Registers a new user in the system.
 	/// </summary>
 	/// <param name="request">Registration data including email, username, and password.</param>
-	/// <returns>User details if registration is successful; otherwise, null.</returns>
+	/// <returns>
+	/// A <see cref="UserDto"/> containing user details if registration is successful; otherwise, <c>null</c>.
+	/// </returns>
 	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
 	{
-		if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-			return null; // User already exists
-
-		var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == RoleEnum.Guest);
-		if (role == null)
-			throw new InvalidOperationException("Default role 'Guest' not found in database");
-
-		var user = new User
+		try
 		{
-			Email = request.Email,
-			UserName = request.Username,
-			HashedPassword = string.Empty,
-			CreatedAt = DateTime.UtcNow.AddHours(2),
-			UserRoleId = role.Id
-		};
+			if (string.IsNullOrWhiteSpace(request.Email)
+				|| string.IsNullOrWhiteSpace(request.Username)
+				|| string.IsNullOrWhiteSpace(request.Password))
+			{
+				_logger.LogWarning("Registration failed: Email, Username, or Password is empty.");
+				return null;
+			}
 
-		var hashedPassword = new PasswordHasher<User>()
-		.HashPassword(user, request.Password);
+			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+			{
+				_logger.LogWarning("Registration failed: User with email {Email} already exists.", request.Email);
+				return null; // User already exists
+			}
 
-		user.HashedPassword = hashedPassword;
+			var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == RoleEnum.Guest);
+			if (role == null)
+				throw new InvalidOperationException("Default role 'Guest' not found in database");
 
-		_context.Users.Add(user);
-		await _context.SaveChangesAsync();
+			var user = new User
+			{
+				Email = request.Email,
+				UserName = request.Username,
+				HashedPassword = string.Empty,
+				CreatedAt = DateTime.UtcNow.AddHours(2),
+				UserRoleId = role.Id
+			};
 
-		return _userMapping.ToUserDto(user);
+			var hashedPassword = new PasswordHasher<User>()
+				.HashPassword(user, request.Password);
+
+			user.HashedPassword = hashedPassword;
+
+			_context.Users.Add(user);
+			await _context.SaveChangesAsync();
+
+			_logger.LogInformation("Registered new user with email: {Email}", request.Email);
+
+			return _userMapping.ToUserDto(user);
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Error during user registration");
+			return null; 
+		}
 	}
 
 	/// <summary>
 	/// Authenticates a user and returns a JWT token if successful.
 	/// </summary>
 	/// <param name="request">Login credentials containing email and password.</param>
-	/// <returns>JWT token string if login is successful; otherwise, null.</returns>
+	/// <returns>
+	/// A JWT token string if login is successful; otherwise, <c>null</c>.
+	/// </returns>
 	public async Task<string?> LoginUserAsync(LoginDto request)
 	{
 		var user = await _context.Users
@@ -119,11 +146,13 @@ public class AuthService : IAuthService
 	}
 
 	/// <summary>
-	/// Changes the password for a user if the current password matches.
+	/// Changes the password for a user.
 	/// </summary>
 	/// <param name="userEmail">The email of the user whose password is to be changed.</param>
 	/// <param name="newPassword">The new password to set.</param>
-	/// <returns>True if the password was changed successfully; otherwise, false.</returns>
+	/// <returns>
+	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
+	/// </returns>
 	public async Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword)
 	{
 		try
