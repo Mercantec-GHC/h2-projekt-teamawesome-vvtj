@@ -22,7 +22,7 @@ namespace API.Services
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
-                RoomTypeId = r.RoomType.TypeofRoom,
+                RoomtypeId = r.RoomType,
                 HotelId = r.Hotel.Id,
 
             });
@@ -44,20 +44,20 @@ namespace API.Services
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
-                RoomTypeId = room.RoomType.TypeofRoom,
+                RoomtypeId = room.RoomType,
             };
 
             return getRoom;
         }
         
         //Use type Room instead of RoomsDto, as we want the new room into the DB
-        public async Task<Room> PostRoom(RoomsDto room)
+        public async Task<Room> PostRoom(RoomCreateDto room)
         {
             if (await _context.Rooms.AnyAsync(r => r.RoomNumber == room.RoomNumber))
             {
                 return null;
             }
-            var type = _context.RoomTypes.Find((int)room.RoomTypeId);
+            var type = _context.RoomTypes.Find(room.RoomtypeId);
             if (type == null)
             {
                 return null;
