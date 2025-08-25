@@ -157,14 +157,7 @@ public class Program
 			app.MapOpenApi();
 			app.MapScalarApiReference();
 		}
-        // Scalar Middleware for OpenAPI
-        //app.MapScalarApiReference(options =>
-        //{
-        //    options
-        //        .WithTitle("MAGSLearn")
-        //        .WithTheme(ScalarTheme.Mars)
-        //        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-        //});
+
         // Map the Swagger UI
         app.UseSwagger();
 		app.UseSwaggerUI(options =>
