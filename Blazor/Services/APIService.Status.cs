@@ -9,7 +9,8 @@ namespace Blazor.Services
         {
             try
             {
-                return await httpClient.GetFromJsonAsync<HealthCheckResponse>("api/status/healthcheck");
+                Console.WriteLine($"status link: {httpClient.BaseAddress}api/Status/healthcheck");
+                return await httpClient.GetFromJsonAsync<HealthCheckResponse>("api/Status/healthcheck");
             }
             catch (Exception ex)
             {
@@ -26,7 +27,7 @@ namespace Blazor.Services
         {
             try
             {
-                return await httpClient.GetFromJsonAsync<HealthCheckResponse>("api/status/dbhealthcheck");
+                return await httpClient.GetFromJsonAsync<HealthCheckResponse>("api/Status/dbhealthcheck");
             }
             catch (Exception ex)
             {
