@@ -56,23 +56,12 @@ public class RoomTypesController : ControllerBase
     [HttpPut]
      public async Task<ActionResult> UpdateRoomType(RoomTypePutDto roomTypePutDto)
     {
-        var updatedRoomType = _roomtypeService.UpdateRoomType(roomTypePutDto);
+        var updatedRoomType = await _roomtypeService.UpdateRoomType(roomTypePutDto);
 
         await _context.SaveChangesAsync();
 
         return Ok(updatedRoomType);
     }
-    // [HttpPost]
-    // public async Task<ActionResult> CreateRoomType(RoomTypeDto roomTypeDto)
-    // {
-    //     var newRoomType = await _roomtypeService.PostRoomType(roomTypeDto);
-    //     if (newRoomType == null)
-    //     {
-    //         return BadRequest();
-    //     }
-
-    //     return Ok(newRoomType);
-    // }
 }
 
     

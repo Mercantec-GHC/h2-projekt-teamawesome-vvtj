@@ -47,6 +47,7 @@ namespace API.Services
                     HasTV = rt.HasTV,
                     HasVault = rt.HasVault,
                     Area = rt.Area,
+                    PricePerNight = rt.PricePerNight,
                 };
             }).ToList();
             return newRoomTypesListDto;
@@ -78,6 +79,7 @@ namespace API.Services
                 HasTV = roomtype.HasTV,
                 HasVault = roomtype.HasVault,
                 Area = roomtype.Area,
+                PricePerNight = roomtype.PricePerNight,
             };
 
             return getRoomType;
@@ -91,49 +93,20 @@ namespace API.Services
                 return null;
             }
 
-            existingRoomType.Id = roomTypePutDto.Id;
-            existingRoomType.Description = roomTypePutDto.Description;
-            existingRoomType.PricePerNight = roomTypePutDto.Price;
+            //Only update if there's a new value
+            if (roomTypePutDto.Description != null)
+                existingRoomType.Description = roomTypePutDto.Description;
+            
+            //Only update if there's a new value
+            if (roomTypePutDto.Price != null)
+                existingRoomType.PricePerNight = roomTypePutDto.Price;
+            
+        
             existingRoomType.UpdatedAt = roomTypePutDto.UpdatedAt;
 
             await _context.SaveChangesAsync();
-
             return existingRoomType;
         }
-
-        // var type = _context.RoomTypes.Find((int)roomTypeDto.TypeofRoom);
-        //     if (type == null)
-        //     {
-        //         return null;
-        //     }
-
-        // public async Task<RoomType> UpdateRoomTypes(RoomTypeDto roomTypeDto)
-        // {
-
-        // }
-
-        // public async Task<RoomType> PostRoomType(RoomTypeDto roomTypeDto)
-        // {
-        //     if (await _context.RoomTypes.AnyAsync(rt => rt.Id == roomTypeDto.Id))
-        //     {
-        //         return null;
-        //     }
-
-        //     
-
-        //     var newRoomType = new RoomType
-        //     {
-        //         Id = roomTypeDto.Id,
-        //         TypeofRoom = type.TypeofRoom,
-        //         MaxCapacity = roomTypeDto.MaxCapacity,
-        //         Description = roomTypeDto.Description,
-        //     };
-
-        //     _context.RoomTypes.Add(newRoomType);
-        //     await _context.SaveChangesAsync();
-
-        //     return newRoomType;
-        // }
 
     }
 }

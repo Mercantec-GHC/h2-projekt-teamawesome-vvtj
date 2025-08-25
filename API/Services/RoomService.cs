@@ -22,7 +22,7 @@ namespace API.Services
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
-                RoomtypeId = r.RoomType,
+                Roomtype = r.RoomType,
                 HotelId = r.Hotel.Id,
 
             });
@@ -44,7 +44,7 @@ namespace API.Services
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
-                RoomtypeId = room.RoomType,
+                Roomtype = room.RoomType,
             };
 
             return getRoom;
