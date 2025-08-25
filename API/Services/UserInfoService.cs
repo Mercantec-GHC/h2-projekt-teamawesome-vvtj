@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Interfaces;
+using DomainModels.Dto.UserProfileDto;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +15,9 @@ public class UserInfoService : IUserInfoService
 		_context = context;
 	}
 
-	public async Task<UserInfo?> GetByUserIdAsync(int userId)
+	public async Task<UserInfoGetDto?> GetByUserEmailAsync(int id)
 	{
 		return await _context.UserInfos
-			.FirstOrDefaultAsync(ui => ui.UserId == userId);
 	}
 
 	public async Task<UserInfo?> UpdateUserInfoAsync(int userId, UserInfo updatedInfo)

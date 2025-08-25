@@ -1,4 +1,4 @@
-﻿using DomainModels.Dto;
+﻿using DomainModels.Dto.UserProfileDto;
 using DomainModels.Models;
 
 namespace DomainModels.Mapping;
