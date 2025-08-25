@@ -15,8 +15,9 @@ public class UserMapping
 			UserName = user.UserName,
 			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
 			CreatedAt = user.CreatedAt,
+			UpdatedAt = DateTime.UtcNow.AddHours(2),
 			HashedPasword = user.HashedPassword,
-			UserRole = user.UserRole.RoleName.ToString()
+			UserRole = user.UserRole.RoleName.ToString(),
 		};
 	}
 }

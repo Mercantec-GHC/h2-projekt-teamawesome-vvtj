@@ -5,6 +5,7 @@ using API.Data;
 using API.Services;
 using DomainModels.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -76,7 +77,9 @@ public class HotelController : ControllerBase
     /// <param name="hotelcreateDto">Contains hotel details to be created</param>
     /// <returns>The newly created hotel</returns>
     /// <response code="400">Could not create hotel!</response>
-    [HttpPost]
+    /// 
+    [Authorize(Roles = "Admin")]
+	[HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
         
@@ -99,15 +102,17 @@ public class HotelController : ControllerBase
 
     }
 
-    //Only Admin
-    //PUT: api/Hotels
-    /// <summary>
-    /// Updates a specific hotel
-    /// </summary>
-    /// <param name="updateHotel">Contains hotel details to be updated</param>
-    /// <returns>Updated hotel</returns>
-    /// <response code="400">Could not update hotel!</response>
-    [HttpPut]
+	//Only Admin
+	//PUT: api/Hotels
+	/// <summary>
+	/// Updates a specific hotel
+	/// </summary>
+	/// <param name="updateHotel">Contains hotel details to be updated</param>
+	/// <returns>Updated hotel</returns>
+	/// <response code="400">Could not update hotel!</response>
+	/// 
+	[Authorize(Roles = "Admin")]
+	[HttpPut]
     public async Task<ActionResult> PutHotel(HotelDto updateHotel)
     {
         try
@@ -124,15 +129,17 @@ public class HotelController : ControllerBase
         
     }
 
-    //Only Admin
-    //DELETE: api/Hotels
-    /// <summary>
-    /// Deletes a hotel
-    /// </summary>
-    /// <param name="Id">Unique identifier</param>
-    /// <returns>true if deletion succeed</returns>
-    /// <response code="404">Could not delete hotel!</response>
-    [HttpDelete]
+	//Only Admin
+	//DELETE: api/Hotels
+	/// <summary>
+	/// Deletes a hotel
+	/// </summary>
+	/// <param name="Id">Unique identifier</param>
+	/// <returns>true if deletion succeed</returns>
+	/// <response code="404">Could not delete hotel!</response>
+	/// 
+	[Authorize(Roles = "Admin")]
+	[HttpDelete]
     public async Task<IActionResult> DeleteHotel(int Id)
     {
         var deletedHotel = await _hotelService.DeleteHotel(Id);
