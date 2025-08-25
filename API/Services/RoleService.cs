@@ -64,9 +64,6 @@ public class RoleService : IRoleService
 	public async Task<UserDto> AssignRoleToUserAsync(int userId, RoleEnum newRole)
 	{
 		var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-		if (user == null)
-			throw new KeyNotFoundException($"User with ID {userId} not found.");
-
 
 		user.UserRoleId = (int)newRole;
 		user.UpdatedAt = DateTime.UtcNow.AddHours(2);

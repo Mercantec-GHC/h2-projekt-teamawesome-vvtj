@@ -57,10 +57,7 @@ namespace API.Services
 		public async Task<UserDto> GetUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Email == email);
-			if (user == null)
-			{
-				throw new KeyNotFoundException("User not found.");
-			}
+		
 			var userDto = _userMapping.ToUserDto(user);
 			return userDto;
 		}
