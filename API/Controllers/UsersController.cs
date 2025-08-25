@@ -1,4 +1,5 @@
-﻿using API.Interfaces;
+﻿using API.Data;
+using API.Interfaces;
 using DomainModels.Dto.UserDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,10 @@ public class UsersController : ControllerBase
 	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="UserDto"/> objects if users exist;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
+	[Authorize(Roles = "Admin")]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
 	{
@@ -61,9 +66,9 @@ public class UsersController : ControllerBase
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
 	/// <remarks>
-	/// Requires authentication.
+	/// Requires authentication and Admin role.
 	/// </remarks>
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserDto>> GetUserById(int id)
 	{

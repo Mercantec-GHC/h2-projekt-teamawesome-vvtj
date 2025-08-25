@@ -97,9 +97,8 @@ public class Program
 			);
 		});
 
-		// Tilføj basic health checks
-		builder.Services.AddHealthChecks()
-			.AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), ["live"]);
+        // Tilføj basic health checks
+        builder.Services.AddHealthChecks();
 
 		if (builder.Environment.IsDevelopment())
 		{
@@ -109,7 +108,6 @@ public class Program
 
 			builder.Services.AddDbContext<AppDBContext>(options =>
 					options.UseNpgsql(connectionString));
-
 		}
 
 		if (builder.Environment.IsProduction())
@@ -183,7 +181,8 @@ public class Program
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		app.MapControllers();
+        app.MapDefaultEndpoints();
+        app.MapControllers();
 
 		app.Run();
 	}

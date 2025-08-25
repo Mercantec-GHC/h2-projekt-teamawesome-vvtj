@@ -56,22 +56,20 @@ public class AuthService : IAuthService
 			}
 
 			var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == RoleEnum.Guest);
-			if (role == null)
-				throw new InvalidOperationException("Default role 'Guest' not found in database");
 
-			var user = new User
-			{
-				Email = request.Email,
-				UserName = request.Username,
-				HashedPassword = string.Empty,
-				CreatedAt = DateTime.UtcNow.AddHours(2),
-				UserRoleId = role.Id
-			};
+		var user = new User
+		{
+			Email = request.Email,
+			UserName = request.Username,
+			HashedPassword = string.Empty,
+			CreatedAt = DateTime.UtcNow.AddHours(2),
+		};
 
 			var hashedPassword = new PasswordHasher<User>()
 				.HashPassword(user, request.Password);
 
-			user.HashedPassword = hashedPassword;
+		user.HashedPassword = hashedPassword;
+		user.UserRole = role;
 
 			_context.Users.Add(user);
 			await _context.SaveChangesAsync();

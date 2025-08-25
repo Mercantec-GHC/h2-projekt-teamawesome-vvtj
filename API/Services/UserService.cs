@@ -54,11 +54,14 @@ namespace API.Services
 			return userDto;
 		}
 
-		/// <summary>
-		/// Deletes a user by their email address.
-		/// </summary>
-		/// <param name="email">The user's email address.</param>
-		/// <returns><c>true</c> if the user was deleted; otherwise, <c>false</c>.</returns>
+		public async Task<UserDto> GetUserByEmailAsync(string email)
+		{
+			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Email == email);
+		
+			var userDto = _userMapping.ToUserDto(user);
+			return userDto;
+		}
+
 		public async Task<bool> DeleteUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
