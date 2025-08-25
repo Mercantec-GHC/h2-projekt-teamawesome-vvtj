@@ -1,5 +1,4 @@
 ﻿using DomainModels.Dto.UserDto;
-using DomainModels.Enums;
 using DomainModels.Models;
 
 namespace DomainModels.Mapping;

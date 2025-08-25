@@ -3,9 +3,9 @@ using DomainModels.Models;
 
 namespace DomainModels.Mapping;
 
-public static class UserInfoMapping
+public class UserInfoMapping
 {
-	public static UserInfoGetDto ToUserInfoGetDto(this UserInfo ui)
+	public UserInfoGetDto ToUserInfoGetDto(UserInfo ui)
 	{
 		return new UserInfoGetDto
 		{
@@ -22,7 +22,7 @@ public static class UserInfoMapping
 		};
 	}
 
-	public static UserInfo FromDtoToUserInfo(UserInfoPostDto dto)
+	public UserInfo FromDtoToUserInfo(UserInfoPostDto dto)
 	{
 		return new UserInfo
 		{
@@ -38,7 +38,7 @@ public static class UserInfoMapping
 		};
 	}
 
-	public static void UpdateUserInfoFromDto(UserInfo existing, UserInfoPutDto dto)
+	public void UpdateUserInfoFromDto(UserInfo existing, UserInfoPutDto dto)
 	{
 		if (!string.IsNullOrWhiteSpace(dto.FirstName))
 			existing.FirstName = dto.FirstName;

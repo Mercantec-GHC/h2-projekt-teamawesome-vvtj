@@ -5,7 +5,7 @@ namespace API.Interfaces;
 
 public interface IUserInfoService
 {
-	Task<UserInfoGetDto?> GetByUserEmailAsync(int id);
-	Task<UserInfoPutDto?> UpdateUserInfoAsync(int id, UserInfo updatedInfo);
-	Task<UserInfoPostDto?> CreateUserInfoAsync(UserInfo newInfo);
+	Task<UserInfoGetDto?> GetByUserIdAsync(int id);
+	Task<UserInfo?> UpdateUserInfoAsync(int id, UserInfoPutDto updatedInfo);
+	Task<UserInfo?> CreateUserInfoAsync(UserInfoPostDto newInfo);
 }

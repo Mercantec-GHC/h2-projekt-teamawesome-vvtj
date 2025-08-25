@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserProfileDto;
+using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,36 +10,41 @@ using Microsoft.EntityFrameworkCore;
 public class UserInfoService : IUserInfoService
 {
 	private readonly AppDBContext _context;
+	private readonly UserInfoMapping _userInfoMapping = new();
 
 	public UserInfoService(AppDBContext context)
 	{
 		_context = context;
 	}
 
-	public async Task<UserInfoGetDto?> GetByUserEmailAsync(int id)
+	public async Task<UserInfoGetDto?> GetByUserIdAsync(int id)
 	{
-		return await _context.UserInfos
+		var userInfo = await _context.UserInfos.FirstOrDefaultAsync(ui => ui.UserId == id);
+		if (userInfo == null)
+		{
+			return null;
+		}
+		return _userInfoMapping.ToUserInfoGetDto(userInfo);
 	}
 
-	public async Task<UserInfo?> UpdateUserInfoAsync(int userId, UserInfo updatedInfo)
+	public async Task<UserInfo?> UpdateUserInfoAsync(int userId, UserInfoPutDto updatedInfo)
 	{
-		var existing = await _context.UserInfos
+		var existingUser = await _context.UserInfos
 			.FirstOrDefaultAsync(ui => ui.UserId == userId);
 
-		if (existing == null)
+		if (existingUser == null)
 		{
 			return null;
 		}
 
-		existing.FirstName = updatedInfo.FirstName;
-		existing.LastName = updatedInfo.LastName;
-		existing.Address = updatedInfo.Address;
-		existing.PostalCode = updatedInfo.PostalCode;
-		existing.City = updatedInfo.City;
-		existing.Country = updatedInfo.Country;
-		existing.PhoneNumber = updatedInfo.PhoneNumber;
+		_userInfoMapping.UpdateUserInfoFromDto(existingUser, updatedInfo);
+		return await _context.SaveChangesAsync() > 0 ? existingUser : null;
+	}
 
-		await _context.SaveChangesAsync();
-		return existing;
+	public async Task<UserInfo?> CreateUserInfoAsync(UserInfoPostDto newInfo)
+	{
+		var userInfo = _userInfoMapping.FromDtoToUserInfo(newInfo);
+		_context.UserInfos.Add(userInfo);
+		return await _context.SaveChangesAsync() > 0 ? userInfo : null;
 	}
 }
