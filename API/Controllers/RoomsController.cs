@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -19,8 +20,15 @@ public class RoomsController : ControllerBase
         _roomService = roomService;
     }
 
-    //Everybody
-    [HttpGet]
+	//Everybody  -> Guests shouldn't be able to see rooms, so not everybody
+	/// <summary>
+	/// Shows all rooms
+	/// </summary>
+	/// <returns> A list of rooms</returns>
+	/// <response code="404">Rooms not found!</response>
+	/// 
+	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
+	[HttpGet]
     public async Task<ActionResult<IEnumerable<RoomsDto>>> GetRooms()
     {
         var rooms = await _roomService.GetRooms();
@@ -33,8 +41,16 @@ public class RoomsController : ControllerBase
         return Ok(rooms);
     }
 
-    //Everybody
-    [HttpGet("{id}")]
+	//Everybody -> Guests shouldn't be able to see rooms, so not everybody
+	/// <summary>
+	/// Show one specific room
+	/// </summary>
+	/// <param name="id">Unique identifier for room</param>
+	/// <returns>A room</returns>
+	/// <response code="404">Rooms not found!</response>
+	/// 
+	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
+	[HttpGet("{id}")]
     public async Task<ActionResult<RoomsDto>> GetSpecificRoom(int id)
     {
         if (id == null)

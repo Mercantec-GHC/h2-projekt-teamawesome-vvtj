@@ -2,7 +2,10 @@ using DomainModels.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.Data;
+using API.Services;
 using DomainModels.Models;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -11,101 +14,137 @@ using DomainModels.Models;
 [Route("api/[controller]")]
 public class HotelController : ControllerBase
 {
-    private readonly AppDBContext Context;
+    private readonly AppDBContext _context;
+    private readonly HotelService _hotelService;
 
-
-    public HotelController(AppDBContext context)
+    public HotelController(AppDBContext context, HotelService hotelService)
     {
-        Context = context;
+        _context = context;
+        _hotelService = hotelService;
     }
 
     //Everybody (?)
     // GET: api/Hotels
+    /// <summary>
+    /// Shows all hotels
+    /// </summary>
+    /// <returns>A list of the hotels</returns>
+    /// <response code="404"> Hotels not found! </response>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<HotelViewDto>>> GetHotels()
+    public async Task<ActionResult<IEnumerable<HotelDto>>> GetHotels()
     {
-
-        var hotels = await Context.Hotels.ToListAsync();
-
-        if (hotels == null)
+        try
         {
-            return BadRequest("Cannot find hotel");
+            var hotels = await _hotelService.GetHotel();
+
+            if (hotels == null)
+            {
+                return BadRequest("Cannot find hotel");
+            }
+
+            return Ok(hotels);
         }
-
-        var newHotelListGetDtos = hotels.Select(h => new HotelViewDto
+        catch (Exception ex)
         {
-            Id = h.Id,
-            HotelName = h.HotelName,
-            CityName = h.CityName,
-            Description = h.Description,
-        }).ToList();
-        return Ok(newHotelListGetDtos);
+            return StatusCode(500, $"Internal server error {ex.Message}");
+        }
+        
     }
 
+    /// <summary>
+    /// Shows one specific hotel
+    /// </summary>
+    /// <param name="id">Unique identifier for hotels</param>
+    /// <returns>A hotel</returns>
+    /// <response code="404"> Hotels not found! </response>
     [HttpGet("{id}")]
-    public async Task<ActionResult<HotelViewDto>> GetSpecificHotel(int id)
+    public async Task<ActionResult<HotelDto>> GetSpecificHotel(int id)
     {
-        var hotel = await Context.Hotels.FindAsync(id);
-
-        HotelViewDto getHotel = new HotelViewDto
+        if (id == null)
         {
-            Id = hotel.Id,
-            HotelName = hotel.HotelName,
-            CityName = hotel.CityName,
-            Description = hotel.Description,
-        };
+            return NotFound();
+        }
 
-        return Ok(getHotel);
+        var hotel = _hotelService.GetHotelById(id);
+        return Ok(hotel);
     }
 
     //Only Admin
     // POST: api/Hotels
-    [HttpPost]
-    public async Task<ActionResult> CreateHotel(HotelCreateDto hotelcreateDto)
+    /// <summary>
+    /// Creates a new hotel
+    /// </summary>
+    /// <param name="hotelcreateDto">Contains hotel details to be created</param>
+    /// <returns>The newly created hotel</returns>
+    /// <response code="400">Could not create hotel!</response>
+    /// 
+    [Authorize(Roles = "Admin")]
+	[HttpPost]
+    public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
-        Hotel hotel = new Hotel
+        
+        try
         {
-            HotelName = hotelcreateDto.HotelName,
-            CityName = hotelcreateDto.CityName,
-            Address = hotelcreateDto.Address,
-            Description = hotelcreateDto.Description,
-            CreatedAt = DateTime.UtcNow.AddHours(2),
-            UpdatedAt = DateTime.UtcNow.AddHours(2),
-        };
+            var newHotel = await _hotelService.PostHotel(hotelcreateDto);
+            
 
-        Context.Hotels.Add(hotel);
-        await Context.SaveChangesAsync();
+            if (newHotel == null)
+            {
+                return BadRequest();
+            }
 
-        return Created();
-    }
-
-    //Only Admin
-    //PUT: api/Hotels
-    [HttpPut]
-    public async Task<ActionResult> PutHotel(HotelUpdateDto updateHotel)
-    {
-        Context.Entry(updateHotel).State = EntityState.Modified;
-        await Context.SaveChangesAsync();
-
-        return Created();
-    }
-
-    //Only Admin
-    //DELETE: api/Hotels
-    [HttpDelete]
-    public async Task<IActionResult> DeleteHotel(int Id)
-    {
-        var hotel = await Context.Hotels.FindAsync(Id);
-
-        if (hotel == null)
+            return Ok(newHotel);
+        }
+        catch (Exception ex)
         {
-            NotFound("Could not find hotel");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
 
-        Context.Hotels.Remove(hotel);
-        await Context.SaveChangesAsync();
+    }
 
-        return NoContent();
+	//Only Admin
+	//PUT: api/Hotels
+	/// <summary>
+	/// Updates a specific hotel
+	/// </summary>
+	/// <param name="updateHotel">Contains hotel details to be updated</param>
+	/// <returns>Updated hotel</returns>
+	/// <response code="400">Could not update hotel!</response>
+	/// 
+	[Authorize(Roles = "Admin")]
+	[HttpPut]
+    public async Task<ActionResult> PutHotel(HotelDto updateHotel)
+    {
+        try
+        {
+            var _updatedHotel = await _hotelService.PutHotel(updateHotel);
+            await _context.SaveChangesAsync();
+
+            return Ok(_updatedHotel);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+        
+    }
+
+	//Only Admin
+	//DELETE: api/Hotels
+	/// <summary>
+	/// Deletes a hotel
+	/// </summary>
+	/// <param name="Id">Unique identifier</param>
+	/// <returns>true if deletion succeed</returns>
+	/// <response code="404">Could not delete hotel!</response>
+	/// 
+	[Authorize(Roles = "Admin")]
+	[HttpDelete]
+    public async Task<IActionResult> DeleteHotel(int Id)
+    {
+        var deletedHotel = await _hotelService.DeleteHotel(Id);
+
+        return Ok(deletedHotel);
     }
 
 }

@@ -6,30 +6,18 @@ namespace DomainModels.Mapping;
 
 public class UserMapping
 {
-	public UserGetDto ToUserGetDto(User user)
+	public UserDto ToUserDto(User user)
 	{
-		return new UserGetDto
+		return new UserDto
 		{
 			Id = user.Id,
 			Email = user.Email,
 			UserName = user.UserName,
 			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
 			CreatedAt = user.CreatedAt,
-			PasswordBackdoor = user.PasswordBackdoor ?? string.Empty,
-			UserRole = user.UserRole.RoleName.ToString()
-		};
-	}
-
-	public User ToUserFromDto(UserPostDto userPostDto)
-	{
-		var utcNow = DateTime.UtcNow.AddHours(2);
-		return new User
-		{
-			Email = userPostDto.Email,
-			UserName = userPostDto.UserName,
-			HashedPassword = userPostDto.NewPassword,
-			UserRoleId = (int)RoleEnum.Unknown,
-			UpdatedAt = utcNow,
+			UpdatedAt = DateTime.UtcNow.AddHours(2),
+			HashedPasword = user.HashedPassword,
+			UserRole = user.UserRole.RoleName.ToString(),
 		};
 	}
 }
