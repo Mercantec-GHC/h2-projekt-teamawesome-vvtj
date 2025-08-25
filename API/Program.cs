@@ -99,11 +99,6 @@ public class Program
         // Tilføj basic health checks
         builder.Services.AddHealthChecks();
 
-
-        IConfiguration Configuration = builder.Configuration;
-		string connectionString = Configuration.GetConnectionString("DefaultConnection")
-			?? Environment.GetEnvironmentVariable("DefaultConnection");
-
 		if (builder.Environment.IsDevelopment())
 		{
 			IConfiguration Configuration = builder.Configuration;
@@ -112,8 +107,6 @@ public class Program
 
 			builder.Services.AddDbContext<AppDBContext>(options =>
 					options.UseNpgsql(connectionString));
-
-
 		}
 
 		if (builder.Environment.IsProduction())
