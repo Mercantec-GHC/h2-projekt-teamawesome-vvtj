@@ -36,7 +36,7 @@ public class Program
 		builder.Services.AddScoped<IBookingInterface, BookingService>();
         builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
         builder.Services.AddMemoryCache();
-
+        builder.AddServiceDefaults();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddSwaggerGen(c =>
 		{
@@ -96,9 +96,13 @@ public class Program
 			);
 		});
 
-		// Tilføj basic health checks
-		builder.Services.AddHealthChecks()
-			.AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), ["live"]);
+        // Tilføj basic health checks
+        builder.Services.AddHealthChecks();
+
+
+        IConfiguration Configuration = builder.Configuration;
+		string connectionString = Configuration.GetConnectionString("DefaultConnection")
+			?? Environment.GetEnvironmentVariable("DefaultConnection");
 
 		if (builder.Environment.IsDevelopment())
 		{
@@ -108,6 +112,7 @@ public class Program
 
 			builder.Services.AddDbContext<AppDBContext>(options =>
 					options.UseNpgsql(connectionString));
+
 
 		}
 
@@ -182,7 +187,8 @@ public class Program
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		app.MapControllers();
+        app.MapDefaultEndpoints();
+        app.MapControllers();
 
 		app.Run();
 	}
