@@ -33,7 +33,7 @@ public class Program
 		builder.Services.AddScoped<ICleaningService, CleaningService>();
 		builder.Services.AddScoped<IAuthService, AuthService>();
 		builder.Services.AddScoped<HotelService>();
-		builder.Services.AddScoped<IBookingInterface, BookingService>();
+		builder.Services.AddScoped<IBookingService, BookingService>();
         builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
         builder.Services.AddMemoryCache();
         builder.AddServiceDefaults();
