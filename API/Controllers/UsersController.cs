@@ -1,4 +1,5 @@
-﻿using API.Interfaces;
+﻿using API.Data;
+using API.Interfaces;
 using DomainModels.Dto.UserDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,11 +31,15 @@ public class UsersController : ControllerBase
 	/// Retrieves all users.
 	/// </summary>
 	/// <returns>
-	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="UserGetDto"/> objects if users exist;
+	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="UserDto"/> objects if users exist;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
+	/// <remarks>
+	/// Requires authentication and Admin role.
+	/// </remarks>
+	[Authorize(Roles = "Admin")]
 	[HttpGet]
-	public async Task<ActionResult<IEnumerable<UserGetDto>>> GetUsers()
+	public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
 	{
 		try
 		{
@@ -57,15 +62,15 @@ public class UsersController : ControllerBase
 	/// </summary>
 	/// <param name="id">The unique identifier of the user.</param>
 	/// <returns>
-	/// An <see cref="ActionResult{T}"/> containing the <see cref="UserGetDto"/> if found;
+	/// An <see cref="ActionResult{T}"/> containing the <see cref="UserDto"/> if found;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
 	/// <remarks>
-	/// Requires authentication.
+	/// Requires authentication and Admin role.
 	/// </remarks>
-	[Authorize]
+	[Authorize(Roles = "Admin")]
 	[HttpGet("{id:int}")]
-	public async Task<ActionResult<UserGetDto>> GetUserById(int id)
+	public async Task<ActionResult<UserDto>> GetUserById(int id)
 	{
 		try
 		{
@@ -79,41 +84,6 @@ public class UsersController : ControllerBase
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Error occurred while retrieving user with ID {Id}.", id);
-			return StatusCode(500, "An unexpected error occurred.");
-		}
-	}
-
-	/// <summary>
-	/// Updates an existing user's information.
-	/// </summary>
-	/// <param name="userDto">The user data to update.</param>
-	/// <returns>
-	/// A 204 No Content response if successful; 400 Bad Request if input is invalid; 404 Not Found if user does not exist;
-	/// or a 500 Internal Server Error if an exception occurs.
-	/// </returns>
-	/// <remarks>
-	/// Requires authentication and either Admin or Reception role.
-	/// </remarks>
-	[Authorize(Roles = "Admin,Reception")]
-	[HttpPut]
-	public async Task<IActionResult> UpdateUser([FromBody] UserPostDto userDto)
-	{
-		try
-		{
-			if (userDto == null)
-			{
-				return BadRequest("User data is null.");
-			}
-			var updated = await _userService.UpdateUserAsync(userDto);
-			if (!updated)
-			{
-				return NotFound();
-			}
-			return NoContent();
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError(ex, "Error occurred while updating user.");
 			return StatusCode(500, "An unexpected error occurred.");
 		}
 	}

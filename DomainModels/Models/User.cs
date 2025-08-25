@@ -7,8 +7,8 @@ public class User : Common
 	public required string UserName { get; set; }
 	public required string HashedPassword { get; set; }
 	public DateTime? LastLogin { get; set; }
-	public int UserRoleId { get; set; } = (int)RoleEnum.Unknown;
-	public Role UserRole { get; set; } = default!;
+	public int UserRoleId { get; set; } = (int)RoleEnum.Guest;
+	public Role UserRole { get; set; } 
 	public int? UserInfoId { get; set; }
 	public UserInfo? UserInfo { get; set; } 
 	public List<Booking>? Bookings { get; set; } = new List<Booking>();

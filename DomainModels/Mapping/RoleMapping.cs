@@ -1,16 +1,19 @@
-﻿using DomainModels.Dto;
+﻿using DomainModels.Dto.RoleDto;
+using DomainModels.Enums;
 using DomainModels.Models;
 
 namespace DomainModels.Mapping;
 
 public class RoleMapping
 {
-	public RoleDto ToRoleGetDto(Role role)
+	public RoleDetailsDto ToRoleDto(Role role)
 	{
-		return new RoleDto
+		var roleEnum = (RoleEnum)role.Id;
+		return new RoleDetailsDto
 		{
 			Id = role.Id,
-			RoleName = role.RoleName
+			RoleName = role.RoleName,
+			Description = roleEnum.GetDescription()
 		};
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DomainModels.Enums;
 
 namespace DomainModels.Dto.UserDto;
 
@@ -30,8 +29,5 @@ public class RegisterDto
 	[Display(Name = "Confirm password")]
 	public string ConfirmPassword { get; set; } = string.Empty;
 
-	[Required(ErrorMessage = "Role is required")]
-	[Display(Name = "Role")]
-	
-	public RoleEnum role { get; set; } 
+	public string RoleName { get; set; }
 }

@@ -26,9 +26,12 @@ public class AppDBContext : DbContext
 			entity.HasOne(u => u.UserRole)
 				.WithMany(r => r.Users)
 
-
-
 				.HasForeignKey(u => u.UserRoleId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			entity.HasOne(u => u.UserInfo)
+				.WithOne(ui => ui.User)
+				.HasForeignKey<UserInfo>(ui => ui.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
 		});
 
@@ -48,6 +51,8 @@ public class AppDBContext : DbContext
 		modelBuilder.Entity<UserInfo>(entity =>
 		{
 			entity.HasKey(ui => ui.UserId);
+			entity.Property(ui => ui.DateOfBirth)
+				.HasColumnType("date");
 		});
 
 		modelBuilder.Entity<Hotel>()
