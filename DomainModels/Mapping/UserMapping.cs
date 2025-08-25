@@ -17,6 +17,7 @@ public class UserMapping
 			UpdatedAt = DateTime.UtcNow.AddHours(2),
 			HashedPasword = user.HashedPassword,
 			UserRole = user.UserRole.RoleName.ToString(),
+			UserInfo = user.UserInfo != null ? new UserInfoMapping().ToUserInfoGetDto(user.UserInfo) : null
 		};
 	}
 }

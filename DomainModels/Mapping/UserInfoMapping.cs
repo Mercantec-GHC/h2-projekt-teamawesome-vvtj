@@ -18,23 +18,9 @@ public class UserInfoMapping
 			Country = ui.Country,
 			PhoneNumber = ui.PhoneNumber,
 			DateOfBirth = ui.DateOfBirth,
-			SpecialRequests = ui.SpecialRequests
-		};
-	}
-
-	public UserInfo FromDtoToUserInfo(UserInfoPostDto dto)
-	{
-		return new UserInfo
-		{
-			FirstName = dto.FirstName,
-			LastName = dto.LastName,
-			Address = dto.Address,
-			PostalCode = dto.PostalCode ?? string.Empty,
-			City = dto.City ?? string.Empty,
-			Country = dto.Country ?? string.Empty,
-			PhoneNumber = dto.PhoneNumber,
-			DateOfBirth = dto.DateOfBirth,
-			SpecialRequests = dto.SpecialRequests ?? string.Empty
+			SpecialRequests = ui.SpecialRequests,
+			CreatedAt = ui.CreatedAt,
+			UpdatedAt = DateTime.UtcNow.AddHours(2)
 		};
 	}
 

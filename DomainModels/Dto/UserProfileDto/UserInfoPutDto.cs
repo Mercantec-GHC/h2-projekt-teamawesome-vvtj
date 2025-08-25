@@ -3,7 +3,6 @@ namespace DomainModels.Dto.UserProfileDto;
 
 public class UserInfoPutDto
 {
-	public int UserId { get; set; }
 	public string? FirstName { get; set; }
 	public string? LastName { get; set; }
 	public string? Address { get; set; } 
@@ -13,4 +12,5 @@ public class UserInfoPutDto
 	public string? PhoneNumber { get; set; }
 	public DateOnly? DateOfBirth { get; set; }
 	public string? SpecialRequests { get; set; }
+	public DateTime? UpdatedAt { get; set; }
 }

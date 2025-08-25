@@ -2,7 +2,6 @@
 using API.Interfaces;
 using DomainModels.Dto.UserProfileDto;
 using DomainModels.Mapping;
-using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -27,24 +26,19 @@ public class UserInfoService : IUserInfoService
 		return _userInfoMapping.ToUserInfoGetDto(userInfo);
 	}
 
-	public async Task<UserInfo?> UpdateUserInfoAsync(int userId, UserInfoPutDto updatedInfo)
-	{
-		var existingUser = await _context.UserInfos
-			.FirstOrDefaultAsync(ui => ui.UserId == userId);
 
-		if (existingUser == null)
+	public async Task<UserInfoGetDto?> UpdateUserInfoAsync(int userId, UserInfoPutDto dto)
+	{
+		var userInfo = await _context.UserInfos.FirstOrDefaultAsync(ui => ui.UserId == userId);
+		if (userInfo == null)
 		{
 			return null;
 		}
 
-		_userInfoMapping.UpdateUserInfoFromDto(existingUser, updatedInfo);
-		return await _context.SaveChangesAsync() > 0 ? existingUser : null;
-	}
+		_userInfoMapping.UpdateUserInfoFromDto(userInfo, dto);
+		_context.UserInfos.Update(userInfo);
 
-	public async Task<UserInfo?> CreateUserInfoAsync(UserInfoPostDto newInfo)
-	{
-		var userInfo = _userInfoMapping.FromDtoToUserInfo(newInfo);
-		_context.UserInfos.Add(userInfo);
-		return await _context.SaveChangesAsync() > 0 ? userInfo : null;
+		await _context.SaveChangesAsync();
+		return _userInfoMapping.ToUserInfoGetDto(userInfo);
 	}
 }
