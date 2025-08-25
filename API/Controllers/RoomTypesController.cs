@@ -52,8 +52,9 @@ public class RoomTypesController : ControllerBase
         var room = await _roomtypeService.GetSpecificRoomType(id);
         return Ok(room);
     }
-
-    public async Task<ActionResult> UpdateRoomType(RoomTypePutDto roomTypePutDto)
+    
+    [HttpPut]
+     public async Task<ActionResult> UpdateRoomType(RoomTypePutDto roomTypePutDto)
     {
         var updatedRoomType = _roomtypeService.UpdateRoomType(roomTypePutDto);
 

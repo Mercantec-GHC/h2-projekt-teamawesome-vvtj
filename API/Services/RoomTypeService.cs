@@ -46,6 +46,7 @@ namespace API.Services
                     HasSeaView = rt.HasSeaView,
                     HasTV = rt.HasTV,
                     HasVault = rt.HasVault,
+                    Area = rt.Area,
                 };
             }).ToList();
             return newRoomTypesListDto;
@@ -76,6 +77,7 @@ namespace API.Services
                 HasSeaView = roomtype.HasSeaView,
                 HasTV = roomtype.HasTV,
                 HasVault = roomtype.HasVault,
+                Area = roomtype.Area,
             };
 
             return getRoomType;
