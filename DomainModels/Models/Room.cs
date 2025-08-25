@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainModels.Models
 {
-    public class Room 
+    public class Room : Common
     {
-        [Key]
-        public int Id { get; set; }
         public int RoomNumber { get; set; }
         //public required int GuestCount { get; set; }
         public bool IsAvailable { get; set; }

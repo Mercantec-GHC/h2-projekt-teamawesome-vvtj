@@ -6,11 +6,13 @@ using API.Services;
 [Route("api/[controller]")]
 public class RoomTypesController : ControllerBase
 {
+    private readonly AppDBContext _context;
     private readonly RoomTypeService _roomtypeService;
 
-    public RoomTypesController(RoomTypeService roomtypeService)
+    public RoomTypesController(AppDBContext context, RoomTypeService roomtypeService)
     {
         _roomtypeService = roomtypeService;
+        _context = context;
     }
 
     //Everybody
@@ -49,6 +51,16 @@ public class RoomTypesController : ControllerBase
 
         var room = await _roomtypeService.GetSpecificRoomType(id);
         return Ok(room);
+    }
+    
+    [HttpPut]
+     public async Task<ActionResult> UpdateRoomType(RoomTypePutDto roomTypePutDto)
+    {
+        var updatedRoomType = await _roomtypeService.UpdateRoomType(roomTypePutDto);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(updatedRoomType);
     }
 }
 

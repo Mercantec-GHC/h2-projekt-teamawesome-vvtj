@@ -1,4 +1,7 @@
-﻿namespace DomainModels.Dto
+﻿using DomainModels.Enums;
+using DomainModels.Models;
+
+namespace DomainModels.Dto
 {
     public class RoomToCleanDto
     {
