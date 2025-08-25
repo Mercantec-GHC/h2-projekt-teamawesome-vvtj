@@ -18,9 +18,19 @@ public class Program
 
         // Læs API endpoint fra miljøvariabler eller brug default
         var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
-        Console.WriteLine($"API ENV Endpoint: {envApiEndpoint}");
-        var apiEndpoint = envApiEndpoint ?? "https://h2api.mercantec.tech/";
-        Console.WriteLine($"API Endpoint: {apiEndpoint}");
+       
+        var env = builder.HostEnvironment.Environment;
+        string apiEndpoint;
+
+        if (env == "Development")
+        {
+            apiEndpoint = "https://localhost:8000/"; 
+        }
+        else
+        {
+            apiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT")
+                          ?? "https://prod-novahotels-api-mercantec-tech.azurewebsites.net"; 
+        }
 
         // Registrer HttpClient til API service med konfigurerbar endpoint
         builder.Services.AddHttpClient<APIService>(client =>
