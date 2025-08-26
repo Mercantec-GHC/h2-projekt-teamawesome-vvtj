@@ -79,6 +79,8 @@ namespace API.Services
                 GuestsCount = guests,
                 NightsCount = nights,
                 TotalPrice = total
+
+               
             };
         }
 
@@ -115,8 +117,7 @@ namespace API.Services
                     CheckIn = b.CheckIn,
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
-                    GuestsCount = b.GuestsCount,
-
+                    GuestsCount = b.GuestsCount,                
 
                 })
                 .ToListAsync();

@@ -31,6 +31,7 @@ namespace API.Services
 		{
 			var users = await _context.Users
 				.Include(u => u.UserRole)
+				.Include(u => u.UserInfo)
 				.ToListAsync();
 
 			var userDtos = users.Select(u => _userMapping.ToUserDto(u)).ToList();
@@ -44,7 +45,7 @@ namespace API.Services
 		/// <returns>A <see cref="UserDto"/> if found; otherwise, <c>null</c>.</returns>
 		public async Task<UserDto?> GetUserByIdAsync(int id)
 		{
-			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Id == id);
+			var user = await _context.Users.Include(u => u.UserRole).Include(u => u.UserInfo).FirstOrDefaultAsync(u => u.Id == id);
 			if (user == null)
 			{
 				return null;

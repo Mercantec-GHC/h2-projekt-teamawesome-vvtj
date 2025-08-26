@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DomainModels.Models;
 public class Booking : Common
 {
-
 
     [ForeignKey("RoomId")]
     public int RoomId { get; set; }
@@ -16,16 +15,19 @@ public class Booking : Common
     public required DateTime CheckOut { get; set; }
     public int NightsCount { get; set; }
     public int GuestsCount { get; set; }
+
     public decimal? TotalPrice { get; set; }
     public string? Payment { get; set; } = default!;
 
     public bool IsPaid { get; set; } = true;
+
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
     public User? User { get; set; }
 
+
     //public User? UserName { get; set; } 
 
-
 }
+
