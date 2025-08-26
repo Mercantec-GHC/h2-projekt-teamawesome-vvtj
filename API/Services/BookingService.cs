@@ -40,7 +40,6 @@ namespace API.Services
                 CheckOut = booking.CheckOut,
                 NightsCount = booking.NightsCount,
                 GuestsCount = booking.GuestsCount,
-                IsPaid = booking.IsPaid,
                 Payment = booking.Payment,
             };
 
@@ -92,8 +91,7 @@ namespace API.Services
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
                     GuestsCount = b.GuestsCount,
-                    Payment = b.Payment,
-                    IsPaid = b.IsPaid
+                    Payment = b.Payment
 
                 })
                 .ToListAsync();
