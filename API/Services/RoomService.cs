@@ -55,11 +55,14 @@ namespace API.Services
         {
             if (await _context.Rooms.AnyAsync(r => r.RoomNumber == room.RoomNumber))
             {
+                Console.WriteLine("Room already exists");
                 return null;
             }
+
             var type = _context.RoomTypes.Find(room.RoomtypeId);
             if (type == null)
             {
+                Console.WriteLine("RoomType doesn't exist");
                 return null;
             }
 
@@ -75,6 +78,7 @@ namespace API.Services
             };
             _context.Rooms.Add(newRoom);
             await _context.SaveChangesAsync();
+            Console.WriteLine("Added");
 
             return newRoom;
         }

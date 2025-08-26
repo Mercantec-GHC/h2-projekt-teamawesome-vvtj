@@ -6,7 +6,7 @@ public class RoomTypeDto
     public required string TypeofRoom { get; set; }
     public int MaxCapacity { get; set; }
     public string? Description { get; set; }
-    public double? PricePerNight{ get; set; }
+    public decimal? PricePerNight{ get; set; }
 
     //rules
     public bool? HasKitchenette { get; set; }
