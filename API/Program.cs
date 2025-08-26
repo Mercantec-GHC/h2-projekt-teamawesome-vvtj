@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -21,7 +20,7 @@ public class Program
 {
 	public static void Main(string[] args)
 	{
-		var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 		builder.Services.AddControllers();
 		builder.Services.AddOpenApi();
 
@@ -77,32 +76,27 @@ public class Program
 			});
 		});
 
-		// Tilføj CORS for specifikke Blazor WASM domæner
-		builder.Services.AddCors(options =>
-		{
-			options.AddPolicy(
-				"AllowSpecificOrigins",
-				builder =>
-				{
-					builder
-						.WithOrigins(
-							"http://localhost:5085",
-							"http://localhost:8052",
-							"https://h2.mercantec.tech"
-						)
-						.AllowAnyMethod()
-						.AllowAnyHeader()
-						.WithExposedHeaders("Content-Disposition");
-				}
-			);
-		});
+        var allowSpecificOrigins = "AllowSpecificOrigins";
 
-        // Tilføj basic health checks
         builder.Services.AddHealthChecks();
 
 		if (builder.Environment.IsDevelopment())
 		{
-			IConfiguration Configuration = builder.Configuration;
+            // Tilføj CORS for specifikke Blazor WASM domæner fo Development, for all localhosts
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(allowSpecificOrigins,
+                    policy =>
+                    {
+                        policy
+                            .SetIsOriginAllowed(_ => true)
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
+
+            IConfiguration Configuration = builder.Configuration;
 			string connectionString = Configuration.GetConnectionString("DefaultConnection")
 				?? Environment.GetEnvironmentVariable("DefaultConnection");
 
@@ -112,7 +106,21 @@ public class Program
 
 		if (builder.Environment.IsProduction())
 		{
-			var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
+            // Tilføj CORS for specifikke Blazor WASM domæner for Production, only prod domain
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(allowSpecificOrigins,
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("LinkToProdBlazor")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+            });
+
+            var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
 			var KeyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
 				builder.Configuration.AddAzureKeyVault(
 				keyVaultURL.Value!.ToString(),
@@ -144,17 +152,6 @@ public class Program
 
 		var app = builder.Build();
 
-		// Brug CORS - skal være før anden middleware
-		app.UseCors("AllowSpecificOrigins");
-
-		// Map health checks
-		app.MapHealthChecks("/health");
-		app.MapHealthChecks("/alive", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-		{
-			Predicate = r => r.Tags.Contains("live")
-		});
-
-
 		if (app.Environment.IsDevelopment())
 
 		{
@@ -162,28 +159,27 @@ public class Program
 			app.MapScalarApiReference();
 		}
 
-		// Scalar Middleware for OpenAPI
-		//app.MapScalarApiReference(options =>
-		//{
-		//    options
-		//        .WithTitle("MAGSLearn")
-		//        .WithTheme(ScalarTheme.Mars)
-		//        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-		//});
-
-		// Map the Swagger UI
-		app.UseSwagger();
+        // Map the Swagger UI
+        app.UseSwagger();
 		app.UseSwaggerUI(options =>
 		{
 			options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
 		});
 
-		app.UseAuthentication();
-		app.UseAuthorization();
+        app.UseRouting();
+
+        // Brug CORS - skal være før anden middleware
+        app.UseCors(allowSpecificOrigins);
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers().RequireCors(allowSpecificOrigins);
+
 
         app.MapDefaultEndpoints();
-        app.MapControllers();
 
-		app.Run();
-	}
+       
+        app.Run();
+    }
 }
