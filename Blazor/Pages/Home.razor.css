@@ -1,0 +1,54 @@
+﻿
+.wrapper {
+    margin-top: 5rem;
+}
+
+::deep .btn.btn-custom {
+    background-color: #00C4C8;
+    color: #ffffff;
+    padding: 1em 2em;
+    border: 2px solid #ffffff;
+    transition: transform 0.3s ease;
+}
+
+::deep .btn.btn-custom:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
+}
+
+::deep .number-input {
+    width: 6rem;
+    text-align: center;
+    font-size: 1.2rem;
+    border-radius: 5px;
+}
+
+.box-container {
+    border-radius: 10px;
+    min-width: 14rem;
+}
+
+.custom-line {
+    border-top: 2px solid #ffffff;
+    margin: 3rem 1rem;
+    width: 12%;
+}
+
+.custom-card {
+    margin-top: 12rem;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: none;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    
+}
+
+.card-title {
+    font-size: 5rem;
+    text-shadow: 3px 2px 6px rgba(0,0,0,0.5);
+    letter-spacing: 0.1em;
+}
+
+.card-text {
+    font-size: 3.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
