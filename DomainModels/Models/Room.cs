@@ -19,5 +19,6 @@ namespace DomainModels.Models
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; } = default!;
         public DateTime? LastCleaned { get; set; }
-	}
+        public List<Booking>? Bookings { get; set; } = new List<Booking>();
+    }
 }

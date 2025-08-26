@@ -1,4 +1,6 @@
-﻿namespace DomainModels.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DomainModels.Models;
 
 public class UserInfo:Common
 {

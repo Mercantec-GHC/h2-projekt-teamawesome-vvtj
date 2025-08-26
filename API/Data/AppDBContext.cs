@@ -51,6 +51,7 @@ public class AppDBContext : DbContext
 		modelBuilder.Entity<UserInfo>(entity =>
 		{
 			entity.HasKey(ui => ui.UserId);
+
 			entity.Property(ui => ui.DateOfBirth)
 				.HasColumnType("date");
 		});
