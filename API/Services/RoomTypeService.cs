@@ -94,11 +94,11 @@ namespace API.Services
             }
 
             //Only update if there's a new value
-            if (roomTypePutDto.Description != null)
+            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description))
                 existingRoomType.Description = roomTypePutDto.Description;
             
             //Only update if there's a new value
-            if (roomTypePutDto.Price != null)
+            if (roomTypePutDto.Price > 0 )
                 existingRoomType.PricePerNight = roomTypePutDto.Price;
             
         
