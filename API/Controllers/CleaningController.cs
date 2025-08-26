@@ -43,7 +43,7 @@ public class CleaningController : ControllerBase
             var rooms = await _cleaningService.GetAllRoomsToCleanAsync();
             if (rooms == null || !rooms.Any())
             {
-                return NotFound("No rooms to clean found.");
+                return Ok("No rooms to clean found.");
             }
 
             return Ok(rooms);
@@ -94,7 +94,7 @@ public class CleaningController : ControllerBase
             }
             else
             {
-                return NotFound($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
+                return Ok($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
             }
         }
         catch (Exception ex)
