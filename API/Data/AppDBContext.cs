@@ -69,6 +69,7 @@ public class AppDBContext : DbContext
 			.WithMany(h => h.Rooms)
 			.HasForeignKey(h => h.HotelId);
 		});
+		
 	}
 }
 
