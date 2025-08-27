@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+
+<div class="d-flex flex-column min-vh-100">
+<header>
+	<NavMenuComponent />
+</header>
+
+<main class="flex-shrink-0 py-3">
+	<div class="background"></div>
+	<article class="container-xxl bd-gutter mt-3 my-md-4 bd-layout">
+		@Body
+	</article>
+</main>
+
+<footer class="mt-auto py-3 bg-dark opacity-75 border-top">
+	  <FooterComponent />
+</footer>
+</div>

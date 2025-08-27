@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using Blazor.Services;
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,10 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        // Læs API endpoint fra miljøvariabler eller brug default
-        var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
+		builder.Services.AddScoped<ToastService>();
+
+		// Læs API endpoint fra miljøvariabler eller brug default
+		var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
        
         var env = builder.HostEnvironment.Environment;
         string apiEndpoint;
