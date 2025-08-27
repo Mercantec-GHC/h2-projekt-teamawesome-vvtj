@@ -17,7 +17,7 @@ namespace DomainModels.Dto
 
         public string HotelName { get; set; }
 
-        public DateTime CheckIn { get; set; }
-        public DateTime CheckOut { get; set; }
+        public DateOnly CheckIn { get; set; }
+        public DateOnly CheckOut { get; set; }
     }
 }

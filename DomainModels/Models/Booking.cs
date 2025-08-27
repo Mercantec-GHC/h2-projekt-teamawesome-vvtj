@@ -11,8 +11,8 @@ public class Booking : Common
 
     [Required]
 
-    public required DateOnly? CheckIn { get; set; } 
-    public required DateOnly? CheckOut { get; set; }
+    public required DateOnly CheckIn { get; set; } 
+    public required DateOnly CheckOut { get; set; }
     public int NightsCount { get; set; }
     public int GuestsCount { get; set; }
 
@@ -23,9 +23,5 @@ public class Booking : Common
 
     [ForeignKey("UserId")]
     public User? User { get; set; }
-
-
-    //public User? UserName { get; set; } 
-
 }
 

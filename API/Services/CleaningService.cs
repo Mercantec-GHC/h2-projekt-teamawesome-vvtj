@@ -29,7 +29,7 @@ namespace API.Services
                 // Filter rooms that need cleaning
                 var roomsToClean = rooms
                     .Where(r => !r.LastCleaned.HasValue || (DateTime.UtcNow - r.LastCleaned.Value).TotalDays >= 3 ||
-                        bookings.Any(b => b.RoomId == r.Id && b.CheckOut <= DateTime.UtcNow))
+                        bookings.Any(b => b.RoomId == r.Id && b.CheckOut <= DateOnly.FromDateTime(DateTime.UtcNow)))
                     .ToList();
 
                 var roomToCleanDtos = roomsToClean.Select(r => new RoomToCleanDto

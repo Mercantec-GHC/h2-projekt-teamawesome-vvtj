@@ -42,10 +42,10 @@ public class BookingController : ControllerBase
         }
 
 
-        if (dto.CheckOut.Date <= dto.CheckIn.Date)
-        {
-            return BadRequest("Check-out date must be after check-in date.");
-        }
+        //if (dto.CheckOut.Date <= dto.CheckIn.Date)
+        //{
+        //    return BadRequest("Check-out date must be after check-in date.");
+        //}
 
 
         try

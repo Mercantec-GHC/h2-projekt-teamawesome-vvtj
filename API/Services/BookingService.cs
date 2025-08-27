@@ -46,9 +46,9 @@ namespace API.Services
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
             var guests = Math.Clamp(dto.GuestsCount, 1, roomType.MaxCapacity);
-            var nights = Math.Max((dto.CheckOut.Date - dto.CheckIn.Date).Days, 1);
+            //var nights = Math.Max((dto.CheckOut.Date - dto.CheckIn.Date).Days, 1);
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            var total = pricePerNight * nights;
+            //var total = pricePerNight * nights;
 
 
             var booking = new Booking
@@ -59,8 +59,8 @@ namespace API.Services
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
                 GuestsCount = guests,
-                NightsCount = nights,
-                TotalPrice = total,
+                //NightsCount = nights,
+                //TotalPrice = total,
                 CreatedAt = DateTime.UtcNow
 
             };
@@ -77,8 +77,8 @@ namespace API.Services
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                NightsCount = nights,
-                TotalPrice = total
+                //NightsCount = nights,
+                //TotalPrice = total
 
                
             };
@@ -135,8 +135,8 @@ namespace API.Services
             if (newCheckOut <= newCheckIn) return false;
 
 
-            booking.CheckIn = newCheckIn;
-            booking.CheckOut = newCheckOut;
+            //booking.CheckIn = newCheckIn;
+            //booking.CheckOut = newCheckOut;
             booking.UpdatedAt = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();
@@ -150,7 +150,7 @@ namespace API.Services
 
             var query = _dbContext.Bookings
                 .Where(b => b.Room.HotelId == hotelId
-                            && b.CheckOut.Date > today)
+                            /*&& b.CheckOut.Date > today*/)
                 .Select(b => new BookingDto
                 {
                     Id = b.Id,
