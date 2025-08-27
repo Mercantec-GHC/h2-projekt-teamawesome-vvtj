@@ -1,12 +1,9 @@
-using System;
-using System.Net.Http;
 using Blazor.Services;
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
+using Microsoft.AspNetCore.Components.Authorization;
+using Blazored.LocalStorage;
 namespace Blazor;
 
 public class Program
@@ -42,6 +39,9 @@ public class Program
             Console.WriteLine($"APIService BaseAddress: {client.BaseAddress}");
         });
 
-        await builder.Build().RunAsync();
+		builder.Services.AddAuthorizationCore();
+		builder.Services.AddBlazoredLocalStorage();
+
+		await builder.Build().RunAsync();
     }
 }
