@@ -29,7 +29,7 @@ public class Program
         else
         {
             apiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT")
-                          ?? "https://prod-novahotels-api-mercantec-tech.azurewebsites.net"; 
+                          ?? "https://prod-novahotels-api-mercantec-tech.azurewebsites.net/"; 
         }
 
         // Registrer HttpClient til API service med konfigurerbar endpoint
