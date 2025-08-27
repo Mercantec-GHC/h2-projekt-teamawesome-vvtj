@@ -11,15 +11,13 @@ public class Booking : Common
 
     [Required]
 
-    public required DateTime CheckIn { get; set; }
-    public required DateTime CheckOut { get; set; }
+    public required DateOnly? CheckIn { get; set; } 
+    public required DateOnly? CheckOut { get; set; }
     public int NightsCount { get; set; }
     public int GuestsCount { get; set; }
 
     public decimal? TotalPrice { get; set; }
-    public string? Payment { get; set; } = default!;
-
-    public bool IsPaid { get; set; } = true;
+  
 
     public int UserId { get; set; }
 
