@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DomainModels.Dto.UserDto;
+namespace Blazor.Models.Dto.Auth;
 
 public class RegisterDto
 {
@@ -28,4 +28,5 @@ public class RegisterDto
 	[Compare(nameof(Password), ErrorMessage = "Password doesn't match")]
 	[Display(Name = "Confirm password")]
 	public string ConfirmPassword { get; set; } = string.Empty;
+
 }
