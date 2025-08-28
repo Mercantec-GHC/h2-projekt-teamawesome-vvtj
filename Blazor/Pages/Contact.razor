@@ -1,0 +1,142 @@
+﻿@page "/contact"
+
+<PageTitle>Contact</PageTitle>
+
+<div class="contact-container">
+
+    <h3>Contact</h3>
+
+    <div class="intro">
+        <h3>
+            We will be happy to answer your questions.
+            Call us or use the form on the right 👇
+        </h3>
+    </div>
+
+    <div class="contact-content">
+
+        <!-- Contacts -->
+        <div class="contact-contacts">
+            @if (Hotels == null)
+            {
+                <div class="spinner-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading hotels...</p>
+                </div>
+            }
+            else if (!Hotels.Any())
+            {
+                <p>No hotels found.</p>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var hotel in Hotels)
+                    {
+                        <div class="list-group-item">
+                            <h5 class="mb-1">@hotel.HotelName (@hotel.CityName)</h5>
+                            <p class="mb-1">
+                                <i class="bi bi-geo-alt-fill"></i> @hotel.Address <br />
+@*                              <i class="bi bi-envelope-fill"></i> @hotel.Email <br />
+                                <i class="bi bi-telephone-fill"></i> @hotel.Number <br /> *@
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Form -->
+        <div class="contact-form">
+            <EditForm Model="@contactModel" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-1">
+                    <InputText @bind-Value="contactModel.Name" placeholder="Name" class="form-control" />
+                </div>
+
+                <div class="mb-1">
+                    <InputText @bind-Value="contactModel.Email" type="email" placeholder="Email" class="form-control" />
+                </div>
+
+                <div class="mb-1">
+                    <InputTextArea @bind-Value="contactModel.Message" placeholder="Message" class="form-control" rows="4" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Send</button>
+            </EditForm>
+        </div>
+    </div>
+
+    <h4 class="text-center mt-5 mb-3">Central reservation – Opening hours</h4>
+
+    @if (Hotels == null)
+    {
+        <div class="spinner-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive contact-table">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Day</th>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            <th>@hotel.HotelName - @hotel.CityName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mon–Fri</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            @* <td>@hotel.WeekdayTime</td> *@
+                            <td>8:00–19:00</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Sat</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            @* <td>@hotel.SaturdayTime</td> *@
+                            <td>8:00–17:00</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Weekends and holidays</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            @* <td>@hotel.HolidaysTime</td> *@
+                            <td>8:00–12:00</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private ContactModel contactModel = new();
+
+    private void HandleSubmit()
+    {
+        Console.WriteLine($"Contact form submitted: {contactModel.Name}, {contactModel.Email}, {contactModel.Message}");
+    }
+
+    public class ContactModel
+    {
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Message { get; set; }
+    }
+}
