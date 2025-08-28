@@ -13,7 +13,7 @@ namespace API.Services
         private readonly AppDBContext _context;
         public RoomTypeService(AppDBContext context)
         {
-            this._context = context;
+            _context = context;
         }
         public async Task<IEnumerable<RoomTypeDto?>> GetRoomTypes()
         {
@@ -84,10 +84,14 @@ namespace API.Services
 
             return getRoomType;
         }
-
-        public async Task<RoomType> UpdateRoomType(RoomTypePutDto roomTypePutDto)
+        
+        /// <summary>
+        /// Returns RoomType (Model), as we want to see the entire
+        /// roomtype model, with the updated fields
+        /// </summary>
+        public async Task<RoomType> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
         {
-            var existingRoomType = await _context.RoomTypes.FindAsync(roomTypePutDto.Id);
+            var existingRoomType = await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Id == roomtypeId);
             if (existingRoomType == null)
             {
                 return null;
@@ -96,13 +100,13 @@ namespace API.Services
             //Only update if there's a new value
             if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description))
                 existingRoomType.Description = roomTypePutDto.Description;
-            
+
             //Only update if there's a new value
-            if (roomTypePutDto.Price > 0 )
+            if (roomTypePutDto.Price > 0)
                 existingRoomType.PricePerNight = roomTypePutDto.Price;
-            
-        
-            existingRoomType.UpdatedAt = roomTypePutDto.UpdatedAt;
+
+
+            existingRoomType.UpdatedAt = DateTime.UtcNow.AddHours(2);
 
             await _context.SaveChangesAsync();
             return existingRoomType;
