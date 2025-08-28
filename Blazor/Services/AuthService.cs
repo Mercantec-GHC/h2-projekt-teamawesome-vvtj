@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using Blazor.Interfaces;
 using Blazored.LocalStorage;
 
@@ -9,12 +10,14 @@ public class AuthService : IAuthService
 {
 	private readonly HttpClient _httpClient;
 	private readonly ILocalStorageService _localStorage;
+	private readonly CustomAuthStateProvider _authStateProvider;
 	private const string _tokenKey = "token";
 
-	public AuthService(HttpClient httpClient, ILocalStorageService localStorage)
+	public AuthService(HttpClient httpClient, ILocalStorageService localStorage, CustomAuthStateProvider authStateProvider)
 	{
 		_httpClient = httpClient;
 		_localStorage = localStorage;
+		_authStateProvider = authStateProvider;
 	}
 
 	public async Task<bool> LoginAsync (string email, string password)
@@ -27,7 +30,13 @@ public class AuthService : IAuthService
 			return false;
 
 		var token = await response.Content.ReadAsStringAsync();
-		await _localStorage.SetItemAsync(_tokenKey, token.Trim('"')); 
+		await _localStorage.SetItemAsync(_tokenKey, token.Trim('"'));
+
+		// Notify the authentication state provider about the login
+		_authStateProvider.NotifyUserAuthentication(token.Trim('"'));
+
+		// Set the token in the HttpClient for future requests
+		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Trim('"'));
 
 		return true;
 	}
@@ -42,6 +51,9 @@ public class AuthService : IAuthService
 	public async Task LogoutAsync()
 	{
 		await _localStorage.RemoveItemAsync(_tokenKey);
+
+		_authStateProvider.NotifyUserLogout();
+		_httpClient.DefaultRequestHeaders.Authorization = null;
 	}
 
 }

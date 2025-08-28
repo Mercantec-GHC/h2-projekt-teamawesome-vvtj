@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
+using Blazor.Interfaces;
 namespace Blazor;
 
 public class Program
@@ -15,6 +16,16 @@ public class Program
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
 		builder.Services.AddScoped<ToastService>();
+		builder.Services.AddScoped<CustomAuthStateProvider>();
+		builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
+			provider.GetRequiredService<CustomAuthStateProvider>());
+		builder.Services.AddScoped<IAuthService, AuthService>();
+		builder.Services.AddScoped<APIService>();
+        builder.Services.AddScoped<HttpClient>();
+
+		builder.Services.AddAuthorizationCore();
+		builder.Services.AddBlazoredLocalStorage();
+		builder.Services.AddCascadingAuthenticationState();
 
 		// Læs API endpoint fra miljøvariabler eller brug default
 		var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
@@ -38,9 +49,6 @@ public class Program
             client.BaseAddress = new Uri(apiEndpoint);
             Console.WriteLine($"APIService BaseAddress: {client.BaseAddress}");
         });
-
-		builder.Services.AddAuthorizationCore();
-		builder.Services.AddBlazoredLocalStorage();
 
 		await builder.Build().RunAsync();
     }
