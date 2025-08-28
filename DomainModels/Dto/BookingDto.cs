@@ -29,14 +29,15 @@ namespace DomainModels.Dto
         public int GuestsCount { get; set; }
         public decimal? TotalPrice { get; set; }
 
-        //public string? Payment { get; set; }
-        //public bool IsPaid { get; set; }
+        public bool isBreakfast { get; set; }
+
+
     }
 
 
     public class UpdateDatesDto
     {
-        public DateTime CheckIn { get; set; }
-        public DateTime CheckOut { get; set; }
+        public DateOnly CheckIn { get; set; }
+        public DateOnly CheckOut { get; set; }
     }
 }

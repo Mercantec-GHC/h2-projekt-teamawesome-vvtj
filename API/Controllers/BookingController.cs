@@ -103,22 +103,27 @@ public class BookingController : ControllerBase
     }
 
     /// <summary>
-    /// Allows to update check-in and check-out dates.
+    /// Updates the check-in and check-out dates of an existing booking,
+    /// and automatically recalculates nights count and total price.
     /// </summary>
-    /// <param name="id">Requires BookingID</param>
-    /// <returns> Returns a success message if the update was successful, or an error message if it failed.</returns>
-    /// <response code="200">Booking dates were successfully updated.</response>
-    /// <response code="400">Bad request – invalid input data, invalid dates, or booking not found.</response>
-    /// <response code="401">Unauthorized – the user is not authenticated.</response>
-    /// <response code="404">Not found – booking with the specified ID does not exist.</response>
-    /// <response code="500">Internal server error – an unexpected error occurred while processing the request.</response>
-    //[Authorize(Roles = "Admin", "Reciptionist", "User")]
+    /// <param name="id">The ID of the booking to update</param>
+    /// <param name="dto">The DTO containing the new check-in and check-out dates</param>
+    /// <returns>
+    /// Returns the updated booking details if successful.
+    /// </returns>
+    /// <response code="200">Returns the updated booking with new dates, nights count, and total price</response>
+    /// <response code="400">Invalid input data</response>
+    /// <response code="404">Booking with the specified ID not found</response>
+    /// <response code="500">Unexpected server error</response>
     [HttpPut("{id}/dates")]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
     {
-        var success = await _bookingService.UpdateBookingDates(id, dto.CheckIn, dto.CheckOut);
-        if (!success) return BadRequest("Booking not updated.");
-        return Ok("Booking dates updated successfully.");
+        var updatedBooking = await _bookingService.UpdateBookingDatesAsync(id, dto.CheckIn, dto.CheckOut);
+
+        if (updatedBooking == null)
+            return NotFound($"Booking with ID {id} not found.");
+
+        return Ok(updatedBooking); // <-- тепер повертається BookingResponseDto
     }
     /// <summary>
     /// Delete a booking from a system.

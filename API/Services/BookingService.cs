@@ -42,27 +42,40 @@ namespace API.Services
             var room = await roomQuery.FirstOrDefaultAsync();
             var roomType = room.RoomType;
 
+            if (room == null || !room.IsAvailable)
+                return null;
+
+
             var UserName = await _dbContext.Users.Where(u => u.Id == userId)
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
             var guests = Math.Clamp(dto.GuestsCount, 1, roomType.MaxCapacity);
-            //var nights = Math.Max((dto.CheckOut.Date - dto.CheckIn.Date).Days, 1);
+            var nights = Math.Max((dto.CheckOut.Day - dto.CheckIn.Day), 1);
+
+            if (dto.isBreakfast == true)
+            {
+                roomType.PricePerNight += 200 * guests;
+            }
+            else
+            {
+                roomType.PricePerNight = roomType.PricePerNight;
+            }
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            //var total = pricePerNight * nights;
+            var total = pricePerNight * nights;
 
 
             var booking = new Booking
             {
                 UserId = userId,
-                //UserName = dto.UserName,
+
                 RoomId = room.Id,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
                 GuestsCount = guests,
-                //NightsCount = nights,
-                //TotalPrice = total,
-                CreatedAt = DateTime.UtcNow
-
+                NightsCount = nights,
+                TotalPrice = total,
+                CreatedAt = DateTime.UtcNow,
+                IsPaid = true
             };
 
             _dbContext.Bookings.Add(booking);
@@ -77,10 +90,10 @@ namespace API.Services
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                //NightsCount = nights,
-                //TotalPrice = total
+                IsBreakfast = room.IsBreakfast,
+                NightsCount = nights,
+                TotalPrice = total,
 
-               
             };
         }
 
@@ -117,30 +130,60 @@ namespace API.Services
                     CheckIn = b.CheckIn,
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
-                    GuestsCount = b.GuestsCount,                
+                    GuestsCount = b.GuestsCount,
 
                 })
                 .ToListAsync();
             return userBookings;
         }
-        //TODO : figure out how to update booking, without deleting other data
-        public async Task<bool> UpdateBookingDates(int bookingId, DateTime newCheckIn, DateTime newCheckOut)
-        {
 
+        public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
+        {
             var booking = await _dbContext.Bookings
-               .Include(b => b.Room)
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.RoomType)
+                .Include(b => b.User)
+                .Include(b => b.Room.Hotel)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
-            if (booking is null) return false;
-            if (newCheckOut <= newCheckIn) return false;
+            if (booking == null)
+                return null;
+
+            if (newCheckOut <= newCheckIn)
+                return null;
+
+            if (booking == null || !booking.Room.IsAvailable)
+
+                return null;
+
+            booking.CheckIn = newCheckIn;
+            booking.CheckOut = newCheckOut;
+
+            var nights = Math.Max((newCheckOut.DayNumber - newCheckIn.DayNumber), 1);
+            booking.NightsCount = nights;
 
 
-            //booking.CheckIn = newCheckIn;
-            //booking.CheckOut = newCheckOut;
-            booking.UpdatedAt = DateTime.UtcNow;
+            var pricePerNight = booking.Room.RoomType.PricePerNight.GetValueOrDefault(0m);
+            if (booking.Room.IsBreakfast)
+                pricePerNight += 200 * booking.GuestsCount;
+
+            var total = pricePerNight * nights;
+            booking.TotalPrice = total;
 
             await _dbContext.SaveChangesAsync();
-            return true;
+
+            return new BookingResponseDto
+            {
+                UserName = booking.User.UserName,
+                HotelName = booking.Room.Hotel.HotelName,
+                RoomType = booking.Room.RoomType.TypeofRoom,
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut,
+                GuestsCount = booking.GuestsCount,
+                NightsCount = booking.NightsCount,
+                TotalPrice = total,
+                IsBreakfast = booking.Room.IsBreakfast
+            };
         }
 
         public async Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId)
@@ -149,13 +192,11 @@ namespace API.Services
             var today = DateTime.UtcNow.Date;
 
             var query = _dbContext.Bookings
-                .Where(b => b.Room.HotelId == hotelId
-                            /*&& b.CheckOut.Date > today*/)
+                .Where(b => b.Room.HotelId == hotelId)
                 .Select(b => new BookingDto
                 {
                     Id = b.Id,
                     UserId = b.UserId,
-
                     UserName = b.User.UserName,
                     RoomId = b.RoomId,
                     CheckIn = b.CheckIn,
@@ -164,6 +205,7 @@ namespace API.Services
                     HotelId = b.Room.HotelId,
                     HotelName = b.Room.Hotel.HotelName,
                     RoomType = b.Room.RoomType.TypeofRoom,
+                    isBreakfast = b.Room.IsBreakfast,
 
                 })
         .AsNoTracking();

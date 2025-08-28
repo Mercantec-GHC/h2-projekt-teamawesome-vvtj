@@ -16,5 +16,7 @@ namespace DomainModels.Dto
         public DateOnly CheckOut { get; set; }
 
         public int GuestsCount { get; set; }
+
+        public bool isBreakfast { get; set; } = false;
     }
 }

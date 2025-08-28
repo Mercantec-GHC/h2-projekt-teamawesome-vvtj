@@ -14,4 +14,6 @@ public class BookingResponseDto
     public int GuestsCount { get; set; }
     public int NightsCount { get; set; }
     public decimal TotalPrice { get; set; }
+
+    public bool IsBreakfast { get; set; }
 }
