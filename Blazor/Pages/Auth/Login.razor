@@ -1,5 +1,30 @@
-﻿<h3>Login</h3>
+﻿@page "/login"
+@inherits LayoutComponentBase
 
-@code {
 
+<h3>Login</h3>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <p style="color:red">@_errorMessage</p>
 }
+
+<EditForm Model="_loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="_loginModel.Email" Placeholder="Email" />
+    <br />
+    <InputText @bind-Value="_loginModel.Password" Placeholder="Password" Type="password" />
+    <br />
+    <button type="submit">Login</button>
+</EditForm>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Hello, @context.User.Identity?.Name?.ToString() </p>
+    </Authorized>
+    <NotAuthorized>
+        <p>You're not authorized.</p>
+    </NotAuthorized>
+</AuthorizeView>
