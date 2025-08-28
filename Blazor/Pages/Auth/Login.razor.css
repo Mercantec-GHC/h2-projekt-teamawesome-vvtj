@@ -15,7 +15,7 @@
     font-size: 3em;
     align-self: center;
     color: rgb(57 166 168);
-    text-shadow: 1px 1px 0 #ffff, -1px 1px 0 #ffff, 1px -1px 0 #ffff, -1px -1px 0 #ffff;
+    text-shadow: 2px 1px 3px #ffff;
 }
 
 ::deep #input-field-email {
