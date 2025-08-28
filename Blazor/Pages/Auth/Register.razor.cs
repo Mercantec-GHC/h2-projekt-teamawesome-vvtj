@@ -1,6 +1,5 @@
-﻿namespace Blazor.Pages.Auth
+﻿namespace Blazor.Pages.Auth;
+
+public partial class Reagister
 {
-	public class Reagister
-	{
-	}
 }

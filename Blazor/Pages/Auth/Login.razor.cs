@@ -21,7 +21,7 @@ public partial class Login
 		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password);
 		if (result)
 		{
-			//_navigation.NavigateTo("/");
+			_navigation.NavigateTo("/");
 		}
 		else
 		{

@@ -1,2 +1,75 @@
-﻿body {
+﻿.container {
+    position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
 }
+
+.form {
+    background-color: rgba(255, 255, 255, .5);
+    border-radius: 30px;
+}
+
+.custom-header {
+    font-size: 3em;
+    align-self: center;
+    color: rgb(57 166 168);
+    text-shadow: 1px 1px 0 #ffff, -1px 1px 0 #ffff, 1px -1px 0 #ffff, -1px -1px 0 #ffff;
+}
+
+::deep #input-field-email {
+    background-color: rgba(255, 255, 255, .8);
+    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    padding: .8em;
+    width: 100%;
+    transition: background .8s ease-out;
+}
+    ::deep #input-field-email:hover {
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    ::deep #input-field-email:active, ::deep #input-field-email:focus-within {
+        outline: 2px solid #00c4c8;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+::deep #input-field-password {
+    background-color: rgba(255, 255, 255, .8);
+    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    padding: .8em;
+    width: 100%;
+    transition: background .8s ease-out;
+}
+
+    ::deep #input-field-password:hover {
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    ::deep #input-field-password:active, ::deep #input-field-password:focus-within {
+        outline: 2px solid #00c4c8;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+::deep .btn.btn-custom {
+    align-self:center;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    width: 90%;
+    transition: background-image 2s ease-in-out;
+}
+
+    ::deep .btn.btn-custom:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255, 255, 255, .5);
+    }
+
+    ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+    }
