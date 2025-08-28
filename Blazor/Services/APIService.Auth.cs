@@ -28,7 +28,7 @@ public partial class APIService
 		if (!response.IsSuccessStatusCode)
 			return false;
 
-		var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+		var result = await response.Content.ReadFromJsonAsync<LoginDto>();
 
 		if (result == null || string.IsNullOrWhiteSpace(result.Token))
 			return false;

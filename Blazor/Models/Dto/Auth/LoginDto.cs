@@ -2,7 +2,7 @@
 
 namespace Blazor.Models.Dto.Auth;
 
-public class LoginRequestDto
+public class LoginDto
 {
 	[Required(ErrorMessage = "Email is required")]
 	[EmailAddress(ErrorMessage = "Email has wrong format")]
