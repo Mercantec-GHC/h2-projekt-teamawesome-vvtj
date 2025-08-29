@@ -89,7 +89,7 @@ namespace API.Services
         /// Returns RoomType (Model), as we want to see the entire
         /// roomtype model, with the updated fields
         /// </summary>
-        public async Task<RoomType> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
+        public async Task<RoomType?> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
         {
             var existingRoomType = await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Id == roomtypeId);
             if (existingRoomType == null)
