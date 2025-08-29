@@ -1,11 +1,10 @@
-using System;
-using System.Net.Http;
 using Blazor.Services;
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
+using Microsoft.AspNetCore.Components.Authorization;
+using Blazored.LocalStorage;
+using Blazor.Interfaces;
 namespace Blazor;
 
 public class Program
@@ -16,11 +15,31 @@ public class Program
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
-        // Læs API endpoint fra miljøvariabler eller brug default
-        var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
-        Console.WriteLine($"API ENV Endpoint: {envApiEndpoint}");
-        var apiEndpoint = envApiEndpoint ?? "https://h2api.mercantec.tech/";
-        Console.WriteLine($"API Endpoint: {apiEndpoint}");
+		builder.Services.AddScoped<ToastService>();
+		builder.Services.AddScoped<CustomAuthStateProvider>();
+		builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
+			provider.GetRequiredService<CustomAuthStateProvider>());
+		builder.Services.AddScoped<IAuthService, AuthService>();
+
+		builder.Services.AddAuthorizationCore();
+		builder.Services.AddBlazoredLocalStorage();
+		builder.Services.AddCascadingAuthenticationState();
+
+		// Læs API endpoint fra miljøvariabler eller brug default
+		var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
+       
+        var env = builder.HostEnvironment.Environment;
+        string apiEndpoint;
+
+        if (env == "Development")
+        {
+            apiEndpoint = "https://localhost:8000/"; 
+        }
+        else
+        {
+            apiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT")
+                          ?? "https://prod-novahotels-api-mercantec-tech.azurewebsites.net/"; 
+        }
 
         // Registrer HttpClient til API service med konfigurerbar endpoint
         builder.Services.AddHttpClient<APIService>(client =>
@@ -29,6 +48,6 @@ public class Program
             Console.WriteLine($"APIService BaseAddress: {client.BaseAddress}");
         });
 
-        await builder.Build().RunAsync();
+		await builder.Build().RunAsync();
     }
 }

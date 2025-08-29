@@ -1,47 +1,66 @@
 ﻿@page "/"
+@using BlazorBootstrap
+@using System.ComponentModel.DataAnnotations
+@inherits LayoutComponentBase
 
-@using System.Net.Http
+<PageTitle>Home</PageTitle>
 
-<h1 class="mb-4">Status Dashboard</h1>
+<div class="container-fluid">
+	<div class="content flex-wrap text-center px-4 py-3 px-md-5">
+		<div class="card overflow-hidden custom-card">
+			<div class="d-flex flex-column justify-content-center p-3 text-white">
+				<div class="card-title fw-bold mt-5">Welcome to NOVA hotels</div>
+				<div class="container d-flex justify-content-around">
+					<div class="custom-line"></div>
+					<div class="card-text mb-5">your own peace of paradise</div>
+					<div class="custom-line"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <StatusCard 
-            Title="API Status"
-            IconClass="bi bi-heart-pulse text-success"
-            BorderClass="border-success"
-            HealthCheck="@healthCheck" />
-    </div>
-    <div class="col-md-6 mb-4">
-        <StatusCard 
-            Title="Database Status"
-            IconClass="bi bi-database text-warning"
-            BorderClass="border-warning"
-            HealthCheck="@dbHealthCheck" />
-    </div>
+
+	<div class="wrapper w-100 d-flex justify-content-between flex-wrap gap-2">
+		<div class="box-container bg-white text-center p-3">
+			<div class="mb-md-3 border-bottom">Start Date <span class="text-danger">*</span></div>
+			<DateInput TValue="DateOnly?"
+					   Value="_startDate"
+					   ValueExpression="() => _startDate"
+					   ValueChanged="StartDateChanged" />
+		</div>
+
+		<div class="box-container bg-white text-center p-3">
+			<div class="mb-md-3 border-bottom">End Date <span class="text-danger">*</span></div>
+			<DateInput TValue="DateOnly?"
+					   Value="_endDate"
+					   ValueChanged="(value) => _endDate = value"
+					   ValueExpression="() => _endDate"
+					   Disabled="@_disableEndDate"
+					   EnableMinMax="true"
+					   Min="@GetMinEndDate()" />
+		</div>
+
+		<div class="box-container bg-white text-center p-3">
+			<div class="mb-md-3 border-bottom">Choose hotel</div>
+			<Dropdown Color="DropdownColor.None">
+				<DropdownToggleButton>@(_selectedHotel ?? "Hotels")</DropdownToggleButton>
+				<DropdownMenu>
+					<DropdownItem>Hotel 1</DropdownItem>
+					<DropdownItem>Hotel 2</DropdownItem>
+					<DropdownItem>Hotel 3</DropdownItem>
+				</DropdownMenu>
+			</Dropdown>
+		</div>
+
+		<div class="box-container bg-white text-center justify-content-center p-3">
+			<div class="mb-md-3 border-bottom">Guests<span class="text-danger">*</span></div>
+			<NumberInput Class="number-input" TValue="int" @bind-Value="_amountGuests" />
+		</div>
+
+		<div class="py-4">
+			<Button Type="ButtonType.Submit" Class="btn btn-custom">
+				<span class="fw-bolder fs-3 ">See options</span>
+			</Button>
+		</div>
+	</div>
 </div>
-
-<div class="row">
-    <div class="col-12">
-        <WeatherTable WeatherForecasts="@weatherForecasts" />
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <Counter />
-    </div>
-</div>
-
-@code {
-    HealthCheckResponse? healthCheck;
-    HealthCheckResponse? dbHealthCheck;
-    WeatherForecast[]? weatherForecasts;
-
-    protected override async Task OnInitializedAsync()
-    {
-        healthCheck = await ApiService.GetHealthCheckAsync();
-        dbHealthCheck = await ApiService.GetDBHealthCheckAsync();
-        weatherForecasts = await ApiService.GetWeatherAsync(5);
-    }
-}

@@ -2,6 +2,7 @@
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers;
 
 /// <summary>
-/// Provides endpoints for user authentication, registration, and profile retrieval.
+/// Provides endpoints for user authentication, registration, profile retrieval and password changing.
 /// </summary>
 
 [Route("api/[controller]")]
@@ -28,12 +29,12 @@ public class AuthController : ControllerBase
 	/// <param name="loginAttemptService">Service for tracking login attempts and lockouts.</param>
 	/// <param name="logger">Logger for authentication events.</param>
 	/// <param name="context">Database context for user data.</param>
-	public AuthController(IAuthService authService, ILoginAttemptService loginAttemptService , ILogger<AuthController> logger,  AppDBContext context)
+	public AuthController(IAuthService authService, ILoginAttemptService loginAttemptService, ILogger<AuthController> logger, AppDBContext context)
 	{
 		_authService = authService;
 		_loginAttemptService = loginAttemptService;
 		_logger = logger;
-        _context = context;
+		_context = context;
 	}
 
 	/// <summary>
@@ -97,13 +98,52 @@ public class AuthController : ControllerBase
 			return Ok(token);
 		}
 
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Login failed for email {Email}", request.Email);
-            return StatusCode(500, "An internal error occurred. Please try again later.");
-        }
-    }
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Login failed for email {Email}", request.Email);
+			return StatusCode(500, "An internal error occurred. Please try again later.");
+		}
+	}
 
+	/// <summary>
+	/// Changes the password for a specified user.
+	/// </summary>
+	/// <param name="email">The email address of the user whose password is to be changed.</param>
+	/// <param name="request">The new password details.</param>
+	/// <returns>
+	/// <see cref="OkObjectResult"/> if the password was changed successfully;
+	/// <see cref="BadRequestObjectResult"/> if the new password is empty;
+	/// <see cref="NotFoundObjectResult"/> if the user was not found or the password update failed.
+	/// </returns>
+	[Authorize(Roles = "Admin")]
+	[HttpPost("change-password/{email}")]
+	public async Task<IActionResult> ChangePassword(string email, [FromBody] ChangePasswordDto request)
+	{
+		try
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+			if (user == null)
+				return NotFound("User not found.");
+
+			if (string.IsNullOrWhiteSpace(request.NewPassword))
+				return BadRequest("New password cannot be empty.");
+
+			var result = await _authService.ChangeUserPasswordAsync(email, request.NewPassword);
+			
+			if (!result)
+				return NotFound("User not found or failed to update password.");
+
+
+			_logger.LogInformation("Password changed successfully for user with email {Email}", email);
+
+			return Ok("Password changed successfully.");
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Error changing password for user with email {Email}", email);
+			return StatusCode(500, "An error occurred while retrieving the user.");
+		}	
+	}
 	/// <summary>
 	/// Retrieves the currently authenticated user's profile information.
 	/// </summary>
@@ -128,6 +168,8 @@ public class AuthController : ControllerBase
 		if (user == null)
 			return NotFound("Brugeren blev ikke fundet i databasen.");
 
+		var roleEnum = (RoleEnum)user.UserRoleId;
+
 		return Ok(new
 		{
 			Id = user.Id,
@@ -136,6 +178,7 @@ public class AuthController : ControllerBase
 			CreatedAt = user.CreatedAt,
 			LastLogin = user.LastLogin,
 			Role = user.UserRole.RoleName.ToString(),
+			Description = roleEnum.GetDescription()
 		});
 	}
 }

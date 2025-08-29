@@ -1,5 +1,6 @@
 ﻿using API.Interfaces;
 using DomainModels.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -32,7 +33,9 @@ public class CleaningController : ControllerBase
     /// 404 Not Found — If no rooms requiring cleaning were found.<br/>
     /// 500 Internal Server Error — If an unexpected error occurs while processing the request.
     /// </returns>
-    [HttpGet]
+    /// 
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
+	[HttpGet]
     public async Task<ActionResult<IEnumerable<RoomToCleanDto>>> GetAllRoomsToClean()
     {
         try
@@ -40,7 +43,7 @@ public class CleaningController : ControllerBase
             var rooms = await _cleaningService.GetAllRoomsToCleanAsync();
             if (rooms == null || !rooms.Any())
             {
-                return NotFound("No rooms to clean found.");
+                return Ok("No rooms to clean found.");
             }
 
             return Ok(rooms);
@@ -51,28 +54,30 @@ public class CleaningController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date to the current UTC time.
-    /// </summary>
-    /// <param name="roomNumbers">
-    /// A list of room numbers that should be marked as cleaned.  
-    /// Must not be null or empty.
-    /// </param>
-    /// <returns>
-    /// <para>
-    /// 200 OK — If the rooms were successfully marked as cleaned.  
-    /// </para>
-    /// <para>
-    /// 400 Bad Request — If the <paramref name="roomNumbers"/> parameter is null or empty.  
-    /// </para>
-    /// <para>
-    /// 404 Not Found — If none of the specified room numbers exist or they were already marked as cleaned.  
-    /// </para>
-    /// <para>
-    /// 500 Internal Server Error — If an unexpected error occurs while processing the request.  
-    /// </para>
-    /// </returns>
-    [HttpPut]
+	/// <summary>
+	/// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date to the current UTC time.
+	/// </summary>
+	/// <param name="roomNumbers">
+	/// A list of room numbers that should be marked as cleaned.  
+	/// Must not be null or empty.
+	/// </param>
+	/// <returns>
+	/// <para>
+	/// 200 OK — If the rooms were successfully marked as cleaned.  
+	/// </para>
+	/// <para>
+	/// 400 Bad Request — If the <paramref name="roomNumbers"/> parameter is null or empty.  
+	/// </para>
+	/// <para>
+	/// 404 Not Found — If none of the specified room numbers exist or they were already marked as cleaned.  
+	/// </para>
+	/// <para>
+	/// 500 Internal Server Error — If an unexpected error occurs while processing the request.  
+	/// </para>
+	/// </returns>
+	/// 
+	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
+	[HttpPut]
     public  async Task<IActionResult> MarkRoomAsCleaned(List<int> roomNumbers)
     {
         try
@@ -89,7 +94,7 @@ public class CleaningController : ControllerBase
             }
             else
             {
-                return NotFound($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
+                return Ok($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
             }
         }
         catch (Exception ex)
