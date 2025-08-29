@@ -39,27 +39,23 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(dto.TypeOfRoom))
                 roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
 
-            var room = await roomQuery.FirstOrDefaultAsync();
+            var rooms = await roomQuery.ToListAsync();
+
+            var room = rooms.FirstOrDefault(r => r.IsAvailable);
+
             var roomType = room.RoomType;
-
-            if (room == null || !room.IsAvailable)
-                return null;
-
-
+                        
             var UserName = await _dbContext.Users.Where(u => u.Id == userId)
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
+
             var guests = Math.Clamp(dto.GuestsCount, 1, roomType.MaxCapacity);
-            var nights = Math.Max((dto.CheckOut.Day - dto.CheckIn.Day), 1);
+           
+            var nights = Math.Max((dto.CheckOut.DayNumber - dto.CheckIn.DayNumber), 1);
 
             if (dto.isBreakfast == true)
-            {
                 roomType.PricePerNight += 200 * guests;
-            }
-            else
-            {
-                roomType.PricePerNight = roomType.PricePerNight;
-            }
+                        
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
             var total = pricePerNight * nights;
 
@@ -146,14 +142,9 @@ namespace API.Services
                 .Include(b => b.Room.Hotel)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
-            if (booking == null)
-                return null;
-
-            if (newCheckOut <= newCheckIn)
-                return null;
+           
 
             if (booking == null || !booking.Room.IsAvailable)
-
                 return null;
 
             booking.CheckIn = newCheckIn;
@@ -165,7 +156,10 @@ namespace API.Services
 
             var pricePerNight = booking.Room.RoomType.PricePerNight.GetValueOrDefault(0m);
             if (booking.Room.IsBreakfast)
+            {
                 pricePerNight += 200 * booking.GuestsCount;
+            }
+           
 
             var total = pricePerNight * nights;
             booking.TotalPrice = total;

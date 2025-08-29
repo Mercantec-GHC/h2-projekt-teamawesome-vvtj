@@ -18,7 +18,7 @@ public class Booking : Common
 
     public decimal? TotalPrice { get; set; }
   
-    public bool IsPaid { get; set; } = true;
+    public bool IsPaid { get; set; }
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]

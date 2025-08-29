@@ -51,14 +51,13 @@ public class BookingController : ControllerBase
         try
         {
             var result = await _bookingService.CreateBooking(dto);
-            Console.WriteLine(result);
+            
             if (result == null)
             {
-                return BadRequest("Booking could not be created.");
+                return BadRequest("No available rooms of this type for the selected dates.");
             }
 
             return Ok(result);
-
 
         }
 
@@ -118,12 +117,15 @@ public class BookingController : ControllerBase
     [HttpPut("{id}/dates")]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
     {
+        if (dto.CheckOut <= dto.CheckIn)
+            return BadRequest("Check-out date must be after check-in date.");
+
         var updatedBooking = await _bookingService.UpdateBookingDatesAsync(id, dto.CheckIn, dto.CheckOut);
 
         if (updatedBooking == null)
-            return NotFound($"Booking with ID {id} not found.");
+            return BadRequest("Booking could not be updated. Room may be unavailable or booking not found.");
 
-        return Ok(updatedBooking); // <-- тепер повертається BookingResponseDto
+        return Ok(updatedBooking);
     }
     /// <summary>
     /// Delete a booking from a system.
