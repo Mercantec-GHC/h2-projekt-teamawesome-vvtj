@@ -91,7 +91,10 @@ namespace API.Services
             //Return new Hotel into db
             return newHotel;
         }
-
+        
+        /// <summary>
+        /// Returns HotelDto, as we want the "tailored" version
+        /// </summary>
         public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)
         {
             var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id);
