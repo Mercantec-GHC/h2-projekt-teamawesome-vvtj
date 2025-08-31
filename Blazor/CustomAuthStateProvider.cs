@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor;
@@ -9,20 +10,23 @@ namespace Blazor;
 public class CustomAuthStateProvider : AuthenticationStateProvider
 {
 	private readonly ILocalStorageService _localStorage;
+	private readonly ISessionStorageService _sessionStorage;
 	private readonly JwtSecurityTokenHandler _tokenHandler = new();
 	private readonly HttpClient _httpClient;
 	private const string _tokenKey = "authToken";
 
-	public CustomAuthStateProvider(ILocalStorageService localStorage, HttpClient httpClient)
+	public CustomAuthStateProvider(ILocalStorageService localStorage, ISessionStorageService sessionStorage,  HttpClient httpClient)
 	{
 		_localStorage = localStorage;
+		_sessionStorage = sessionStorage;
 		_httpClient = httpClient;
 	}
 
 	public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
 		//Check if token exists in local storage
-		var savedToken = await _localStorage.GetItemAsStringAsync(_tokenKey);
+		var savedToken = await _localStorage.GetItemAsStringAsync(_tokenKey) 
+			?? await _sessionStorage.GetItemAsStringAsync(_tokenKey);
 
 		//If no token, return anonymous user
 		if (string.IsNullOrWhiteSpace(savedToken))

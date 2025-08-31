@@ -3,6 +3,7 @@ using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
 using Blazor.Models.Dto.User;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 
 namespace Blazor.Services;
 
@@ -11,23 +12,26 @@ public class AuthService : IAuthService
 {
 	private readonly APIService _apiService;
 	private readonly ILocalStorageService _localStorage;
+	private readonly ISessionStorageService _sessionStorage;
 	private readonly CustomAuthStateProvider _authStateProvider;
 	private const string _tokenKey = "token";
 
-	public AuthService(APIService apiService, ILocalStorageService localStorage, CustomAuthStateProvider authStateProvider)
+	public AuthService(APIService apiService, ILocalStorageService localStorage, ISessionStorageService sessionStorage, CustomAuthStateProvider authStateProvider)
 	{
 		_apiService = apiService;
+		_sessionStorage = sessionStorage;
 		_localStorage = localStorage;
 		_authStateProvider = authStateProvider;
 	}
 
-	public async Task<bool> LoginAsync (string email, string password)
+	public async Task<bool> LoginAsync (string email, string password, bool remember)
 	{
 		// Create the login DTO with data for a login
 		var loginDto = new LoginDto
 		{
 			Email = email,
-			Password = password
+			Password = password,
+			RememberMe = remember
 		};
 
 		// Send the login request to the API
@@ -39,8 +43,11 @@ public class AuthService : IAuthService
 		// Read the token from the response
 		var token = await response.Content.ReadAsStringAsync();
 
-		// Store the token in local storage
-		await _localStorage.SetItemAsync(_tokenKey, token.Trim('"'));
+		// Store the token in local storage if remember me is checked, otherwise in session storage
+		if (remember)
+			await _localStorage.SetItemAsync(_tokenKey, token.Trim('"'));
+		else
+			await _sessionStorage.SetItemAsync(_tokenKey, token.Trim('"'));
 
 		// Notify Blazor that the user is authenticated
 		_authStateProvider.NotifyUserAuthentication(token.Trim('"'));
@@ -79,6 +86,7 @@ public class AuthService : IAuthService
 	public async Task LogoutAsync()
 	{
 		await _localStorage.RemoveItemAsync(_tokenKey);
+		await _sessionStorage.RemoveItemAsync(_tokenKey);
 		_apiService.RemoveBearerToken();
 		_authStateProvider.NotifyUserLogout();
 	}
