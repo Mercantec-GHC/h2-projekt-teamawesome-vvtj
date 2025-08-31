@@ -79,9 +79,8 @@ public class AuthService : IAuthService
 	public async Task LogoutAsync()
 	{
 		await _localStorage.RemoveItemAsync(_tokenKey);
-
-		_authStateProvider.NotifyUserLogout();
 		_apiService.RemoveBearerToken();
+		_authStateProvider.NotifyUserLogout();
 	}
 
 }

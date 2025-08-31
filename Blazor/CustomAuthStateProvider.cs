@@ -54,8 +54,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
 	public void NotifyUserLogout()
 	{
-		var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-		NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymousUser)));
+		var authState = Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+		NotifyAuthenticationStateChanged(authState);
 	}
 
 	//Helper method to parse claims from JWT
