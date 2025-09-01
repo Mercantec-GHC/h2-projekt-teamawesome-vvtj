@@ -39,8 +39,8 @@
                             <h5 class="mb-1">@hotel.HotelName (@hotel.CityName)</h5>
                             <p class="mb-1">
                                 <i class="bi bi-geo-alt-fill"></i> @hotel.Address <br />
-@*                              <i class="bi bi-envelope-fill"></i> @hotel.Email <br />
-                                <i class="bi bi-telephone-fill"></i> @hotel.Number <br /> *@
+                                <i class="bi bi-envelope-fill"></i> @hotel.Email <br />
+                                <i class="bi bi-telephone-fill"></i> @hotel.Phone <br />
                             </p>
                         </div>
                     }
@@ -50,25 +50,41 @@
 
         <!-- Form -->
         <div class="contact-form">
-            <EditForm Model="@contactModel" OnValidSubmit="HandleSubmit">
+            @if (isSent)
+            {
+                <div class="alert alert-success" role="alert">
+                    ✅ Thank you for your message! We will get back to you shortly.
+                </div>
+            }
+            else if (isError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    ❌ An error occurred while sending your message. Please try again later.
+                </div>
+            }
+
+            <EditForm Model="@contactForm" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="mb-1">
-                    <InputText @bind-Value="contactModel.Name" placeholder="Name" class="form-control" />
+                    <InputText @bind-Value="contactForm.Name" placeholder="Name" class="form-control" />
                 </div>
 
                 <div class="mb-1">
-                    <InputText @bind-Value="contactModel.Email" type="email" placeholder="Email" class="form-control" />
+                    <InputText @bind-Value="contactForm.Email" type="email" placeholder="Email" class="form-control" />
                 </div>
 
                 <div class="mb-1">
-                    <InputTextArea @bind-Value="contactModel.Message" placeholder="Message" class="form-control" rows="4" />
+                    <InputTextArea @bind-Value="contactForm.Message" placeholder="Message" class="form-control" rows="4" />
                 </div>
 
-                <button type="submit" class="btn btn-primary">Send</button>
+                <BlazorBootstrap.Button type="BlazorBootstrap.ButtonType.Submit" class="btn btn-primary">
+                    Send
+                </BlazorBootstrap.Button>
             </EditForm>
         </div>
+
     </div>
 
     <h4 class="text-center mt-5 mb-3">Central reservation – Opening hours</h4>
@@ -99,24 +115,21 @@
                         <td><strong>Mon–Fri</strong></td>
                         @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
                         {
-                            @* <td>@hotel.WeekdayTime</td> *@
-                            <td>8:00–19:00</td>
+                            <td>@hotel.WeekdayTime</td>
                         }
                     </tr>
                     <tr>
                         <td><strong>Sat</strong></td>
                         @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
                         {
-                            @* <td>@hotel.SaturdayTime</td> *@
-                            <td>8:00–17:00</td>
+                            <td>@hotel.SaturdayTime</td>
                         }
                     </tr>
                     <tr>
                         <td><strong>Weekends and holidays</strong></td>
                         @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
                         {
-                            @* <td>@hotel.HolidaysTime</td> *@
-                            <td>8:00–12:00</td>
+                            <td>@hotel.HolidaysTime</td>
                         }
                     </tr>
                 </tbody>
@@ -124,19 +137,3 @@
         </div>
     }
 </div>
-
-@code {
-    private ContactModel contactModel = new();
-
-    private void HandleSubmit()
-    {
-        Console.WriteLine($"Contact form submitted: {contactModel.Name}, {contactModel.Email}, {contactModel.Message}");
-    }
-
-    public class ContactModel
-    {
-        public string? Name { get; set; }
-        public string? Email { get; set; }
-        public string? Message { get; set; }
-    }
-}
