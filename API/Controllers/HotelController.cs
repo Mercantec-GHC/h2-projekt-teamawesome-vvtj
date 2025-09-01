@@ -65,7 +65,7 @@ public class HotelController : ControllerBase
             return NotFound();
         }
 
-        var hotel = _hotelService.GetHotelById(id);
+        var hotel = await _hotelService.GetHotelById(id);
         return Ok(hotel);
     }
 
