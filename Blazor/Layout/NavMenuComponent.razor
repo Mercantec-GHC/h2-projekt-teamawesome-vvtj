@@ -26,19 +26,33 @@
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
 						<a class="nav-link text-white" href="#">Contact us</a>
 					</li>
+					@*TODO: <AuthorizeView>
+						<Authorized>
 					<NavSeparatorComponent />
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-						<a class="nav-link text-white" href="/login">Log in</a>
+						<a class="nav-link text-white" href="#">Hotel Rooms</a>
 					</li>
+					</Authorized>
+					</AuthorizeView>*@
+
+					<NavSeparatorComponent />
+
+					<AuthorizeView>
+						<NotAuthorized>
+							<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
+								<a class="nav-link text-white" href="/login">Log in</a>
+							</li>
+						</NotAuthorized>
+
+						<Authorized>
+							@*TODO: instead of logout button display user page/account and move the logout in there*@
+							<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
+								<button class="nav-link custom-btn text-white" @onclick="HandleLogout">Log out</button>
+							</li>
+						</Authorized>
+					</AuthorizeView>
 				</ul>
 			</div>
 		</div>
 	</div>
 </nav>
-
-<style>
-	.nav-link {
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		font-size: large;
-	}
-</style>

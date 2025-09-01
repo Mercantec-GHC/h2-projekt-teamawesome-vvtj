@@ -7,16 +7,40 @@
 }
 
 .form {
-    background-color: rgba(255, 255, 255, .5);
+    background-color: rgba(255, 255, 255, .6);
     border-radius: 30px;
 }
 
+.check-text {
+    color: #0f6769;
+}
+
+    .check-text:hover {
+        cursor: default;
+    }
+
+.btn-link {
+    transition: transform 0.3s ease;
+}
+
+    .btn-link:hover {
+        transform: scale(1.2);
+        background-color: rgba(255,255,255,0.1);
+        color: #3a9698;
+        margin-left: 1em;
+    }
+
 .custom-header {
-    font-size: 3em;
+    font-size: 4em;
+    font-weight: 600;
     align-self: center;
     color: rgb(57 166 168);
     text-shadow: 2px 1px 3px #ffff;
 }
+
+    .custom-header:hover {
+        cursor: default;
+    }
 
 ::deep #input-field-email {
     background-color: rgba(255, 255, 255, .8);
@@ -27,6 +51,7 @@
     width: 100%;
     transition: background .8s ease-out;
 }
+
     ::deep #input-field-email:hover {
         background-color: rgba(255, 255, 255, 1);
     }
@@ -56,7 +81,7 @@
     }
 
 ::deep .btn.btn-custom {
-    align-self:center;
+    align-self: center;
     background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
     background-color: #00c4c8;
     border-radius: 35px;
@@ -73,6 +98,7 @@
     ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
         box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
     }
+
 .floating-label-group {
     position: relative;
     margin-bottom: 1.5rem;
