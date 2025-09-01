@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Data;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -52,11 +53,20 @@ public class RoomTypesController : ControllerBase
         var room = await _roomtypeService.GetSpecificRoomType(id);
         return Ok(room);
     }
-    
-    [HttpPut]
-     public async Task<ActionResult> UpdateRoomType(RoomTypePutDto roomTypePutDto)
+
+    /// <summary>
+    /// Updates either price or description for a roomtype
+    /// </summary>
+    /// <param name="id">Unique identifier for room types</param>
+    /// <param name="roomTypePutDto">The updated roomtype data</param>
+    /// <returns>Updated roomtype</returns>
+    /// <response code="200">Room type successfully updated.</response>
+    /// <response code="404">Room type not found.</response>
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}")]
+     public async Task<ActionResult> UpdateRoomType(int id, RoomTypePutDto roomTypePutDto)
     {
-        var updatedRoomType = await _roomtypeService.UpdateRoomType(roomTypePutDto);
+        var updatedRoomType = await _roomtypeService.UpdateRoomType(id, roomTypePutDto);
 
         await _context.SaveChangesAsync();
 

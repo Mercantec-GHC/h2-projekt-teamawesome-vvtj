@@ -62,6 +62,7 @@ public class RoomsController : ControllerBase
         return Ok(room);
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> CreateRoom(RoomCreateDto createRoom)
     {
