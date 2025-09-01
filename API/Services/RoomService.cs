@@ -1,4 +1,5 @@
 using API.Data;
+using DomainModels.Dto;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,14 +8,19 @@ namespace API.Services
     public class RoomService
     {
         private readonly AppDBContext _context;
-        public RoomService(AppDBContext context)
+        private readonly BookingService _booking;
+        public RoomService(AppDBContext context, BookingService booking)
         {
             _context = context;
+            _booking = booking;
         }
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
         {
-            var rooms = await _context.Rooms.Include(r => r.RoomType).Include(r => r.Hotel).ToListAsync();
+            var rooms = await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.Hotel)
+            .ToListAsync();
             return rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
@@ -49,7 +55,7 @@ namespace API.Services
 
             return getRoom;
         }
-        
+
         //Use type Room instead of RoomsDto, as we want the new room into the DB
         public async Task<Room> PostRoom(RoomCreateDto room)
         {
@@ -81,6 +87,13 @@ namespace API.Services
             Console.WriteLine("Added");
 
             return newRoom;
+        }
+
+        public async Task<RoomsDto> CheckAvailability(int roomId)
+        {
+            var room = await _context.Rooms.FindAsync(roomId);
+
+            return null;
         }
 
     }
