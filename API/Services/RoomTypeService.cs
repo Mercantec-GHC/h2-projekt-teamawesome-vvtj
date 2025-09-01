@@ -96,12 +96,12 @@ namespace API.Services
             //Only update if there's a new value
             if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description))
                 existingRoomType.Description = roomTypePutDto.Description;
-            
+
             //Only update if there's a new value
-            if (roomTypePutDto.Price > 0 )
+            if (roomTypePutDto.Price > 0)
                 existingRoomType.PricePerNight = roomTypePutDto.Price;
-            
-        
+
+
             existingRoomType.UpdatedAt = roomTypePutDto.UpdatedAt;
 
             await _context.SaveChangesAsync();
