@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BlazorBootstrap;
-using DomainModels.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace Blazor.Pages;

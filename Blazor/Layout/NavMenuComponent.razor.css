@@ -20,6 +20,11 @@
     filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
 }
 
+.nav-link {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: large;
+}
+
 .nav-link.home {
     color: #3a9698;
     font-weight: 600;
@@ -54,11 +59,11 @@
             color: #3a9698;
         }
 
-        .nav-item ::deep a:hover {
-            transform: scale(1.2);
-            background-color: rgba(255,255,255,0.1);
-            color: #3a9698 !important;
-        }
+    .nav-item a:hover, .nav-item .custom-btn:hover {
+        transform: scale(1.2);
+        background-color: rgba(255,255,255,0.1);
+        color: #3a9698 !important;
+    }
 
 @media (min-width: 641px) {
     .navbar-toggler {
