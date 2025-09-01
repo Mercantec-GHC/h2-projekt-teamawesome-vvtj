@@ -4,7 +4,6 @@ using DomainModels.Dto;
 using DomainModels.Mapping;
 using DomainModels.Models;
 using Humanizer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -26,11 +25,16 @@ namespace API.Services
                 .Select(u => u.Id)
                 .FirstOrDefaultAsync();
 
+            // If user not found, return null
+            if (userId == 0)
+                return null;
 
             var hotel = await _dbContext.Hotels
                 .AsNoTracking()
                 .FirstOrDefaultAsync(h => h.HotelName == dto.HotelName);
-
+            // If hotel not found, aborts and returns null.
+            if (hotel == null)
+                return null;
 
             var roomQuery = _dbContext.Rooms
                 .Include(r => r.RoomType)
@@ -39,12 +43,41 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(dto.TypeOfRoom))
                 roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
 
-            var rooms = await roomQuery.ToListAsync();
+           // var rooms = await roomQuery.ToListAsync();
+            // Get all room IDs to check for booking overlaps in a single query
+            var roomIds = await roomQuery.Select(r => r.Id).ToListAsync();
+            if (roomIds.Count == 0)
+                return null;
+            // Find rooms that are not booked for the requested dates (single query for overlaps)
+            var overlappingRoomIds = await _dbContext.Bookings
+                .Where(b =>
+                    roomIds.Contains(b.RoomId) &&
+                    (
+                        (dto.CheckIn >= b.CheckIn && dto.CheckIn < b.CheckOut) ||
+                        (dto.CheckOut > b.CheckIn && dto.CheckOut <= b.CheckOut) ||
+                        (dto.CheckIn <= b.CheckIn && dto.CheckOut >= b.CheckOut)
+                    )
+                )
+                .Select(b => b.RoomId)
+                .Distinct()
+                .ToListAsync();
 
-            var room = rooms.FirstOrDefault(r => r.IsAvailable);
+            var availableRoomId = roomIds.Except(overlappingRoomIds).FirstOrDefault();
+            if (availableRoomId == 0)
+                return null;
 
-            var roomType = room.RoomType;
-                        
+            // Get the available room with its RoomType
+            var availableRoom = await _dbContext.Rooms
+                .Include(r => r.RoomType)
+                .FirstOrDefaultAsync(r => r.Id == availableRoomId);
+
+            // If no available room is found, return null
+            if (availableRoom == null || availableRoom.RoomType == null || availableRoom.IsAvailable == false)
+                return null;
+
+            // Get the room type for price and capacity calculations
+            var roomType = availableRoom.RoomType;
+
             var UserName = await _dbContext.Users.Where(u => u.Id == userId)
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
@@ -64,14 +97,14 @@ namespace API.Services
             {
                 UserId = userId,
 
-                RoomId = room.Id,
+                RoomId = availableRoom.Id,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
                 GuestsCount = guests,
                 NightsCount = nights,
                 TotalPrice = total,
                 CreatedAt = DateTime.UtcNow,
-                IsPaid = true
+                IsPaid = true,
             };
 
             _dbContext.Bookings.Add(booking);
@@ -86,7 +119,7 @@ namespace API.Services
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                IsBreakfast = room.IsBreakfast,
+                IsBreakfast = availableRoom.IsBreakfast,
                 NightsCount = nights,
                 TotalPrice = total,
 
@@ -101,7 +134,8 @@ namespace API.Services
                 .Select(b => new GetBookingsDto
                 {
                     Id = b.Id,
-
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt,
                     UserName = b.User.UserName,
                     RoomId = b.RoomId,
                     HotelName = b.Room.Hotel.HotelName,
@@ -113,25 +147,50 @@ namespace API.Services
             return bookings;
         }
 
-
-        public async Task<IEnumerable<BookingDto>> GetBookingByUser(int userId)
+        public async Task<IEnumerable<BookingByUserDto>> GetBookingByUser(int userId)
         {
             var userBookings = await _dbContext.Bookings
                 .Where(b => b.UserId == userId)
-                .Select(b => new BookingDto
+                .Select(b => new BookingByUserDto
                 {
-                    Id = b.Id,
+                    CreatedAt = b.CreatedAt,
                     UserName = b.User.UserName,
-                    RoomId = b.RoomId,
+                    HotelName = b.Room.Hotel.HotelName,
+                    RoomType = b.Room.RoomType.TypeofRoom,
                     CheckIn = b.CheckIn,
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
                     GuestsCount = b.GuestsCount,
-
+                   TotalPrice = b.TotalPrice,
+                    IsBreakfast = b.Room.IsBreakfast
                 })
                 .ToListAsync();
+
             return userBookings;
         }
+
+        //public async Task<IEnumerable<object>> GetBookingByUser(int userId)
+        //{
+        //    var userBookings = await _dbContext.Bookings
+        //        .Where(b => b.UserId == userId)
+        //        .Select(b => new
+        //        {
+
+        //            CreatedAt = b.CreatedAt,
+        //            UserName = b.User.UserName,
+        //            HotelName = b.Room.Hotel.HotelName,
+        //            RoomType = b.Room.RoomType.TypeofRoom,
+        //            CheckIn = b.CheckIn,
+        //            CheckOut = b.CheckOut,
+        //            NightsCount = b.NightsCount,
+        //            GuestsCount = b.GuestsCount,
+        //            TotalPrice = b.TotalPrice,
+        //            isBreakfast = b.Room.IsBreakfast,
+
+        //        })
+        //        .ToListAsync();
+        //    return userBookings;
+        //}
 
         public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
         {

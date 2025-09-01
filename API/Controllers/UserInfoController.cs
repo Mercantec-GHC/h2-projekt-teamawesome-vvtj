@@ -58,32 +58,32 @@ public class UserInfoController : ControllerBase
 	/// An <see cref="IActionResult"/> containing the updated user profile information if successful;
 	/// otherwise, a 404 Not Found response.
 	/// </returns>
-	[Authorize]
-	[HttpPut("update-my-profile")]
-	public async Task<IActionResult> UpdateUserInfo([FromBody] UserInfoPutDto dto)
-	{
-		var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+	//[Authorize]
+	//[HttpPut("update-my-profile")]
+	//public async Task<IActionResult> UpdateUserInfo([FromBody] UserInfoPutDto dto)
+	//{
+	//	var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-		if (userIdStr == null)
-			return Unauthorized("UserId is not authorized.");
+	//	if (userIdStr == null)
+	//		return Unauthorized("UserId is not authorized.");
 
-		if (!int.TryParse(userIdStr, out var userId))
-			return Unauthorized("UserId is not a valid integer.");
+	//	if (!int.TryParse(userIdStr, out var userId))
+	//		return Unauthorized("UserId is not a valid integer.");
 
-		var userInfo = await _context.UserInfos.FirstOrDefaultAsync(ui => ui.UserId == userId);
+	//	var userInfo = await _context.UserInfos.FirstOrDefaultAsync(ui => ui.UserId == userId);
 
-		if (userInfo == null)
-			return NotFound("User was not found in database.");
+	//	if (userInfo == null)
+	//		return NotFound("User was not found in database.");
 
-		var updatedUserInfo = await _userInfoService.UpdateUserInfoAsync(userId, dto);
+	//	var updatedUserInfo = await _userInfoService.UpdateUserInfoAsync(userId, dto);
 
-		if (updatedUserInfo == null)
-		{
-			return NotFound();
-		}
+	//	if (updatedUserInfo == null)
+	//	{
+	//		return NotFound();
+	//	}
 
-		return Ok(updatedUserInfo);
-	}
+	//	return Ok(updatedUserInfo);
+	//}
 
 	/// <summary>
 	/// Creates a user profile for the currently authenticated user.

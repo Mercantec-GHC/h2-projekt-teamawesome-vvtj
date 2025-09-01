@@ -1,6 +1,5 @@
 ﻿
 
-using DomainModels.Models;
 
 namespace DomainModels.Dto
 {
@@ -9,17 +8,12 @@ namespace DomainModels.Dto
         public int Id { get; set; }
 
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
+       
         public int UserId { get; set; }
         public string UserName { get; set; }
 
         public int RoomId { get; set; }
         public string RoomType { get; set; }
-
-        public int RoomTypeId { get; set; }
-
-        public string TypeOfRoom { get; set; }
 
         public int HotelId { get; set; }
         public string HotelName { get; set; }
@@ -40,4 +34,19 @@ namespace DomainModels.Dto
         public DateOnly CheckIn { get; set; }
         public DateOnly CheckOut { get; set; }
     }
+
+    public class BookingByUserDto
+    {
+        public DateTime CreatedAt { get; set; }
+        public string UserName { get; set; }
+        public string HotelName { get; set; }
+        public string RoomType { get; set; }
+        public DateOnly CheckIn { get; set; }
+        public DateOnly CheckOut { get; set; }
+        public int NightsCount { get; set; }
+        public int GuestsCount { get; set; }
+        public decimal? TotalPrice { get; set; }
+        public bool IsBreakfast { get; set; }
+    }
+
 }
