@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Blazor.Interfaces;
 namespace Blazor;
 
@@ -23,6 +24,7 @@ public class Program
 
 		builder.Services.AddAuthorizationCore();
 		builder.Services.AddBlazoredLocalStorage();
+        builder.Services.AddBlazoredSessionStorage();
 		builder.Services.AddCascadingAuthenticationState();
 
 		// Læs API endpoint fra miljøvariabler eller brug default
