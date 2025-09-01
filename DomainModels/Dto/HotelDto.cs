@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace DomainModels.Dto
@@ -16,6 +17,11 @@ namespace DomainModels.Dto
         [Required(ErrorMessage = "Address is required")]
 		public required string Address { get; set; }
         public string? Description { get; set; }
+        public string? Email { get; set; } 
+        public string? Phone { get; set; }
+        public string? WeekdayTime { get; set; }
+        public string? SaturdayTime { get; set; }
+        public string? HolidaysTime { get; set; }
     }
 
     // //Get - Read
