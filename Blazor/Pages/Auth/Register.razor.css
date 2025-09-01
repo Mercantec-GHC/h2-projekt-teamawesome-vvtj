@@ -1,5 +1,4 @@
 ﻿.container {
-    position: center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,11 +10,14 @@
     border-radius: 30px;
 }
 
+.custom-header, .custom-subheader {
+    color: rgb(57 166 168);
+    text-shadow: 2px 1px 3px #ffff;
+}
+
 .custom-header {
     font-size: 3em;
     align-self: center;
-    color: rgb(57 166 168);
-    text-shadow: 2px 1px 3px #ffff;
 }
 
 ::deep #input-field-email,
@@ -47,12 +49,11 @@
     }
 
 ::deep .btn.btn-custom {
-    align-self:center;
     background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
     background-color: #00c4c8;
     border-radius: 35px;
     border: 2px solid #ffff;
-    width: 80%;
+    padding: .4em 4em;
     transition: background-image 2s ease-in-out;
 }
 
@@ -86,4 +87,11 @@
     left: 8px;
     font-size: 0.85em;
     color: #495057;
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 auto;
+        width: max-content !important;
+    }
 }

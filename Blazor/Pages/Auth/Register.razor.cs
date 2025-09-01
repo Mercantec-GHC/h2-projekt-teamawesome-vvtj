@@ -11,13 +11,11 @@ public partial class Register
 	[Inject]
 	private NavigationManager _navigation { get; set; } = null!;
 	private string _errorMessage = string.Empty;
-	private string _successMessage = string.Empty;
 	private RegisterDto _registerModel = new();
 
 	private async Task HandleRegister()
 	{
 		_errorMessage = string.Empty;
-		_successMessage = string.Empty;
 
 		if (_registerModel.Password != _registerModel.ConfirmPassword)
 		{
@@ -25,21 +23,31 @@ public partial class Register
 			return;
 		}
 
-		var result = await _authService.RegisterAsync(
-		_registerModel.Email,
-		_registerModel.Username,
-		_registerModel.Password,
-		_registerModel.ConfirmPassword
-		);
+		_isLoading = true;
+		try
+		{
+			var emailExists = await _authService.RegisterAsync(
+				_registerModel.Email,
+				_registerModel.Username,
+				_registerModel.Password,
+				_registerModel.ConfirmPassword
+			);
 
-		if (result)
-		{
-			_successMessage = "Registration successful! You can now log in.";
-			_navigation.NavigateTo("/login");
+			_isLoading = false;
+			if (!emailExists)
+			{
+				_errorMessage = "Account with this email already exists in our system.";
+				return;
+			}
+			else
+			{
+				_navigation.NavigateTo("/login");
+			}
 		}
-		else
+		catch (Exception ex)
 		{
-			_errorMessage = "Registration failed. Please try again.";
+			_errorMessage = $"An error occurred: {ex.Message}";
+			return;
 		}
 	}
 }
