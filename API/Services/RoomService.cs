@@ -94,7 +94,7 @@ namespace API.Services
             var booking = await _context.Bookings.AnyAsync(b => b.RoomId == roomId
                                                           && desiredCheckIn < b.CheckIn
                                                           && desiredCheckOut > b.CheckOut);
-            if (booking)
+            if (!booking)
                 return false; //Room is already booked
 
             var room = _context.Rooms.FirstOrDefault(r => r.Id == roomId);
