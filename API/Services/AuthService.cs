@@ -125,9 +125,9 @@ public class AuthService : IAuthService
 			new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString())
 		};
 
-
+		string secretKey = _configuration["AppSettings:Token"]!;
 		var key = new SymmetricSecurityKey(
-			Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
+			Encoding.UTF8.GetBytes(secretKey));
 
 		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 		var tokenDescriptor = new SecurityTokenDescriptor
@@ -135,7 +135,7 @@ public class AuthService : IAuthService
 			Subject = new ClaimsIdentity(claims),
 			Issuer = _configuration.GetValue<string>("AppSettings:Issuer"),
 			Audience = _configuration.GetValue<string>("AppSettings:Audience"),
-			Expires = DateTime.UtcNow.AddHours(3), // 2 hours + 60 minutes = 3 hours
+			Expires = DateTime.UtcNow.AddHours(1), 
 			SigningCredentials = creds
 		};
 

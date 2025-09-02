@@ -25,8 +25,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
 		//Check if token exists in local storage
-		var savedToken = await _localStorage.GetItemAsStringAsync(_tokenKey) 
-			?? await _sessionStorage.GetItemAsStringAsync(_tokenKey);
+		var savedToken = await _sessionStorage.GetItemAsStringAsync(_tokenKey)
+			?? await _localStorage.GetItemAsStringAsync(_tokenKey);
 
 		//If no token, return anonymous user
 		if (string.IsNullOrWhiteSpace(savedToken))
@@ -53,12 +53,15 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		var identity = new ClaimsIdentity(claims, "jwt");
 		var user = new ClaimsPrincipal(identity);
 
-		NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+		var authState = Task.FromResult(new AuthenticationState(user));
+
+		NotifyAuthenticationStateChanged(authState);
 	}
 
 	public void NotifyUserLogout()
 	{
-		var authState = Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+		var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
+		var authState = Task.FromResult(new AuthenticationState(anonymousUser));
 		NotifyAuthenticationStateChanged(authState);
 	}
 

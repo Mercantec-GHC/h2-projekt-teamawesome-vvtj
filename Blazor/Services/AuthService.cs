@@ -14,7 +14,7 @@ public class AuthService : IAuthService
 	private readonly ILocalStorageService _localStorage;
 	private readonly ISessionStorageService _sessionStorage;
 	private readonly CustomAuthStateProvider _authStateProvider;
-	private const string _tokenKey = "token";
+	private const string _tokenKey = "authToken";
 
 	public AuthService(APIService apiService, ILocalStorageService localStorage, ISessionStorageService sessionStorage, CustomAuthStateProvider authStateProvider)
 	{
@@ -24,7 +24,7 @@ public class AuthService : IAuthService
 		_authStateProvider = authStateProvider;
 	}
 
-	public async Task<bool> LoginAsync (string email, string password, bool remember)
+	public async Task<bool> LoginAsync(string email, string password, bool remember)
 	{
 		// Create the login DTO with data for a login
 		var loginDto = new LoginDto
@@ -42,18 +42,26 @@ public class AuthService : IAuthService
 
 		// Read the token from the response
 		var token = await response.Content.ReadAsStringAsync();
-
+		var cleanToken = token.Trim('"');
+		Console.WriteLine(cleanToken);
 		// Store the token in local storage if remember me is checked, otherwise in session storage
 		if (remember)
-			await _localStorage.SetItemAsync(_tokenKey, token.Trim('"'));
-		else
-			await _sessionStorage.SetItemAsync(_tokenKey, token.Trim('"'));
+		{
+			await _localStorage.SetItemAsync(_tokenKey, cleanToken);
+			await _sessionStorage.RemoveItemAsync(_tokenKey);
+		}
 
+		else
+		{
+			await _sessionStorage.SetItemAsync(_tokenKey, cleanToken);
+			await _localStorage.RemoveItemAsync(_tokenKey);
+		}
+			
 		// Notify Blazor that the user is authenticated
-		_authStateProvider.NotifyUserAuthentication(token.Trim('"'));
+		_authStateProvider.NotifyUserAuthentication(cleanToken);
 
 		// Set the token in the HttpClient for future requests
-		_apiService.SetBearerToken(token.Trim('"'));
+		_apiService.SetBearerToken(cleanToken);
 
 		return true;
 	}

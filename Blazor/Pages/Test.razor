@@ -1,0 +1,16 @@
+﻿@page "/test"
+
+
+<h3 class="mt-5">Testing re-routing to see how works authentica.</h3>
+<AuthorizeView>
+	<Authorized>
+		<h3>You are authorized!</h3>
+	</Authorized>
+	<NotAuthorized>
+		<h3>You are not authorized. Please log in.</h3>
+	</NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+}
