@@ -43,7 +43,7 @@ public class AuthService : IAuthService
 		// Read the token from the response
 		var token = await response.Content.ReadAsStringAsync();
 		var cleanToken = token.Trim('"');
-		Console.WriteLine(cleanToken);
+
 		// Store the token in local storage if remember me is checked, otherwise in session storage
 		if (remember)
 		{
