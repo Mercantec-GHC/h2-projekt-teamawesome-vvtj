@@ -49,7 +49,7 @@ namespace API.Services
 
             return getRoom;
         }
-        
+
         //Use type Room instead of RoomsDto, as we want the new room into the DB
         public async Task<Room> PostRoom(RoomCreateDto room)
         {
@@ -82,6 +82,6 @@ namespace API.Services
 
             return newRoom;
         }
-
+        
     }
 }

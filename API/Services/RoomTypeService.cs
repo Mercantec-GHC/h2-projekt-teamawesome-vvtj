@@ -27,12 +27,12 @@ namespace API.Services
             var newRoomTypesListDto = roomtypes
             .Select(rt =>
             {
-                if (!RoomTypeEnumHelper.TryToConvert(rt.TypeofRoom, out var roomTypeEnum))
+                // if (!RoomTypeEnumHelper.TryToConvert(rt.TypeofRoom, out var roomTypeEnum))
                     return null;
                 return new RoomTypeDto
                 {
                     Id = rt.Id,
-                    TypeofRoom = roomTypeEnum.ToString(),
+                    TypeofRoom = rt.TypeofRoom,
                     MaxCapacity = rt.MaxCapacity,
                     Description = rt.Description,
                     HasBalcony = rt.HasBalcony,
@@ -56,15 +56,15 @@ namespace API.Services
         public async Task<RoomTypeDto> GetSpecificRoomType(int roomtypeId)
         {
             var roomtype = await _context.RoomTypes.FindAsync(roomtypeId);
-            if (!RoomTypeEnumHelper.TryToConvert(roomtype.TypeofRoom, out var roomTypeEnum))
-            {
-                return null;
-            }
+            // if (!RoomTypeEnumHelper.TryToConvert(roomtype.TypeofRoom, out var roomTypeEnum))
+            // {
+            //     return null;
+            // }
 
             RoomTypeDto getRoomType = new RoomTypeDto
             {
                 Id = roomtype.Id,
-                TypeofRoom = roomTypeEnum.ToString(),
+                TypeofRoom = roomtype.TypeofRoom.ToString(),
                 MaxCapacity = roomtype.MaxCapacity,
                 Description = roomtype.Description,
                 HasBalcony = roomtype.HasBalcony,
