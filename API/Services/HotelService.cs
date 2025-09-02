@@ -33,6 +33,11 @@ namespace API.Services
                 CityName = h.CityName,
                 Address = h.Address,
                 Description = h.Description,
+                Phone = h.Phone,
+                Email = h.Email,
+                WeekdayTime = h.WeekdayTime,
+                SaturdayTime = h.SaturdayTime,
+                HolidaysTime = h.HolidaysTime
             }).ToList();
 
             return getHotels;
