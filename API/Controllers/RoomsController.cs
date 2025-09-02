@@ -20,15 +20,15 @@ public class RoomsController : ControllerBase
         _roomService = roomService;
     }
 
-	//Everybody  -> Guests shouldn't be able to see rooms, so not everybody
-	/// <summary>
-	/// Shows all rooms
-	/// </summary>
-	/// <returns> A list of rooms</returns>
-	/// <response code="404">Rooms not found!</response>
-	/// 
-	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
-	[HttpGet]
+    //Everybody  -> Guests shouldn't be able to see rooms, so not everybody
+    /// <summary>
+    /// Shows all rooms
+    /// </summary>
+    /// <returns> A list of rooms</returns>
+    /// <response code="404">Rooms not found!</response>
+    /// 
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomsDto>>> GetRooms()
     {
         var rooms = await _roomService.GetRooms();
@@ -41,16 +41,16 @@ public class RoomsController : ControllerBase
         return Ok(rooms);
     }
 
-	//Everybody -> Guests shouldn't be able to see rooms, so not everybody
-	/// <summary>
-	/// Show one specific room
-	/// </summary>
-	/// <param name="id">Unique identifier for room</param>
-	/// <returns>A room</returns>
-	/// <response code="404">Rooms not found!</response>
-	/// 
-	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
-	[HttpGet("{id}")]
+    //Everybody -> Guests shouldn't be able to see rooms, so not everybody
+    /// <summary>
+    /// Show one specific room
+    /// </summary>
+    /// <param name="id">Unique identifier for room</param>
+    /// <returns>A room</returns>
+    /// <response code="404">Rooms not found!</response>
+    /// 
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<RoomsDto>> GetSpecificRoom(int id)
     {
         if (id == null)
@@ -61,7 +61,7 @@ public class RoomsController : ControllerBase
         var room = await _roomService.GetRoomByID(id);
         return Ok(room);
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> CreateRoom(RoomCreateDto createRoom)
@@ -73,6 +73,20 @@ public class RoomsController : ControllerBase
         }
 
         return Ok(newRoom);
+    }
+    
+    [HttpGet("{roomId}/availability")]
+    public async Task<IActionResult> CheckAvailability(int roomId, DateOnly checkIn, DateOnly checkOut)
+    {
+        var availability = await _roomService.CheckAvailability(roomId, checkIn, checkOut);
+        if (availability == false)
+            return BadRequest("Not available");
+
+        return Ok(new Room
+        {
+            Id = roomId,
+            IsAvailable = availability,
+        });
     }
 
 }

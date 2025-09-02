@@ -8,11 +8,11 @@ namespace API.Services
     public class RoomService
     {
         private readonly AppDBContext _context;
-        private readonly BookingService _booking;
-        public RoomService(AppDBContext context, BookingService booking)
+        
+        public RoomService(AppDBContext context)
         {
             _context = context;
-            _booking = booking;
+           
         }
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
@@ -89,11 +89,22 @@ namespace API.Services
             return newRoom;
         }
 
-        public async Task<RoomsDto> CheckAvailability(int roomId)
+        public async Task<bool> CheckAvailability(int roomId, DateOnly desiredCheckIn, DateOnly desiredCheckOut)
         {
-            var room = await _context.Rooms.FindAsync(roomId);
+            var booking = await _context.Bookings.AnyAsync(b => b.RoomId == roomId
+                                                          && desiredCheckIn < b.CheckIn
+                                                          && desiredCheckOut > b.CheckOut);
+            if (booking)
+                return false; //Room is already booked
 
-            return null;
+            var room = _context.Rooms.FirstOrDefault(r => r.Id == roomId);
+            if (room == null)
+                return false; //Room does not exist
+
+            if (!room.LastCleaned.HasValue || (DateTime.UtcNow - room.LastCleaned.Value).TotalDays >= 3)
+                return false; //Room hasn't been marked as clean
+
+            return true; //Room is available
         }
 
     }
