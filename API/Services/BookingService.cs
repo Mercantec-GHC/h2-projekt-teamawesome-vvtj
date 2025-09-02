@@ -43,7 +43,6 @@ namespace API.Services
             if (!string.IsNullOrWhiteSpace(dto.TypeOfRoom))
                 roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
 
-           // var rooms = await roomQuery.ToListAsync();
             // Get all room IDs to check for booking overlaps in a single query
             var roomIds = await roomQuery.Select(r => r.Id).ToListAsync();
             if (roomIds.Count == 0)
@@ -83,12 +82,12 @@ namespace API.Services
                 .FirstOrDefaultAsync();
 
             var guests = Math.Clamp(dto.GuestsCount, 1, roomType.MaxCapacity);
-           
+
             var nights = Math.Max((dto.CheckOut.DayNumber - dto.CheckIn.DayNumber), 1);
 
             if (dto.isBreakfast == true)
                 roomType.PricePerNight += 200 * guests;
-                        
+
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
             var total = pricePerNight * nights;
 
@@ -104,7 +103,7 @@ namespace API.Services
                 NightsCount = nights,
                 TotalPrice = total,
                 CreatedAt = DateTime.UtcNow,
-                IsPaid = true,
+                IsPaid = dto.isBreakfast,
             };
 
             _dbContext.Bookings.Add(booking);
@@ -119,10 +118,9 @@ namespace API.Services
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                IsBreakfast = availableRoom.IsBreakfast,
+                IsBreakfast = booking.IsPaid,
                 NightsCount = nights,
                 TotalPrice = total,
-
             };
         }
 
@@ -161,7 +159,7 @@ namespace API.Services
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
                     GuestsCount = b.GuestsCount,
-                   TotalPrice = b.TotalPrice,
+                    TotalPrice = b.TotalPrice,
                     IsBreakfast = b.Room.IsBreakfast
                 })
                 .ToListAsync();
@@ -201,7 +199,7 @@ namespace API.Services
                 .Include(b => b.Room.Hotel)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
-           
+
 
             if (booking == null || !booking.Room.IsAvailable)
                 return null;
@@ -218,7 +216,7 @@ namespace API.Services
             {
                 pricePerNight += 200 * booking.GuestsCount;
             }
-           
+
 
             var total = pricePerNight * nights;
             booking.TotalPrice = total;

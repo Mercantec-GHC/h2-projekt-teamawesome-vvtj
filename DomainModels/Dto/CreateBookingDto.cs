@@ -10,7 +10,9 @@ namespace DomainModels.Dto
         public DateOnly CheckIn { get; set; }
         public DateOnly CheckOut { get; set; }
         public int GuestsCount { get; set; }
-        public bool isBreakfast { get; set; }
+        public bool isBreakfast { get; set; } = false;
+
+
     }
 
     public class BookingResponseDto
