@@ -5,17 +5,17 @@
 <PageTitle>Register</PageTitle>
 
 <div class="container">
-	<div class="col-md-6">
+	<div class="col col-sm-10 col-md-12 col-lg-10 col-xl-6">
 		<div class="form d-flex flex-column flex-wrap p-3 p-md-5">
 
 			<div class="custom-header">Welcome!</div>
-			<div class="custom-subheader text-center fs-3 my-3">Create an account to see and manage your bookings</div>
+			<div class="custom-subheader text-center fs-3 m-0 my-3">Create an account to see and manage your bookings</div>
 
 			<EditForm Model="_registerModel" OnValidSubmit="HandleRegister">
 
 				<DataAnnotationsValidator />
 
-				<div class="floating-label-group m-3 my-md-4">
+				<div class="floating-label-group mb-1 my-md-4">
 					<InputText id="input-field-email"
 							   @bind-Value="_registerModel.Email"
 							   class="form-control"
@@ -24,7 +24,7 @@
 					<ValidationMessage For="@(() => _registerModel.Email)" />
 				</div>
 
-				<div class="floating-label-group m-3 my-md-4">
+				<div class="floating-label-group mb-1 my-md-4">
 					<InputText id="input-field-username"
 							   @bind-Value="_registerModel.Username"
 							   class="form-control"
@@ -33,7 +33,7 @@
 					<ValidationMessage For="@(() => _registerModel.Username)" />
 				</div>
 
-				<div class="floating-label-group m-3 my-md-4">
+				<div class="floating-label-group mb-1 my-md-4">
 					<InputText id="input-field-password"
 							   @bind-Value="_registerModel.Password"
 							   class="form-control"
@@ -42,7 +42,7 @@
 					<label class="floating-label" for="input-field-password">Password</label>
 					<ValidationMessage For="@(() => _registerModel.Password)" />
 				</div>
-				<div class="floating-label-group m-3 my-md-4">
+				<div class="floating-label-group mb-1 my-md-4">
 					<InputText id="input-field-confirm-password"
 							   @bind-Value="_registerModel.ConfirmPassword"
 							   class="form-control"

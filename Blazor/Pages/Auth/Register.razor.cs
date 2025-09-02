@@ -23,7 +23,6 @@ public partial class Register
 			return;
 		}
 
-		_isLoading = true;
 		try
 		{
 			var emailExists = await _authService.RegisterAsync(
@@ -33,7 +32,7 @@ public partial class Register
 				_registerModel.ConfirmPassword
 			);
 
-			_isLoading = false;
+
 			if (!emailExists)
 			{
 				_errorMessage = "Account with this email already exists in our system.";
