@@ -37,7 +37,7 @@ public class BookingController : ControllerBase
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
-        {
+    {
 
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -56,7 +56,7 @@ public class BookingController : ControllerBase
         try
         {
             var result = await _bookingService.CreateBooking(dto);
-            
+
             if (result == null)
             {
                 return BadRequest("No available rooms of this type for the selected dates.");
@@ -97,15 +97,10 @@ public class BookingController : ControllerBase
     /// <response code="403">Forbidden – the user does not have administrator privileges.</response>
     /// <response code="404">Not found – user with specified ID does not exist or has no bookings.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-     [Authorize]
-    [HttpGet]
+    [Authorize]
+    [HttpGet("userId")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
     {
-
-        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (currentUserId == null)
-            return Unauthorized("UserId is not found in token.");
 
         var bookings = await _bookingService.GetBookingByUser(userId);
         return Ok(bookings);
