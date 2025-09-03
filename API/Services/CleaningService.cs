@@ -32,15 +32,18 @@ namespace API.Services
                         bookings.Any(b => b.RoomId == r.Id && b.CheckOut <= DateOnly.FromDateTime(DateTime.UtcNow)))
                     .ToList();
 
-                var roomToCleanDtos = roomsToClean.Select(r => new RoomToCleanDto
-                {
-                    RoomNumber = r.RoomNumber,
-                    RoomType = r.RoomType.TypeofRoom.ToString(),
-                    HotelName = r.Hotel.HotelName
-                });
+                var roomToCleanDtos = roomsToClean
+                    .GroupBy(r => r.HotelId)
+                    .Select(g => new RoomToCleanDto
+                    {
+                        HotelId = g.Key, 
+                        RoomNumbers = g.Select(r => r.RoomNumber).ToList()
+                    })
+                    .ToList();
 
                 return roomToCleanDtos;
             }
+
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
@@ -50,34 +53,45 @@ namespace API.Services
             }
         }
 
-        public async Task<bool> MarkRoomAsCleanedAsync(List<int> roomNumbers)
+        public async Task<List<RoomToCleanDto?>> MarkRoomAsCleanedAsync(List<RoomToCleanDto> roomDtos)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
             try
             {
-                int rowsAffected = await _dbContext.Rooms
-                    .Where(r => roomNumbers.Contains(r.RoomNumber))
-                    .ExecuteUpdateAsync(s => s.SetProperty(r => r.LastCleaned, _ => DateTime.UtcNow));
+                int rowsAffected = 0;
 
-                if (rowsAffected != roomNumbers.Count)
+                foreach (var dto in roomDtos)
                 {
+                    var updated = await _dbContext.Rooms
+                        .Where(r => r.HotelId == dto.HotelId && dto.RoomNumbers.Contains(r.RoomNumber))
+                        .ExecuteUpdateAsync(s => s.SetProperty(r => r.LastCleaned, _ => DateTime.UtcNow));
 
-                    _logger.LogInformation($"Incorrect number of room numbers updated in DB. Rows affected: {rowsAffected}");
+                    rowsAffected += updated;
+                }
+
+                var totalExpected = roomDtos.Sum(d => d.RoomNumbers.Count());
+
+                if (rowsAffected != totalExpected)
+                {
+                    _logger.LogInformation($"Incorrect number of rooms updated. Rows affected: {rowsAffected}, expected: {totalExpected}");
                     await transaction.RollbackAsync();
-                    return false;
+                    return null;
                 }
 
                 await transaction.CommitAsync();
-                return true;
+                return roomDtos;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
                 _logger.LogError($"Error updating rooms: {ex.Message}");
-                return false;
+                return null;
             }
         }
+
+
+
 
     }
 }
