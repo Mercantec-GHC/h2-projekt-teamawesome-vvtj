@@ -35,6 +35,7 @@ public class Program
 		builder.Services.AddScoped<IBookingService, BookingService>();
         builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
 		builder.Services.AddScoped<IUserInfoService, UserInfoService>();
+		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddMemoryCache();
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
