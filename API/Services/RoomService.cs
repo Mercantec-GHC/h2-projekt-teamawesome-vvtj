@@ -22,7 +22,7 @@ namespace API.Services
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
-                Roomtype = r.RoomType,
+                RoomType = r.RoomType,
                 HotelId = r.Hotel.Id,
 
             });
@@ -44,7 +44,7 @@ namespace API.Services
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
-                Roomtype = room.RoomType,
+                RoomType = room.RoomType,
             };
 
             return getRoom;
@@ -83,25 +83,21 @@ namespace API.Services
             return newRoom;
         }
 
-        public async Task<List<RoomsDto>> GetRoomsByRoomType(int roomTypeId)
+        public async Task<IEnumerable<RoomsDto>> GetRoomsByRoomType(int roomTypeId)
         {
             var rooms = await _context.Rooms
             .Where(r => r.TypeId == roomTypeId)
+            .Include(r => r.RoomType)
             .ToListAsync();
 
             var roomsWithType = rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
-                Roomtype = r.RoomType,
+                RoomType = r.RoomType,
             });
 
             return roomsWithType;
-            
-            // Id = r.Id,
-            //     RoomNumber = r.RoomNumber,
-            //     Roomtype = r.RoomType,
-            //     // Add other properties as needed
 
         }
 

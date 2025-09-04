@@ -61,7 +61,12 @@ public class RoomsController : ControllerBase
         var room = await _roomService.GetRoomByID(id);
         return Ok(room);
     }
-
+    /// <summary>
+    /// Creates a new room
+    /// </summary>
+    /// <param name="createRoom">Identifier for the new room</param>
+    /// <returns>The newly created room</returns>
+    /// <response code="404">Room could not be created!</response>
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> CreateRoom(RoomCreateDto createRoom)
@@ -75,10 +80,19 @@ public class RoomsController : ControllerBase
         return Ok(newRoom);
     }
 
-    // [Authorize(Roles = "Receptionist")]
+    /// <summary>
+    /// Gets all rooms with the specified roomtype id
+    /// </summary>
+    /// <param name="roomTypeId">Unique identifier for the roomtypes</param>
+    /// <returns>A list of the rooms with the specified id</returns>
+    /// /// <response code="404">Could not find rooms!</response>
+    //[Authorize(Roles = "Receptionist")]
     [HttpGet("{roomTypeId}/Id-for-roomtypes")]
     public async Task<ActionResult<RoomType>> GetRoomsByRoomType(int roomTypeId)
     {
-        
+        var rooms = await _roomService.GetRoomsByRoomType(roomTypeId);
 
+        return Ok(rooms);
+    }
+        
 }

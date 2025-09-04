@@ -9,7 +9,7 @@ public class RoomsDto
     public bool IsBreakfast { get; set; }
     public DateTime AvailableFrom { get; set; }
     public int RoomNumber { get; set; }
-    public RoomType Roomtype { get; set; }
+    public RoomType RoomType { get; set; }
     public int HotelId { get; set; }
 }
 
