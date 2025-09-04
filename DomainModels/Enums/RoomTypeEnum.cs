@@ -11,7 +11,7 @@ public enum RoomTypeEnum
 
 public static class RoomTypeExtenstion
 {
-	public static string GetDescription(RoomTypeEnum roomType) => roomType switch
+	public static string GetDescription(this RoomTypeEnum roomType) => roomType switch
 	{
 		RoomTypeEnum.Standard => "A comfortable room. Ideal for solo travelers or couples seeking simplicity and value.",
 		RoomTypeEnum.Family => "Spacious and cozy, designed to accommodate families with multiple beds.",

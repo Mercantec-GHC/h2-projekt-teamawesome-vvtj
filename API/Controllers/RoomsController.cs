@@ -75,11 +75,11 @@ public class RoomsController : ControllerBase
         return Ok(newRoom);
     }
 
-    [Authorize(Roles = "Receptionist")]
-    [HttpGet]
-    public async Task<ActionResult> GetRoomsByRoomType()
-    {
-        
-    }
+    //  [Authorize(Roles = "Receptionist")]
+    //  [HttpGet]
+    //  public async Task<ActionResult> GetRoomsByRoomType()
+    //  {
+    //     return null;
+    //  }
 
 }

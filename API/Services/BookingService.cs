@@ -36,7 +36,7 @@ namespace API.Services
                 .Include(r => r.RoomType)
                 .Where(r => r.HotelId == hotel.Id);
 
-            if (!string.IsNullOrWhiteSpace(dto.TypeOfRoom))
+            if (dto.TypeOfRoom == null)
                 roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
 
             var room = await roomQuery.FirstOrDefaultAsync();
@@ -73,7 +73,7 @@ namespace API.Services
             {
                 UserName = dto.UserName,
                 HotelName = hotel.HotelName,
-                RoomType = roomType.TypeofRoom,
+                RoomType = roomType.TypeofRoom.ToString(),
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
@@ -163,7 +163,7 @@ namespace API.Services
                     GuestsCount = b.GuestsCount,
                     HotelId = b.Room.HotelId,
                     HotelName = b.Room.Hotel.HotelName,
-                    RoomType = b.Room.RoomType.TypeofRoom,
+                    RoomType = b.Room.RoomType.TypeofRoom.ToString(),
 
                 })
         .AsNoTracking();
