@@ -82,6 +82,28 @@ namespace API.Services
 
             return newRoom;
         }
-        
+
+        public async Task<List<RoomsDto>> GetRoomsByRoomType(int roomTypeId)
+        {
+            var rooms = await _context.Rooms
+            .Where(r => r.TypeId == roomTypeId)
+            .ToListAsync();
+
+            var roomsWithType = rooms.Select(r => new RoomsDto
+            {
+                Id = r.Id,
+                RoomNumber = r.RoomNumber,
+                Roomtype = r.RoomType,
+            });
+
+            return roomsWithType;
+            
+            // Id = r.Id,
+            //     RoomNumber = r.RoomNumber,
+            //     Roomtype = r.RoomType,
+            //     // Add other properties as needed
+
+        }
+
     }
 }
