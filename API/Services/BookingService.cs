@@ -133,7 +133,7 @@ namespace API.Services
                 {
                     Id = b.Id,
                     CreatedAt = b.CreatedAt,
-                    UpdatedAt = b.UpdatedAt,
+                    UpdatedAt = b.UpdatedAt ?? DateTime.MinValue,
                     UserName = b.User.UserName,
                     RoomId = b.RoomId,
                     HotelName = b.Room.Hotel.HotelName,
