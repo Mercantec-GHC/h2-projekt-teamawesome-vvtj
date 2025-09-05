@@ -36,17 +36,19 @@ namespace API.Services
             if (hotel == null)
                 return null;
 
-            var roomQuery = _dbContext.Rooms
+            var roomsQuery = await _dbContext.Rooms
                 .Include(r => r.RoomType)
-                .Where(r => r.HotelId == hotel.Id);
-
-            if (!string.IsNullOrWhiteSpace(dto.TypeOfRoom))
-                roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
-
-            // Get all room IDs to check for booking overlaps in a single query
-            var roomIds = await roomQuery.Select(r => r.Id).ToListAsync();
-            if (roomIds.Count == 0)
+                .Where(r => r.HotelId == hotel.Id &&
+                r.RoomType.TypeofRoom == dto.TypeOfRoom && r.IsAvailable == true)
+                .Select(r => new { r.Id, r.RoomType })
+                 .ToListAsync();
+          
+            //if there are no rooms with chosen type in the hotel
+            if (roomsQuery.Count == 0) 
                 return null;
+
+            var roomIds = roomsQuery.Select(r => r.Id).ToList();
+
             // Find rooms that are not booked for the requested dates (single query for overlaps)
             var overlappingRoomIds = await _dbContext.Bookings
                 .Where(b =>
@@ -63,15 +65,13 @@ namespace API.Services
 
             var availableRoomId = roomIds.Except(overlappingRoomIds).FirstOrDefault();
             if (availableRoomId == 0)
-                return null;
+                return null; // No available rooms found
 
-            // Get the available room with its RoomType
-            var availableRoom = await _dbContext.Rooms
-                .Include(r => r.RoomType)
-                .FirstOrDefaultAsync(r => r.Id == availableRoomId);
-
+           var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
+            
+            
             // If no available room is found, return null
-            if (availableRoom == null || availableRoom.RoomType == null || availableRoom.IsAvailable == false)
+            if (availableRoom == null || availableRoom.RoomType == null)
                 return null;
 
             // Get the room type for price and capacity calculations
@@ -103,7 +103,7 @@ namespace API.Services
                 NightsCount = nights,
                 TotalPrice = total,
                 CreatedAt = DateTime.UtcNow,
-                IsPaid = dto.isBreakfast,
+                IsBreakfast = dto.isBreakfast,
             };
 
             _dbContext.Bookings.Add(booking);
@@ -118,7 +118,7 @@ namespace API.Services
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                IsBreakfast = booking.IsPaid,
+                IsBreakfast = booking.IsBreakfast,
                 NightsCount = nights,
                 TotalPrice = total,
             };
@@ -160,35 +160,14 @@ namespace API.Services
                     NightsCount = b.NightsCount,
                     GuestsCount = b.GuestsCount,
                     TotalPrice = b.TotalPrice,
-                    IsBreakfast = b.Room.IsBreakfast
+                    IsBreakfast = b.IsBreakfast
                 })
                 .ToListAsync();
 
             return userBookings;
         }
 
-        //public async Task<IEnumerable<object>> GetBookingByUser(int userId)
-        //{
-        //    var userBookings = await _dbContext.Bookings
-        //        .Where(b => b.UserId == userId)
-        //        .Select(b => new
-        //        {
-
-        //            CreatedAt = b.CreatedAt,
-        //            UserName = b.User.UserName,
-        //            HotelName = b.Room.Hotel.HotelName,
-        //            RoomType = b.Room.RoomType.TypeofRoom,
-        //            CheckIn = b.CheckIn,
-        //            CheckOut = b.CheckOut,
-        //            NightsCount = b.NightsCount,
-        //            GuestsCount = b.GuestsCount,
-        //            TotalPrice = b.TotalPrice,
-        //            isBreakfast = b.Room.IsBreakfast,
-
-        //        })
-        //        .ToListAsync();
-        //    return userBookings;
-        //}
+     
 
         public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
         {

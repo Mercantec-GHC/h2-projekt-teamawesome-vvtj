@@ -7,7 +7,7 @@ namespace DomainModels.Models
 {
     public class RoomType : Common
     {
-        public required string TypeofRoom { get; set; }
+        public required RoomTypeEnum TypeofRoom { get; set; }
         public int MaxCapacity { get; set; }
         public string? Description { get; set; }
         public decimal? PricePerNight { get; set; }

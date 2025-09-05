@@ -1,6 +1,8 @@
 ﻿
 
 
+using DomainModels.Enums;
+
 namespace DomainModels.Dto
 {
     public class BookingDto
@@ -13,7 +15,7 @@ namespace DomainModels.Dto
         public string UserName { get; set; }
 
         public int RoomId { get; set; }
-        public string RoomType { get; set; }
+        public RoomTypeEnum RoomType { get; set; }
 
         public int HotelId { get; set; }
         public string HotelName { get; set; }
@@ -40,7 +42,7 @@ namespace DomainModels.Dto
         public DateTime CreatedAt { get; set; }
         public string UserName { get; set; }
         public string HotelName { get; set; }
-        public string RoomType { get; set; }
+        public RoomTypeEnum RoomType { get; set; }
         public DateOnly CheckIn { get; set; }
         public DateOnly CheckOut { get; set; }
         public int NightsCount { get; set; }

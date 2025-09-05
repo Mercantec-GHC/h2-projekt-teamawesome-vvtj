@@ -69,8 +69,11 @@ public class AppDBContext : DbContext
 			.WithMany(h => h.Rooms)
 			.HasForeignKey(h => h.HotelId);
 		});
-		
-	}
+
+        modelBuilder.Entity<RoomType>()
+     .Property(rt => rt.TypeofRoom)
+     .HasConversion<string>(); // enum converts to string
+    }
 }
 
 //INFO : For update and add migrations: View/OtherWindows/Package Manager Console.

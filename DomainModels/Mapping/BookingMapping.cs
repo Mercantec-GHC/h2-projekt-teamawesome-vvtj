@@ -23,13 +23,13 @@ namespace DomainModels.Mapping
                 CreatedAt = DateTime.UtcNow
             };
         }
-        public static BookingResponseDto ToResponseDto(Booking booking, string hotelName, string typeOfRoom, decimal total, int guests)
+        public static BookingResponseDto ToResponseDto(Booking booking, string hotelName, decimal total, int guests)
         {
             return new BookingResponseDto
             {
-               // UserName = User.UserName,
+                // UserName = User.UserName,
                 HotelName = hotelName,
-                RoomType = typeOfRoom,
+               
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
