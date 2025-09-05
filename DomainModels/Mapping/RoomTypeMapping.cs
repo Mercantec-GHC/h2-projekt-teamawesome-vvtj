@@ -14,7 +14,7 @@ namespace DomainModels.Mapping
                 Id = roomType.Id,
                 TypeofRoom = roomType.TypeofRoom,
                 MaxCapacity = roomType.MaxCapacity,
-                Description = roomtypeEnum.GetDescription(),
+                Description = roomType.Description,
                 HasBalcony = roomType.HasBalcony,
                 HasJacuzzi = roomType.HasJacuzzi,
                 HasKitchenette = roomType.HasKitchenette,
