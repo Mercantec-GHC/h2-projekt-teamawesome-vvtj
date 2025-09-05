@@ -6,6 +6,7 @@ using DomainModels.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API.Controllers;
 /// <summary>
@@ -33,35 +34,37 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
     {
+
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (currentUserId == null)
+            return Unauthorized("UserId is not found in token.");
+
         if (dto == null || string.IsNullOrWhiteSpace(dto.UserName))
         {
             return BadRequest("Invalid booking data.");
         }
 
 
-        //if (dto.CheckOut.Date <= dto.CheckIn.Date)
-        //{
-        //    return BadRequest("Check-out date must be after check-in date.");
-        //}
-
+        if (dto.CheckOut <= dto.CheckIn)
+            return BadRequest("Check-out date must be after check-in date.");
 
         try
         {
             var result = await _bookingService.CreateBooking(dto);
-            Console.WriteLine(result);
+
             if (result == null)
             {
-                return BadRequest("Booking could not be created.");
+                return BadRequest("No available rooms of this type for the selected dates.");
             }
 
             return Ok(result);
 
-
         }
-
 
         catch (Exception ex)
         {
@@ -85,7 +88,7 @@ public class BookingController : ControllerBase
         return Ok(bookings);
     }
     /// <summary>
-    /// Gets all bookings of a user by user´s ID. Only available to administrators.
+    /// Gets all bookings of a user by user´s ID. 
     /// </summary>
     /// <param name="id">Requires UserID</param>
     /// <response code="200">Successfully retrieved the bookings.</response>
@@ -94,31 +97,48 @@ public class BookingController : ControllerBase
     /// <response code="403">Forbidden – the user does not have administrator privileges.</response>
     /// <response code="404">Not found – user with specified ID does not exist or has no bookings.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-     //[Authorize(Roles = "Admin")]
-    [HttpGet("user")]
+    [Authorize]
+    [HttpGet("userId")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
     {
+
         var bookings = await _bookingService.GetBookingByUser(userId);
         return Ok(bookings);
     }
 
     /// <summary>
-    /// Allows to update check-in and check-out dates.
+    /// Updates the check-in and check-out dates of an existing booking,
+    /// and automatically recalculates nights count and total price.
     /// </summary>
-    /// <param name="id">Requires BookingID</param>
-    /// <returns> Returns a success message if the update was successful, or an error message if it failed.</returns>
-    /// <response code="200">Booking dates were successfully updated.</response>
-    /// <response code="400">Bad request – invalid input data, invalid dates, or booking not found.</response>
-    /// <response code="401">Unauthorized – the user is not authenticated.</response>
-    /// <response code="404">Not found – booking with the specified ID does not exist.</response>
-    /// <response code="500">Internal server error – an unexpected error occurred while processing the request.</response>
-    //[Authorize(Roles = "Admin", "Reciptionist", "User")]
-    [HttpPut("{id}/dates")]
+    /// <param name="id">The ID of the booking to update</param>
+    /// <param name="dto">The DTO containing the new check-in and check-out dates</param>
+    /// <returns>
+    /// Returns the updated booking details if successful.
+    /// </returns>
+    /// <response code="200">Returns the updated booking with new dates, nights count and total price</response>
+    /// <response code="400">Invalid input data</response>
+    ///  <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="404">Booking with the specified ID not found</response>
+    /// <response code="500">Unexpected server error</response>
+    
+    [Authorize]
+    [HttpPut]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
     {
-        var success = await _bookingService.UpdateBookingDates(id, dto.CheckIn, dto.CheckOut);
-        if (!success) return BadRequest("Booking not updated.");
-        return Ok("Booking dates updated successfully.");
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId == null)
+            return Unauthorized("UserId is not found in token.");
+
+        if (dto.CheckOut <= dto.CheckIn)
+            return BadRequest("Check-out date must be after check-in date.");
+
+        var updatedBooking = await _bookingService.UpdateBookingDatesAsync(id, dto.CheckIn, dto.CheckOut);
+
+        if (updatedBooking == null)
+            return BadRequest("Booking could not be updated. Room may be unavailable or booking not found.");
+
+        return Ok(updatedBooking);
     }
     /// <summary>
     /// Delete a booking from a system.
@@ -129,6 +149,7 @@ public class BookingController : ControllerBase
     /// <response code="401">Not authorized - missing or invalid token.</response>
     /// <response code="404">Booking with the specified ID was not found.</response>
     /// <response code="500">>Internal server error.</response>
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBooking(int id)
     {
@@ -145,7 +166,7 @@ public class BookingController : ControllerBase
     ///   <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
 
-    //[Authorize(Roles = "Admin,Reception")]
+    [Authorize(Roles = "Admin, Receptionist")]
     [HttpGet("hotel/{hotelId}")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByHotel(int hotelId)
     {
