@@ -12,7 +12,7 @@ env:
 
   # API
   API_PROJECT_PATH: "API"
-  API_PUBLISH_PATH: "./publish"
+  API_PUBLISH_PATH: "./API/publish"
   API_AZURE_WEBAPP_NAME: "prod-novahotels-api-mercantec-tech"
 
   # Blazor
@@ -41,7 +41,10 @@ jobs:
 
       # Publish API
       - name: Publish API
-        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.API_PUBLISH_PATH }}
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore --no-build --output ${{ env.API_PUBLISH_PATH }}
+        
+      - name: List API publish folder
+        run: ls -la ${{ env.API_PUBLISH_PATH }}
 
       - name: Upload API Artifact
         uses: actions/upload-artifact@v4
