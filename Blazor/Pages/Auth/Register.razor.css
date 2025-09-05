@@ -1,2 +1,97 @@
-﻿body {
+﻿.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+.form {
+    background-color: rgba(255, 255, 255, .7);
+    border-radius: 30px;
+}
+
+.custom-header, .custom-subheader {
+    color: rgb(57 166 168);
+    text-shadow: 2px 1px 3px #ffff;
+}
+
+.custom-header {
+    font-size: 3em;
+    align-self: center;
+}
+
+::deep #input-field-email,
+::deep #input-field-username,
+::deep #input-field-password,
+::deep #input-field-confirm-password {
+    background-color: rgba(255, 255, 255, .8);
+    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    padding: .8em;
+    width: 100%;
+    transition: background .8s ease-out;
+}
+
+    ::deep #input-field-email:hover,
+    ::deep #input-field-username:hover,
+    ::deep #input-field-password:hover,
+    ::deep #input-field-confirm-password:hover {
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    ::deep #input-field-email:active, ::deep #input-field-email:focus-within,
+    ::deep #input-field-username:active, ::deep #input-field-username:focus-within,
+    ::deep #input-field-password:active, ::deep #input-field-password:focus-within,
+    ::deep #input-field-confirm-password:active, ::deep #input-field-confirm-password:focus-within {
+        outline: 2px solid #00c4c8;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+::deep .btn.btn-custom {
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    padding: .4em 4em;
+    transition: background-image 2s ease-in-out;
+}
+
+    ::deep .btn.btn-custom:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255, 255, 255, .5);
+    }
+
+    ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+    }
+
+.floating-label-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.floating-label {
+    position: absolute;
+    left: 12px;
+    top: 16px;
+    color: #aaa;
+    pointer-events: none;
+    transition: 0.2s ease all;
+    padding: 0 4px;
+}
+
+.floating-label-group input:focus + .floating-label,
+.floating-label-group input:not(:placeholder-shown) + .floating-label {
+    top: -22px;
+    left: 8px;
+    font-size: 0.85em;
+    color: #495057;
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 auto;
+        width: max-content !important;
+    }
 }

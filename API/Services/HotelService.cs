@@ -33,6 +33,11 @@ namespace API.Services
                 CityName = h.CityName,
                 Address = h.Address,
                 Description = h.Description,
+                Phone = h.Phone,
+                Email = h.Email,
+                WeekdayTime = h.WeekdayTime,
+                SaturdayTime = h.SaturdayTime,
+                HolidaysTime = h.HolidaysTime
             }).ToList();
 
             return getHotels;
@@ -62,6 +67,11 @@ namespace API.Services
                 CityName = hotel.CityName,
                 Address = hotel.Address,
                 Description = hotel.Description,
+                Email = hotel.Email,
+                Phone = hotel.Phone,
+                WeekdayTime = hotel.WeekdayTime,
+                SaturdayTime = hotel.SaturdayTime,
+                HolidaysTime = hotel.HolidaysTime
             };
 
             return getHotel;
@@ -82,7 +92,12 @@ namespace API.Services
                 Address = hotelCreateDto.Address,
                 Description = hotelCreateDto.Description,
                 CreatedAt = DateTime.UtcNow.AddHours(2),
-                UpdatedAt = DateTime.UtcNow.AddHours(2)
+                UpdatedAt = DateTime.UtcNow.AddHours(2),
+                Email = hotelCreateDto.Email,
+                Phone = hotelCreateDto.Phone,
+                WeekdayTime = hotelCreateDto.WeekdayTime,
+                SaturdayTime = hotelCreateDto.SaturdayTime,
+                HolidaysTime = hotelCreateDto.HolidaysTime
             };
             _context.Hotels.Add(newHotel);
 
@@ -108,7 +123,14 @@ namespace API.Services
             currentHotel.CityName = updatedHotel.CityName;
             currentHotel.Address = updatedHotel.Address;
             currentHotel.Description = updatedHotel.Description;
+            currentHotel.UpdatedAt = DateTime.UtcNow.AddHours(2);
+            currentHotel.Email = updatedHotel.Email;
+            currentHotel.Phone = updatedHotel.Phone;
+            currentHotel.WeekdayTime = updatedHotel.WeekdayTime;
+            currentHotel.SaturdayTime = updatedHotel.SaturdayTime;
+            currentHotel.HolidaysTime = updatedHotel.HolidaysTime;
 
+            await _context.SaveChangesAsync();
 
             return new HotelDto
             {
@@ -117,6 +139,11 @@ namespace API.Services
                 CityName = currentHotel.CityName,
                 Address = currentHotel.Address,
                 Description = currentHotel.Description,
+                Email = currentHotel.Email,
+                Phone = currentHotel.Phone,
+                WeekdayTime = currentHotel.WeekdayTime,
+                SaturdayTime = currentHotel.SaturdayTime,
+                HolidaysTime = currentHotel.HolidaysTime
             };
         }
 

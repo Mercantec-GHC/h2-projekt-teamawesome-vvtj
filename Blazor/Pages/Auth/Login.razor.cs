@@ -17,8 +17,7 @@ public partial class Login
 	private async Task HandleLogin()
 	{
 		_errorMessage = string.Empty;
-	
-		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password);
+		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password, _loginModel.RememberMe);
 		if (result)
 		{
 			_navigation.NavigateTo("/");

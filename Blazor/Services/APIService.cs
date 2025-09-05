@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Blazor.Services
 {
@@ -43,7 +44,7 @@ namespace Blazor.Services
 		public void SetBearerToken(string token)
 		{
 			_httpClient.DefaultRequestHeaders.Authorization =
-				new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+				new AuthenticationHeaderValue("Bearer", token);
 		}
 
 		public void RemoveBearerToken()

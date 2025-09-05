@@ -3,7 +3,7 @@ using DomainModels.Enums;
 public class RoomTypeDto
 {
     public int Id { get; set; }
-    public required string TypeofRoom { get; set; }
+    public required RoomTypeEnum TypeofRoom { get; set; }
     public int MaxCapacity { get; set; }
     public string? Description { get; set; }
     public decimal? PricePerNight{ get; set; }
@@ -21,4 +21,9 @@ public class RoomTypeDto
     public bool? HasMiniFridge { get; set; }
     public int? Area { get; set; }
     public bool? HasVault { get; set; }
+}
+
+public class ToRoomTypeGETdto
+{
+    public required RoomTypeEnum TypeofRoom { get; set; }
 }
