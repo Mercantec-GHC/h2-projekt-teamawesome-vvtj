@@ -15,10 +15,9 @@ public class Booking : Common
     public required DateOnly CheckOut { get; set; }
     public int NightsCount { get; set; }
     public int GuestsCount { get; set; }
-
-    public decimal? TotalPrice { get; set; }
-  
     public bool IsBreakfast { get; set; }
+    public decimal? TotalPrice { get; set; }
+
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]

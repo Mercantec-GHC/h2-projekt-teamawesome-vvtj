@@ -1,0 +1,139 @@
+﻿@page "/contact"
+
+<PageTitle>Contact</PageTitle>
+
+<div class="contact-container">
+
+    <h3>Contact</h3>
+
+    <div class="intro">
+        <h3>
+            We will be happy to answer your questions.
+            Call us or use the form on the right 👇
+        </h3>
+    </div>
+
+    <div class="contact-content">
+
+        <!-- Contacts -->
+        <div class="contact-contacts">
+            @if (Hotels == null)
+            {
+                <div class="spinner-container">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Loading hotels...</p>
+                </div>
+            }
+            else if (!Hotels.Any())
+            {
+                <p>No hotels found.</p>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var hotel in Hotels)
+                    {
+                        <div class="list-group-item">
+                            <h5 class="mb-1">@hotel.HotelName (@hotel.CityName)</h5>
+                            <p class="mb-1">
+                                <i class="bi bi-geo-alt-fill"></i> @hotel.Address <br />
+                                <i class="bi bi-envelope-fill"></i> @hotel.Email <br />
+                                <i class="bi bi-telephone-fill"></i> @hotel.Phone <br />
+                            </p>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Form -->
+        <div class="contact-form">
+            @if (isSent)
+            {
+                <div class="alert alert-success" role="alert">
+                    ✅ Thank you for your message! We will get back to you shortly.
+                </div>
+            }
+            else if (isError)
+            {
+                <div class="alert alert-danger" role="alert">
+                    ❌ An error occurred while sending your message. Please try again later.
+                </div>
+            }
+
+            <EditForm Model="@contactForm" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-1">
+                    <InputText @bind-Value="contactForm.Name" placeholder="Name" class="form-control" />
+                </div>
+
+                <div class="mb-1">
+                    <InputText @bind-Value="contactForm.Email" type="email" placeholder="Email" class="form-control" />
+                </div>
+
+                <div class="mb-1">
+                    <InputTextArea @bind-Value="contactForm.Message" placeholder="Message" class="form-control" rows="4" />
+                </div>
+
+                <BlazorBootstrap.Button type="BlazorBootstrap.ButtonType.Submit" class="btn btn-primary">
+                    Send
+                </BlazorBootstrap.Button>
+            </EditForm>
+        </div>
+
+    </div>
+
+    <h4 class="text-center mt-5 mb-3">Central reservation – Opening hours</h4>
+
+    @if (Hotels == null)
+    {
+        <div class="spinner-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive contact-table">
+            <table class="table table-bordered table-striped text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Day</th>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            <th>@hotel.HotelName - @hotel.CityName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mon–Fri</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            <td>@hotel.WeekdayTime</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Sat</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            <td>@hotel.SaturdayTime</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td><strong>Weekends and holidays</strong></td>
+                        @foreach (var hotel in Hotels.DistinctBy(h => h.Id))
+                        {
+                            <td>@hotel.HolidaysTime</td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

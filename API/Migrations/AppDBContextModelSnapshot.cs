@@ -42,6 +42,9 @@ namespace API.Migrations
                     b.Property<int>("GuestsCount")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsBreakfast")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("NightsCount")
                         .HasColumnType("integer");
 
@@ -51,7 +54,7 @@ namespace API.Migrations
                     b.Property<decimal?>("TotalPrice")
                         .HasColumnType("numeric");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -104,7 +107,7 @@ namespace API.Migrations
                     b.Property<string>("SaturdayTime")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("WeekdayTime")
@@ -194,7 +197,7 @@ namespace API.Migrations
                     b.Property<int>("TypeId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -266,7 +269,7 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -299,7 +302,7 @@ namespace API.Migrations
                     b.Property<string>("PasswordBackdoor")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UserInfoId")
@@ -370,7 +373,7 @@ namespace API.Migrations
                     b.Property<string>("SpecialRequests")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId");
