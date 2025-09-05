@@ -1,12 +1,8 @@
-﻿using DomainModels.Enums;
-using DomainModels.Models;
-
-namespace DomainModels.Dto
+﻿namespace DomainModels.Dto
 {
     public class RoomToCleanDto
     {
-        public int RoomNumber { get; set; }
-        public string RoomType { get; set; }
-        public string HotelName { get; set; }
+        public int HotelId { get; set; }
+        public IEnumerable<int> RoomNumbers { get; set; }
     }
 }
