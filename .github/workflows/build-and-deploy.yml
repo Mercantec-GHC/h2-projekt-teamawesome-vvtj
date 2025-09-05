@@ -12,7 +12,7 @@ env:
 
   # API
   API_PROJECT_PATH: "API"
-  API_PUBLISH_PATH: "./API/publish"
+  API_PUBLISH_PATH: "./publish"
   API_AZURE_WEBAPP_NAME: "prod-novahotels-api-mercantec-tech"
 
   # Blazor
