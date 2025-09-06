@@ -1,8 +1,6 @@
-﻿using System.Security.Claims;
-using API.Data;
+﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
-using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -143,42 +141,5 @@ public class AuthController : ControllerBase
 			_logger.LogError(ex, "Error changing password for user with email {Email}", email);
 			return StatusCode(500, "An error occurred while retrieving the user.");
 		}	
-	}
-	/// <summary>
-	/// Retrieves the currently authenticated user's profile information.
-	/// </summary>
-	/// <returns>
-	/// An object containing user ID, email, username, creation date, last login, and role if found;
-	/// <see cref="UnauthorizedObjectResult"/> if the user ID is not found in the token;
-	/// <see cref="NotFoundObjectResult"/> if the user does not exist in the database.
-	/// </returns>
-	[Authorize]
-	[HttpGet("/me")]
-	public IActionResult GetCurrentUser()
-	{
-		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-		if (userId == null)
-			return Unauthorized("Bruger-ID ikke fundet i token.");
-
-		var user = _context.Users
-			.Include(u => u.UserRole)
-			.FirstOrDefault(u => u.Id.ToString() == userId);
-
-		if (user == null)
-			return NotFound("Brugeren blev ikke fundet i databasen.");
-
-		var roleEnum = (RoleEnum)user.UserRoleId;
-
-		return Ok(new
-		{
-			Id = user.Id,
-			Email = user.Email,
-			Username = user.UserName,
-			CreatedAt = user.CreatedAt,
-			LastLogin = user.LastLogin,
-			Role = user.UserRole.RoleName.ToString(),
-			Description = roleEnum.GetDescription()
-		});
 	}
 }
