@@ -35,7 +35,7 @@ public class CleaningController : ControllerBase
     /// </returns>
     /// 
     [Authorize(Roles = "Admin,Reception,CleaningStaff")]
-	[HttpGet]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomToCleanDto>>> GetAllRoomsToClean()
     {
         try
@@ -54,31 +54,32 @@ public class CleaningController : ControllerBase
         }
     }
 
-	/// <summary>
-	/// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date to the current UTC time.
-	/// </summary>
-	/// <param name="roomNumbers">
-	/// A list of room numbers that should be marked as cleaned.  
-	/// Must not be null or empty.
-	/// </param>
-	/// <returns>
-	/// <para>
-	/// 200 OK — If the rooms were successfully marked as cleaned.  
-	/// </para>
-	/// <para>
-	/// 400 Bad Request — If the <paramref name="roomNumbers"/> parameter is null or empty.  
-	/// </para>
-	/// <para>
-	/// 404 Not Found — If none of the specified room numbers exist or they were already marked as cleaned.  
-	/// </para>
-	/// <para>
-	/// 500 Internal Server Error — If an unexpected error occurs while processing the request.  
-	/// </para>
-	/// </returns>
-	/// 
-	[Authorize(Roles = "Admin,Reception,CleaningStaff")]
+    /// <summary>
+    /// Marks the specified rooms as cleaned by updating their <c>LastCleaned</c> date 
+    /// to the current UTC time for the given hotels.
+    /// </summary>
+    /// <param name="roomNumbers">
+    /// A list of <see cref="RoomToCleanDto"/> objects containing hotel IDs and room numbers 
+    /// that should be marked as cleaned.  
+    /// Must not be null or empty.
+    /// </param>
+    /// <returns>
+    /// <para>
+    /// 200 OK — If one or more rooms were successfully marked as cleaned.  
+    /// </para>
+    /// <para>
+    /// 400 Bad Request — If the <paramref name="roomNumbers"/> parameter is null or empty.  
+    /// </para>
+    /// <para>
+    /// 404 Not Found — If none of the specified rooms exist or they were already marked as cleaned.  
+    /// </para>
+    /// <para>
+    /// 500 Internal Server Error — If an unexpected error occurs while processing the request.  
+    /// </para>
+    /// </returns>
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
 	[HttpPut]
-    public  async Task<IActionResult> MarkRoomAsCleaned(List<int> roomNumbers)
+    public async Task<IActionResult> MarkRoomAsCleaned(List<RoomToCleanDto> roomNumbers)
     {
         try
         {
@@ -88,13 +89,20 @@ public class CleaningController : ControllerBase
             }
 
             var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumbers);
-            if (result)
+
+            if (result != null && result.Any())
             {
-                return Ok("Rooms were marked as cleaned today"); 
+                var cleaned = string.Join(", ",
+                    result.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
+
+                return Ok($"Rooms marked as cleaned today: {cleaned}");
             }
             else
             {
-                return Ok($"Room(s) with number(s) {string.Join(", ", roomNumbers)} not found or already cleaned.");
+                var requested = string.Join(", ",
+                    roomNumbers.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
+
+                return NotFound($"Room(s) not found or already cleaned: {requested}");
             }
         }
         catch (Exception ex)
@@ -102,5 +110,4 @@ public class CleaningController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-
 }
