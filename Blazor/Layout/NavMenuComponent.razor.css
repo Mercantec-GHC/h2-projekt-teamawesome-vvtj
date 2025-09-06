@@ -4,6 +4,7 @@
 
 .navbar {
     background-color: #a9c0c173;
+    z-index: 1000;
 }
 
 .top-row {
@@ -32,7 +33,10 @@
 
 .nav-item {
     font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    padding: .5em;
+    background-color: #b7d2d4;
+    border: none;
+    border-radius: 10px;
 }
 
     .nav-item:first-of-type {
