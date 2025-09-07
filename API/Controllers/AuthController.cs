@@ -66,7 +66,7 @@ public class AuthController : ControllerBase
 	/// <see cref="ObjectResult"/> with status code 500 if an internal error occurs.
 	/// </returns>
 	[HttpPost("login")]
-	public async Task<ActionResult<string>> Login(LoginDto request)
+	public async Task<IActionResult> Login(LoginDto request)
 	{
 		try
 		{
@@ -93,7 +93,10 @@ public class AuthController : ControllerBase
 			}
 
 			_loginAttemptService.RecordSuccessfulLogin(request.Email);
-			return Ok(token);
+			return Ok(new TokenResponseDto
+			{
+				Token = token
+			});
 		}
 
 		catch (Exception ex)
