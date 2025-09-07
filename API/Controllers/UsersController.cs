@@ -2,10 +2,12 @@
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Dto.UserProfileDto;
 using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 
 namespace API.Controllers;
 
@@ -92,41 +94,58 @@ public class UsersController : ControllerBase
 			return StatusCode(500, "An unexpected error occurred.");
 		}
 	}
-	/// <summary>
-	/// Retrieves the currently authenticated user's profile information.
-	/// </summary>
-	/// <returns>
-	/// An object containing user ID, email, username, creation date, last login, and role if found;
-	/// <see cref="UnauthorizedObjectResult"/> if the user ID is not found in the token;
-	/// <see cref="NotFoundObjectResult"/> if the user does not exist in the database.
-	/// </returns>
+
+
 	[Authorize]
 	[HttpGet("me")]
-	public IActionResult GetCurrentUser()
+	public async Task<ActionResult<UserDto>> GetCurrentUser()
 	{
 		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
 		if (userId == null)
 			return Unauthorized("User-ID was not found in a token.");
 
-		var user = _context.Users
-			.Include(u => u.UserRole)
-			.FirstOrDefault(u => u.Id.ToString() == userId);
+		var user = await _context.Users
+		.Include(u => u.UserRole)
+		.Include(u => u.UserInfo)
+		.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
 
 		if (user == null)
 			return NotFound("User was not found in a database.");
 
 		var roleEnum = (RoleEnum)user.UserRoleId;
 
-		return Ok(new
+		UserInfoGetDto? userInfoDto = null;
+		if (user.UserInfo != null)
+		{
+			userInfoDto = new UserInfoGetDto
+			{
+				UserId = user.UserInfo.UserId,
+				FirstName = user.UserInfo.FirstName,
+				LastName = user.UserInfo.LastName,
+				CreatedAt = user.UserInfo.CreatedAt,
+				UpdatedAt = user.UserInfo.UpdatedAt,
+				Address = user.UserInfo.Address,
+				PostalCode = user.UserInfo.PostalCode,
+				City = user.UserInfo.City,
+				Country = user.UserInfo.Country,
+				PhoneNumber = user.UserInfo.PhoneNumber,
+				DateOfBirth = user.UserInfo.DateOfBirth,
+				SpecialRequests = user.UserInfo.SpecialRequests,
+			};
+		}
+
+		return Ok(new UserDto
 		{
 			Id = user.Id,
 			Email = user.Email,
-			Username = user.UserName,
+			UserName = user.UserName,
 			CreatedAt = user.CreatedAt,
 			LastLogin = user.LastLogin,
-			Role = user.UserRole.RoleName.ToString(),
-			Description = roleEnum.GetDescription()
+			UpdatedAt = user.UpdatedAt,
+			UserRole = roleEnum.ToString(),
+			HashedPasword = user.HashedPassword,
+			UserInfo = userInfoDto
 		});
 	}
 

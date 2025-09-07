@@ -12,9 +12,9 @@ public static class CurrentUserViewModelExtensions
 			Username = dto.UserName,
 			Role = dto.UserRole,
 			CreatedAt = dto.CreatedAt,
-			CreatedAtFormated = dto.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+			CreatedAtFormated = dto.CreatedAt.ToString("dd-MM-yyyy HH:mm"),
 			LastLogin = dto.LastLogin,
-			LastLoginFormated = dto.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "Never",
+			LastLoginFormated = dto.LastLogin?.ToString("dd-MM-yyyy HH:mm") ?? "Never",
 			UserInfo = dto.UserInfo
 		};
 	}
