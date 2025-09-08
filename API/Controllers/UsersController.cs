@@ -95,7 +95,27 @@ public class UsersController : ControllerBase
 		}
 	}
 
-
+	/// <summary>
+	/// Retrieves the profile of the currently authenticated user.
+	/// </summary>
+	/// <remarks>
+	/// The user's identifier is extracted from the authentication token.
+	/// Requires a valid JWT.
+	/// </remarks>
+	/// <returns>
+	/// An <see cref="ActionResult{T}"/> containing:
+	/// <list type="bullet">
+	///   <item>
+	///     <description><see cref="UserDto"/> if the user is found.</description>
+	///   </item>
+	///   <item>
+	///     <description><see cref="UnauthorizedResult"/> if the user ID claim is missing.</description>
+	///   </item>
+	///   <item>
+	///     <description><see cref="NotFoundResult"/> if the user profile cannot be found.</description>
+	///   </item>
+	/// </list>
+	/// </returns>
 	[Authorize]
 	[HttpGet("me")]
 	public async Task<ActionResult<UserDto>> GetCurrentUser()
@@ -105,48 +125,13 @@ public class UsersController : ControllerBase
 		if (userId == null)
 			return Unauthorized("User-ID was not found in a token.");
 
-		var user = await _context.Users
-		.Include(u => u.UserRole)
-		.Include(u => u.UserInfo)
-		.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+		var user = await _userService.GetUserFromTokenAsync(userId);
 
 		if (user == null)
-			return NotFound("User was not found in a database.");
+			return NotFound();
 
-		var roleEnum = (RoleEnum)user.UserRoleId;
+		return Ok(user);
 
-		UserInfoGetDto? userInfoDto = null;
-		if (user.UserInfo != null)
-		{
-			userInfoDto = new UserInfoGetDto
-			{
-				UserId = user.UserInfo.UserId,
-				FirstName = user.UserInfo.FirstName,
-				LastName = user.UserInfo.LastName,
-				CreatedAt = user.UserInfo.CreatedAt,
-				UpdatedAt = user.UserInfo.UpdatedAt,
-				Address = user.UserInfo.Address,
-				PostalCode = user.UserInfo.PostalCode,
-				City = user.UserInfo.City,
-				Country = user.UserInfo.Country,
-				PhoneNumber = user.UserInfo.PhoneNumber,
-				DateOfBirth = user.UserInfo.DateOfBirth,
-				SpecialRequests = user.UserInfo.SpecialRequests,
-			};
-		}
-
-		return Ok(new UserDto
-		{
-			Id = user.Id,
-			Email = user.Email,
-			UserName = user.UserName,
-			CreatedAt = user.CreatedAt,
-			LastLogin = user.LastLogin,
-			UpdatedAt = user.UpdatedAt,
-			UserRole = roleEnum.ToString(),
-			HashedPasword = user.HashedPassword,
-			UserInfo = userInfoDto
-		});
 	}
 
 	/// <summary>
