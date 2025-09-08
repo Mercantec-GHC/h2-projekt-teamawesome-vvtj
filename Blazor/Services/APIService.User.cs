@@ -15,29 +15,27 @@ public partial class APIService
 
 			if (response.IsSuccessStatusCode)
 			{
-				// Use cancellation token if available for better control
 				var user = await response.Content.ReadFromJsonAsync<UserDto>();
 				return user;
 			}
 
-			if (response.StatusCode == HttpStatusCode.Unauthorized)
-				throw new UnauthorizedAccessException("User is not authorized.");
-
 			if (response.StatusCode == HttpStatusCode.NotFound)
-				throw new KeyNotFoundException("User profile not found.");
+			{
+				_logger.LogWarning("User profile not found.");
+				return null;
+			}
 
-			throw new HttpRequestException(
-				$"Failed to fetch user profile. Status: {response.StatusCode}");
+			_logger.LogError("Failed to fetch user profile. Status: {StatusCode}", response.StatusCode);
+			return null;
 		}
 		catch (HttpRequestException ex)
 		{
-			// Log network errors separately
-			Console.WriteLine($"Network error fetching user: {ex.Message}");
-			throw;
+			_logger.LogError(ex, "Network error fetching user profile.");
+			return null;
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Error fetching user: {ex.Message}");
+			_logger.LogCritical(ex, "Unexpected error fetching user profile.");
 			throw;
 		}
 	}
