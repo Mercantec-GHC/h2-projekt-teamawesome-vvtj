@@ -1,11 +1,13 @@
-using DomainModels.Models;
 using API.Data;
 using API.Helpers;
-using Microsoft.EntityFrameworkCore;
+using DomainModels.Enums;
+using DomainModels.Mapping;
+using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using DomainModels.Enums;
 using DomainModels.Mapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -27,10 +29,10 @@ namespace API.Services
             }
 
             var newRoomTypesListDto = roomtypes
-            .Select(rt => _mapping.ToRoomTypeGETdto(rt));
-            
-                // if (!RoomTypeEnumHelper.TryToConvert(rt.TypeofRoom, out var roomTypeEnum))
-                //     return null;
+              .Select(rt => _mapping.ToRoomTypeGETdto(rt));
+
+            // if (!RoomTypeEnumHelper.TryToConvert(rt.TypeofRoom, out var roomTypeEnum))
+            //     return null;
             return newRoomTypesListDto;
         }
 
@@ -46,7 +48,8 @@ namespace API.Services
             //      return null;
             //  }
 
-            var getRoomType = _mapping.ToRoomTypeGETdto(roomtype);
+
+          var getRoomType = _mapping.ToRoomTypeGETdto(roomtype);
             return getRoomType;
         }
         

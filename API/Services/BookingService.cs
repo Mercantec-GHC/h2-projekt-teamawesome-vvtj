@@ -4,7 +4,6 @@ using DomainModels.Dto;
 using DomainModels.Mapping;
 using DomainModels.Models;
 using Humanizer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -26,43 +25,85 @@ namespace API.Services
                 .Select(u => u.Id)
                 .FirstOrDefaultAsync();
 
+            // If user not found, return null
+            if (userId == 0)
+                return null;
 
             var hotel = await _dbContext.Hotels
                 .AsNoTracking()
                 .FirstOrDefaultAsync(h => h.HotelName == dto.HotelName);
+            // If hotel not found, aborts and returns null.
+            if (hotel == null)
+                return null;
 
-
-            var roomQuery = _dbContext.Rooms
+            var roomsQuery = await _dbContext.Rooms
                 .Include(r => r.RoomType)
-                .Where(r => r.HotelId == hotel.Id);
+                .Where(r => r.HotelId == hotel.Id &&
+                r.RoomType.TypeofRoom == dto.TypeOfRoom && r.IsAvailable == true)
+                .Select(r => new { r.Id, r.RoomType })
+                 .ToListAsync();
+          
+            //if there are no rooms with chosen type in the hotel
+            if (roomsQuery.Count == 0) 
+                return null;
 
-            if (dto.TypeOfRoom == null)
-                roomQuery = roomQuery.Where(r => r.RoomType.TypeofRoom == dto.TypeOfRoom);
+            var roomIds = roomsQuery.Select(r => r.Id).ToList();
 
-            var room = await roomQuery.FirstOrDefaultAsync();
-            var roomType = room.RoomType;
+            // Find rooms that are not booked for the requested dates (single query for overlaps)
+            var overlappingRoomIds = await _dbContext.Bookings
+                .Where(b =>
+                    roomIds.Contains(b.RoomId) &&
+                    (
+                        (dto.CheckIn >= b.CheckIn && dto.CheckIn < b.CheckOut) ||
+                        (dto.CheckOut > b.CheckIn && dto.CheckOut <= b.CheckOut) ||
+                        (dto.CheckIn <= b.CheckIn && dto.CheckOut >= b.CheckOut)
+                    )
+                )
+                .Select(b => b.RoomId)
+                .Distinct()
+                .ToListAsync();
+
+            var availableRoomId = roomIds.Except(overlappingRoomIds).FirstOrDefault();
+            if (availableRoomId == 0)
+                return null; // No available rooms found
+
+           var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
+            
+            
+            // If no available room is found, return null
+            if (availableRoom == null || availableRoom.RoomType == null)
+                return null;
+
+            // Get the room type for price and capacity calculations
+            var roomType = availableRoom.RoomType;
 
             var UserName = await _dbContext.Users.Where(u => u.Id == userId)
                 .Select(u => u.UserName)
                 .FirstOrDefaultAsync();
+
             var guests = Math.Clamp(dto.GuestsCount, 1, roomType.MaxCapacity);
-            //var nights = Math.Max((dto.CheckOut.Date - dto.CheckIn.Date).Days, 1);
+
+            var nights = Math.Max((dto.CheckOut.DayNumber - dto.CheckIn.DayNumber), 1);
+
+            if (dto.isBreakfast == true)
+                roomType.PricePerNight += 200 * guests;
+
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            //var total = pricePerNight * nights;
+            var total = pricePerNight * nights;
 
 
             var booking = new Booking
             {
                 UserId = userId,
-                //UserName = dto.UserName,
-                RoomId = room.Id,
+
+                RoomId = availableRoom.Id,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
                 GuestsCount = guests,
-                //NightsCount = nights,
-                //TotalPrice = total,
-                CreatedAt = DateTime.UtcNow
-
+                NightsCount = nights,
+                TotalPrice = total,
+                CreatedAt = DateTime.UtcNow,
+                IsBreakfast = dto.isBreakfast,
             };
 
             _dbContext.Bookings.Add(booking);
@@ -73,14 +114,13 @@ namespace API.Services
             {
                 UserName = dto.UserName,
                 HotelName = hotel.HotelName,
-                RoomType = roomType.TypeofRoom.ToString(),
+                RoomType = roomType.TypeofRoom,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
-                //NightsCount = nights,
-                //TotalPrice = total
-
-               
+                IsBreakfast = booking.IsBreakfast,
+                NightsCount = nights,
+                TotalPrice = total,
             };
         }
 
@@ -92,7 +132,8 @@ namespace API.Services
                 .Select(b => new GetBookingsDto
                 {
                     Id = b.Id,
-
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt ?? DateTime.MinValue,
                     UserName = b.User.UserName,
                     RoomId = b.RoomId,
                     HotelName = b.Room.Hotel.HotelName,
@@ -104,43 +145,75 @@ namespace API.Services
             return bookings;
         }
 
-
-        public async Task<IEnumerable<BookingDto>> GetBookingByUser(int userId)
+        public async Task<IEnumerable<BookingByUserDto>> GetBookingByUser(int userId)
         {
             var userBookings = await _dbContext.Bookings
                 .Where(b => b.UserId == userId)
-                .Select(b => new BookingDto
+                .Select(b => new BookingByUserDto
                 {
-                    Id = b.Id,
+                    CreatedAt = b.CreatedAt,
                     UserName = b.User.UserName,
-                    RoomId = b.RoomId,
+                    HotelName = b.Room.Hotel.HotelName,
+                    RoomType = b.Room.RoomType.TypeofRoom,
                     CheckIn = b.CheckIn,
                     CheckOut = b.CheckOut,
                     NightsCount = b.NightsCount,
-                    GuestsCount = b.GuestsCount,                
-
+                    GuestsCount = b.GuestsCount,
+                    TotalPrice = b.TotalPrice,
+                    IsBreakfast = b.IsBreakfast
                 })
                 .ToListAsync();
+
             return userBookings;
         }
-        //TODO : figure out how to update booking, without deleting other data
-        public async Task<bool> UpdateBookingDates(int bookingId, DateTime newCheckIn, DateTime newCheckOut)
-        {
 
+     
+
+        public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
+        {
             var booking = await _dbContext.Bookings
-               .Include(b => b.Room)
+                .Include(b => b.Room)
+                    .ThenInclude(r => r.RoomType)
+                .Include(b => b.User)
+                .Include(b => b.Room.Hotel)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
-            if (booking is null) return false;
-            if (newCheckOut <= newCheckIn) return false;
 
 
-            //booking.CheckIn = newCheckIn;
-            //booking.CheckOut = newCheckOut;
-            booking.UpdatedAt = DateTime.UtcNow;
+            if (booking == null || !booking.Room.IsAvailable)
+                return null;
+
+            booking.CheckIn = newCheckIn;
+            booking.CheckOut = newCheckOut;
+
+            var nights = Math.Max((newCheckOut.DayNumber - newCheckIn.DayNumber), 1);
+            booking.NightsCount = nights;
+
+
+            var pricePerNight = booking.Room.RoomType.PricePerNight.GetValueOrDefault(0m);
+            if (booking.Room.IsBreakfast)
+            {
+                pricePerNight += 200 * booking.GuestsCount;
+            }
+
+
+            var total = pricePerNight * nights;
+            booking.TotalPrice = total;
 
             await _dbContext.SaveChangesAsync();
-            return true;
+
+            return new BookingResponseDto
+            {
+                UserName = booking.User.UserName,
+                HotelName = booking.Room.Hotel.HotelName,
+                RoomType = booking.Room.RoomType.TypeofRoom,
+                CheckIn = booking.CheckIn,
+                CheckOut = booking.CheckOut,
+                GuestsCount = booking.GuestsCount,
+                NightsCount = booking.NightsCount,
+                TotalPrice = total,
+                IsBreakfast = booking.Room.IsBreakfast
+            };
         }
 
         public async Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId)
@@ -149,13 +222,11 @@ namespace API.Services
             var today = DateTime.UtcNow.Date;
 
             var query = _dbContext.Bookings
-                .Where(b => b.Room.HotelId == hotelId
-                            /*&& b.CheckOut.Date > today*/)
+                .Where(b => b.Room.HotelId == hotelId)
                 .Select(b => new BookingDto
                 {
                     Id = b.Id,
                     UserId = b.UserId,
-
                     UserName = b.User.UserName,
                     RoomId = b.RoomId,
                     CheckIn = b.CheckIn,
@@ -163,7 +234,8 @@ namespace API.Services
                     GuestsCount = b.GuestsCount,
                     HotelId = b.Room.HotelId,
                     HotelName = b.Room.Hotel.HotelName,
-                    RoomType = b.Room.RoomType.TypeofRoom.ToString(),
+                    RoomType = b.Room.RoomType.TypeofRoom,
+                    isBreakfast = b.Room.IsBreakfast,
 
                 })
         .AsNoTracking();

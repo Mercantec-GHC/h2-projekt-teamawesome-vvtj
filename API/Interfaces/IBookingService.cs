@@ -10,9 +10,9 @@ namespace API.Interfaces
         Task<BookingResponseDto> CreateBooking(CreateBookingDto dto);
 
         Task<IEnumerable<GetBookingsDto>> GetAllBookings();
-        Task<IEnumerable<BookingDto>> GetBookingByUser(int userId);
+        Task<IEnumerable<BookingByUserDto>> GetBookingByUser(int userId);
 
-        Task<bool> UpdateBookingDates(int bookingId, DateTime newCheckIn, DateTime newCheckOut);
+        Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut);
         Task<bool> DeleteBookingById(int id);
         Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId);
 
