@@ -8,8 +8,6 @@ public partial class APIService
 {
 	public async Task<UserDto?> GetCurrentUserAsync()
 	{
-		Console.WriteLine("Current Authorization header: " +
-	_httpClient.DefaultRequestHeaders.Authorization?.ToString());
 		try
 		{
 			// Ensure HttpClient is properly configured for credentials/cookies if needed
