@@ -1,4 +1,4 @@
-name: Api Service CI
+name: Api & Blazor CI
 
 on:
   workflow_dispatch:
@@ -9,7 +9,6 @@ on:
 env:
   DOTNET_VERSION: "9.x"
   SOLUTION_PATH: "H2-Projekt.sln"
-  PUBLISH_DIR: "./publish"
 
   # API
   API_PROJECT_PATH: "API"
@@ -17,48 +16,51 @@ env:
   API_AZURE_WEBAPP_NAME: "prod-novahotels-api-mercantec-tech"
 
   # Blazor
-  BLAZOR_PROJECT_PATH: "Blazor" 
+  BLAZOR_PROJECT_PATH: "Blazor"
   BLAZOR_PUBLISH_PATH: "./Blazor/publish"
   BLAZOR_AZURE_WEBAPP_NAME: "prod-novahotels-blazor-mercantec-tech"
 
-
 jobs:
   build:
-      name: Build
-      runs-on: ubuntu-latest
+    name: Build
+    runs-on: ubuntu-latest
 
-      steps:
-        - uses: actions/checkout@v4
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v4
-          with:
-            dotnet-version: ${{ env.DOTNET_VERSION }} 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      # Publish API
+      - name: Publish API
+        run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore --no-build --output ${{ env.API_PUBLISH_PATH }}
         
-        - name: Restore
-          run: dotnet restore ${{ env.SOLUTION_PATH }} 
+      - name: List API publish folder
+        run: ls -la ${{ env.API_PUBLISH_PATH }}
 
-        - name: Build
-          run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+      - name: Upload API Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp
+          path: ${{ env.API_PUBLISH_PATH }}
 
-        # Publish API
-        - name: Publish API
-          run: dotnet publish ${{ env.API_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.API_PUBLISH_PATH }}
+      # Publish Blazor
+      - name: Publish Blazor
+        run: dotnet publish ${{ env.BLAZOR_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.BLAZOR_PUBLISH_PATH }}
 
-        - name: Upload API Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: api-app
-            path: ${{ env.API_PUBLISH_PATH }}
-
-        # Publish Blazor
-        - name: Publish Blazor
-          run: dotnet publish ${{ env.BLAZOR_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.BLAZOR_PUBLISH_PATH }}
-
-        - name: Upload Blazor Artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: blazor-app
-            path: ${{ env.BLAZOR_PUBLISH_PATH }}
+      - name: Upload Blazor Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blazor-app
+          path: ${{ env.BLAZOR_PUBLISH_PATH }}
 
   deploy-api:
     name: Deploy API
@@ -69,14 +71,14 @@ jobs:
       - name: Download API Artifact
         uses: actions/download-artifact@v4
         with:
-          name: api-app
+          name: webapp
           path: ${{ env.API_PUBLISH_PATH }}
 
       - name: Deploy API
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.API_AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: ${{ env.API_PUBLISH_PATH }}
 
   deploy-blazor:
