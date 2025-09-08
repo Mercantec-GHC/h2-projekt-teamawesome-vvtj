@@ -87,13 +87,17 @@ namespace API.Services
             var rooms = await _context.Rooms
             .Where(r => r.TypeId == roomTypeId)
             .Include(r => r.RoomType)
+            .Include(r => r.Hotel)
             .ToListAsync();
 
             var roomsWithType = rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
-             //   RoomType = r.RoomType,
+                RoomType = r.RoomType,
+                HotelName = r.Hotel.HotelName,
+                HotelId = r.HotelId
+
             });
 
             return roomsWithType;
