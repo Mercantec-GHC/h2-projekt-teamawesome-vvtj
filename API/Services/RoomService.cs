@@ -100,24 +100,5 @@ namespace API.Services
 
         }
 
-
-        public async Task<IEnumerable<RoomsDto>> GetRoomsByRoomType(int roomTypeId)
-        {
-            var rooms = await _context.Rooms
-            .Where(r => r.TypeId == roomTypeId)
-            .Include(r => r.RoomType)
-            .ToListAsync();
-
-            var roomsWithType = rooms.Select(r => new RoomsDto
-            {
-                Id = r.Id,
-                RoomNumber = r.RoomNumber,
-                RoomType = r.RoomType,
-            });
-
-            return roomsWithType;
-
-        }
-
     }
 }
