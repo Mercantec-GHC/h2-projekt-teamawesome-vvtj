@@ -1,5 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using Blazor.Services;
 using Blazored.LocalStorage;
@@ -57,7 +56,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	// Notifies the app that the user has authenticated with a given token
 	public void NotifyUserAuthentication (string token)
 	{
-		var claims = ParseClaimsFromJwt(token.Trim('"'));
+		var cleanToken = token.Trim('"');
+		var claims = ParseClaimsFromJwt(cleanToken);
 		var identity = new ClaimsIdentity(claims, "jwt");
 		var user = new ClaimsPrincipal(identity);
 

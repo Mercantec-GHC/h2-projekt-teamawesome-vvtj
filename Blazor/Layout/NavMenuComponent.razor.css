@@ -4,6 +4,7 @@
 
 .navbar {
     background-color: #a9c0c173;
+    z-index: 1000;
 }
 
 .top-row {
@@ -25,48 +26,91 @@
     font-size: large;
 }
 
-.nav-link.home {
-    color: #3a9698;
-    font-weight: 600;
-}
+    .nav-link.home {
+        color: #3a9698;
+        font-weight: 600;
+    }
 
 .nav-item {
     font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    padding: .5em;
+    background-color: #b7d2d4;
+    border: none;
+    border-radius: 10px;
 }
 
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-        color: yellow;
+::deep .dropdown-toggle {
+    color: #ffff;
+    padding: .5em;
+    background-color: #b7d2d4;
+    border: none;
+    border-radius: 10px;
+}
+
+
+::deep .bi {
+    font-size: 1.5em;
+}
+
+    ::deep .bi.custom-color {
+        color: #3a9698;
     }
 
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
+
+.nav-item:first-of-type {
+    padding-top: 1rem;
+}
+
+.nav-item:last-of-type {
+    padding-bottom: 1rem;
+}
+
+.nav-item ::deep a {
+    color: #d7d7d7;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    line-height: 3rem;
+    transition: transform 0.3s ease;
+}
+
+    .nav-item ::deep a.active {
+        background-color: rgba(255,255,255,0.37);
+        color: #3a9698;
     }
 
-    .nav-item ::deep a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-        transition: transform 0.3s ease;
+.nav-item a:hover, .nav-item .custom-btn:hover {
+    transform: scale(1.2);
+    background-color: rgba(255,255,255,0.1);
+    color: #3a9698 !important;
+}
+
+::deep .dropdown-menu {
+    position: absolute !important;
+    right: 0;
+    left: revert-layer;
+    border: none;
+}
+
+::deep .dropdown-item {
+    color: #3a9698;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    line-height: 3rem;
+    margin-bottom: .5em;
+}
+    ::deep .dropdown-item:active,
+    ::deep .dropdown-item:focus {
+        background-color: #dce6e7;
+    }
+    ::deep .dropdown-item:hover {
+        background-color: #d5e0e173;
     }
 
-        .nav-item ::deep a.active {
-            background-color: rgba(255,255,255,0.37);
-            color: #3a9698;
-        }
-
-    .nav-item a:hover, .nav-item .custom-btn:hover {
-        transform: scale(1.2);
-        background-color: rgba(255,255,255,0.1);
-        color: #3a9698 !important;
-    }
-
-@media (min-width: 641px) {
-    .navbar-toggler {
+    @media (min-width: 641px) {
+        .navbar-toggler {
         display: none;
     }
 

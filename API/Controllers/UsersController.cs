@@ -1,8 +1,13 @@
-﻿using API.Data;
+﻿using System.Security.Claims;
+using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Dto.UserProfileDto;
+using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 
 namespace API.Controllers;
 
@@ -15,16 +20,18 @@ public class UsersController : ControllerBase
 {
 	private readonly IUserService _userService;
 	private readonly ILogger<UsersController> _logger;
+	private readonly AppDBContext _context;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UsersController"/> class.
 	/// </summary>
 	/// <param name="userService">The user service for user operations.</param>
 	/// <param name="logger">The logger instance for logging errors and information.</param>
-	public UsersController(IUserService userService, ILogger<UsersController> logger)
+	public UsersController(IUserService userService, ILogger<UsersController> logger, AppDBContext context)
 	{
 		_userService = userService;
 		_logger = logger;
+		_context = context;
 	}
 
 	/// <summary>
@@ -86,6 +93,60 @@ public class UsersController : ControllerBase
 			_logger.LogError(ex, "Error occurred while retrieving user with ID {Id}.", id);
 			return StatusCode(500, "An unexpected error occurred.");
 		}
+	}
+
+
+	[Authorize]
+	[HttpGet("me")]
+	public async Task<ActionResult<UserDto>> GetCurrentUser()
+	{
+		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+		if (userId == null)
+			return Unauthorized("User-ID was not found in a token.");
+
+		var user = await _context.Users
+		.Include(u => u.UserRole)
+		.Include(u => u.UserInfo)
+		.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+		if (user == null)
+			return NotFound("User was not found in a database.");
+
+		var roleEnum = (RoleEnum)user.UserRoleId;
+
+		UserInfoGetDto? userInfoDto = null;
+		if (user.UserInfo != null)
+		{
+			userInfoDto = new UserInfoGetDto
+			{
+				UserId = user.UserInfo.UserId,
+				FirstName = user.UserInfo.FirstName,
+				LastName = user.UserInfo.LastName,
+				CreatedAt = user.UserInfo.CreatedAt,
+				UpdatedAt = user.UserInfo.UpdatedAt,
+				Address = user.UserInfo.Address,
+				PostalCode = user.UserInfo.PostalCode,
+				City = user.UserInfo.City,
+				Country = user.UserInfo.Country,
+				PhoneNumber = user.UserInfo.PhoneNumber,
+				DateOfBirth = user.UserInfo.DateOfBirth,
+				SpecialRequests = user.UserInfo.SpecialRequests,
+			};
+		}
+
+		return Ok(new UserDto
+		{
+			Id = user.Id,
+			Email = user.Email,
+			UserName = user.UserName,
+			CreatedAt = user.CreatedAt,
+			LastLogin = user.LastLogin,
+			UpdatedAt = user.UpdatedAt,
+			UserRole = roleEnum.ToString(),
+			HashedPasword = user.HashedPassword,
+			UserInfo = userInfoDto
+		});
 	}
 
 	/// <summary>

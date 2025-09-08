@@ -31,7 +31,7 @@ namespace Blazor.Services
 		{
 			try
 			{
-				return await _httpClient.GetAsync(url);
+				return await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
 			}
 			catch (Exception ex)
 			{
