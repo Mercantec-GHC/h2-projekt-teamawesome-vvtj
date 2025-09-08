@@ -11,7 +11,7 @@ public partial class Login
 	[Inject] 
 	private NavigationManager _navigation{ get; set; } = null!;
 	private string _errorMessage = string.Empty;
-	private LoginDto _loginModel = new();
+	private UserLoginDto _loginModel = new();
 
 
 	private async Task HandleLogin()
@@ -20,7 +20,7 @@ public partial class Login
 		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password, _loginModel.RememberMe);
 		if (result)
 		{
-			_navigation.NavigateTo("/");
+			_navigation.NavigateTo("/user/account");
 		}
 		else
 		{

@@ -43,12 +43,26 @@ public class Program
                           ?? "https://prod-novahotels-api-mercantec-tech.azurewebsites.net/"; 
         }
 
-        // Registrer HttpClient til API service med konfigurerbar endpoint
-        builder.Services.AddHttpClient<APIService>(client =>
-        {
-            client.BaseAddress = new Uri(apiEndpoint);
-            Console.WriteLine($"APIService BaseAddress: {client.BaseAddress}");
-        });
+		// Registrer HttpClient til API service med konfigurerbar endpoint
+
+		//This configuration creates new HttpClient every time the DI resolves APIService
+		//I am using DefaultRequestHeaders.Authorization to SetBearerToken(), so the user stays authorized and authenticated accross the refreshes
+		//EVery time a new HttpClient is created, bearer information is being removed from the header and Blazor no longer knows that the user is authorized.
+
+
+		//builder.Services.AddHttpClient<APIService>(client =>
+		//{
+		//    client.BaseAddress = new Uri(apiEndpoint);
+		//    Console.WriteLine($"APIService BaseAddress: {client.BaseAddress}");
+		//});
+
+		//If possible I would like to keep this configuration. This way same HttpClient reused across the app session.
+		//Perfect for Blazor WASM, because under the hood it’s just calling the browser’s fetch() API.
+		builder.Services.AddScoped(sp => new HttpClient
+		{
+			BaseAddress = new Uri(apiEndpoint)
+		});
+		builder.Services.AddScoped<APIService>();
 
 		await builder.Build().RunAsync();
     }

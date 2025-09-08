@@ -55,14 +55,56 @@ namespace API.Services
 			return userDto;
 		}
 
-		public async Task<UserDto> GetUserByEmailAsync(string email)
+		/// <summary>
+		/// Retrieves a user by their email.
+		/// </summary>
+		/// <param name="email">The user's email address.</param>
+		/// <returns>A <see cref="UserDto"/> if found; otherwise, <c>null</c>.</returns>
+		public async Task<UserDto?> GetUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.Include(u => u.UserRole).FirstOrDefaultAsync(u => u.Email == email);
-		
+			if (user == null)
+			{
+				return null;
+			}
 			var userDto = _userMapping.ToUserDto(user);
 			return userDto;
 		}
 
+		/// <summary>
+		/// Retrieves a user associated with the specified token identifier.
+		/// </summary>
+		/// <param name="userId">
+		/// The unique identifier of the user, typically extracted from a token (e.g., JWT subject claim).
+		/// </param>
+		/// <returns>
+		/// A <see cref="UserDto"/> representing the user if found; otherwise, <c>null</c>.
+		/// </returns>
+		public async Task<UserDto?> GetUserFromTokenAsync(string userId)
+		{
+			var user = await _context.Users
+							.Include(u => u.UserRole)
+							.Include(u => u.UserInfo)
+							.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+
+			if (user == null)
+			{
+				return null;
+			}
+			var userDto = _userMapping.ToUserDto(user);
+			return userDto;
+
+		}
+
+		/// <summary>
+		/// Deletes a user account associated with the specified email address.
+		/// </summary>
+		/// <param name="email">
+		/// The email address of the user to delete.
+		/// </param>
+		/// <returns>
+		/// <c>true</c> if the user was found and deleted; otherwise, <c>false</c>.
+		/// </returns>
 		public async Task<bool> DeleteUserByEmailAsync(string email)
 		{
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
