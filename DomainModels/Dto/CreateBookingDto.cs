@@ -1,5 +1,4 @@
 ﻿
-
 using DomainModels.Enums;
 
 namespace DomainModels.Dto

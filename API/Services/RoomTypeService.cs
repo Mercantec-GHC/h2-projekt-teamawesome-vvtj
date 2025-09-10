@@ -5,6 +5,8 @@ using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using DomainModels.Enums;
+using DomainModels.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
