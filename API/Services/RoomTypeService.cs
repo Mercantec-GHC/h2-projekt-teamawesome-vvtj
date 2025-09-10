@@ -47,10 +47,10 @@ namespace API.Services
             //  }
 
 
-          var getRoomType = _mapping.ToRoomTypeGETdto(roomtype);
+            var getRoomType = _mapping.ToRoomTypeGETdto(roomtype);
             return getRoomType;
         }
-        
+
         /// <summary>
         /// Returns RoomType (Model), as we want to see the entire
         /// roomtype model, with the updated fields
@@ -64,7 +64,7 @@ namespace API.Services
             }
 
             //Only update if there's a new value
-            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description))
+            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description) && roomTypePutDto.Description != "string")
                 existingRoomType.Description = roomTypePutDto.Description;
 
             //Only update if there's a new value
@@ -77,6 +77,7 @@ namespace API.Services
             await _context.SaveChangesAsync();
             return existingRoomType;
         }
+        
 
     }
 }

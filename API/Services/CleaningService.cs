@@ -36,7 +36,7 @@ namespace API.Services
                     .GroupBy(r => r.HotelId)
                     .Select(g => new RoomToCleanDto
                     {
-                        HotelId = g.Key, 
+                        HotelId = g.Key,
                         RoomNumbers = g.Select(r => r.RoomNumber).ToList()
                     })
                     .ToList();
