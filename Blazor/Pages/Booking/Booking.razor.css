@@ -1,0 +1,100 @@
+﻿/* translucent overlay on the home background */
+.booking-backdrop {
+    min-height: 100vh;
+    padding: 48px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+   /* background: url('/images/home-hero.jpg') center/cover no-repeat fixed; */
+}
+
+.booking-container {
+    width: min(960px, 100%);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 28px;
+}
+
+.title {
+    margin: 0 0 12px 0;
+}
+
+.form {
+    margin-top: 8px;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .grid2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.input {
+    width: 100%;
+    padding: .55rem .8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn {
+    padding: .65rem 1.1rem;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    cursor: pointer;
+}
+
+    .btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+    .btn.secondary {
+        background: #6b7280;
+    }
+
+.alert {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+}
+
+.muted {
+    opacity: .8;
+}
+
+.ml {
+    margin-left: .45rem;
+}
+
+.review ul {
+    padding-left: 18px;
+}
+
+.review li {
+    margin: 6px 0;
+}

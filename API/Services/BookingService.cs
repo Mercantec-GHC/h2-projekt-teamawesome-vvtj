@@ -3,7 +3,6 @@ using API.Interfaces;
 using DomainModels.Dto;
 using DomainModels.Mapping;
 using DomainModels.Models;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 

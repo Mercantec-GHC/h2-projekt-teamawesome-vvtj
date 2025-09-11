@@ -1,0 +1,131 @@
+﻿@page "/booking"
+@attribute [Authorize]
+@using DomainModels.Enums
+@using DomainModels.Dto
+@namespace Blazor.Pages
+
+<div class="booking-backdrop">
+    <div class="booking-container">
+        <h3 class="title">Create a booking</h3>
+
+      @if (Vm is not null)
+        {
+            if (!ShowReview)
+            {
+                <EditForm Model="Vm" OnValidSubmit="OnBookClicked" class="form">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="grid2">
+                        <div>
+                            <label>Full name</label>
+                            <InputText class="input" @bind-Value="Vm.FullName" disabled />
+                        </div>
+
+                        <div>
+                            <label>Username</label>
+                            <InputText class="input" @bind-Value="Vm.UserName" disabled />
+                        </div>
+
+                        <div>
+                            <label>Hotel</label>
+                            <InputSelect class="input" @bind-Value="Vm.HotelName" @onchange="OnHotelChanged">
+                                <option value="">-- Select hotel --</option>
+                                @foreach (var h in Hotels)
+                                {
+                                    <option value="@h">@h</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vm.HotelName)" />
+                        </div>
+
+                        <div>
+                            <label>Guests</label>
+                            <InputNumber class="input" @bind-Value="Vm.GuestsCount" @onchange="OnGuestsChanged" />
+                            <ValidationMessage For="@(() => Vm.GuestsCount)" />
+                        </div>
+
+                        <div>
+                            <label>Room type</label>
+                            <InputSelect class="input" @bind-Value="Vm.RoomType" disabled="@(!IsRoomTypeEnabled)" @onchange="OnRoomTypeChanged">
+                                <option value="">-- Select room type --</option>
+                                @foreach (var t in AllowedRoomTypes)
+                                {
+                                    <option value="@t">@t</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vm.RoomType)" />
+                            @if (!IsRoomTypeEnabled)
+                            {
+                                <small class="muted">Select number of guests first.</small>
+                            }
+                        </div>
+
+                        <div>
+                            <label>Check-in</label>
+                            @* TODO:    connect component DatePicker із DisabledDates from BlazorBootstrap *@
+                            <InputDate class="input" @bind-Value="Vm.CheckIn" @onchange="OnDatesChanged" />
+                            <ValidationMessage For="@(() => Vm.CheckIn)" />
+                        </div>
+
+                        <div>
+                            <label>Check-out</label>
+                            <InputDate class="input" @bind-Value="Vm.CheckOut" @onchange="OnDatesChanged" />
+                            <ValidationMessage For="@(() => Vm.CheckOut)" />
+                        </div>
+
+                        <div>
+                            <label>Nights</label>
+                            <InputNumber class="input" @bind-Value="Vm.NightsCount" disabled />
+                        </div>
+
+                        <div class="full">
+                            <InputCheckbox @bind-Value="Vm.IsBreakfast" />
+                            <label class="ml">Breakfast for all nights</label>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(FormError))
+                    {
+                        <div class="alert">@FormError</div>
+                    }
+
+                    <div class="actions">
+                        <button class="btn" disabled="(!CanBook)">Book</button>
+                    </div>
+                </EditForm>
+            }
+            else
+            {
+                <div class="review">
+                    <h4>Review your booking</h4>
+                    <ul>
+                        <li><b>Full name:</b> @Vm.FullName</li>
+                        <li><b>Username:</b> @Vm.UserName</li>
+                        <li><b>Hotel:</b> @Vm.HotelName</li>
+                        <li><b>Room type:</b> @Vm.RoomType</li>
+                        <li><b>Check-in:</b> @Vm.CheckIn:dd MMM yyyy</li>
+                        <li><b>Check-out:</b> @Vm.CheckOut:dd MMM yyyy</li>
+                        <li><b>Nights:</b> @Vm.NightsCount</li>
+                        <li><b>Guests:</b> @Vm.GuestsCount</li>
+                        <li><b>Breakfast:</b> @(Vm.IsBreakfast ? "Yes" : "No")</li>
+                        @if (Quote is not null)
+                        {
+                            <li><b>Total price:</b> @($"{Quote.TotalPrice:C}")</li>
+                        }
+                    </ul>
+
+                    <div class="actions">
+                        <button class="btn secondary" @onclick="BackToEdit">Back</button>
+                        <button class="btn" disabled="@IsSubmitting" @onclick="OnPayClicked">Pay</button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(FormError))
+                    {
+                        <div class="alert">@FormError</div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
