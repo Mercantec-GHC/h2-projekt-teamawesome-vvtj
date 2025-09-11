@@ -45,6 +45,13 @@ namespace API.Services
 
 				var publicKey = _config["vapid-public"];
 				var privateKey = _config["vapid-private"];
+
+				if (string.IsNullOrEmpty(publicKey) || string.IsNullOrEmpty(privateKey))
+				{
+					_logger.LogWarning("VAPID keys are missing. Push notifications will not be sent.");
+					return;
+				}
+
 				var vapidDetails = new VapidDetails("mailto:<someone@example.com>", publicKey, privateKey);
 				var webPushClient = new WebPushClient();
 
