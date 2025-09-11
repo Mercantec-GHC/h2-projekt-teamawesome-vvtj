@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Blazor.Helpers;
 using Blazor.Services;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
@@ -13,6 +14,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	private readonly ISessionStorageService _sessionStorage;
 	private readonly JwtSecurityTokenHandler _tokenHandler = new();
 	private readonly APIService _apiService;
+	private readonly JwtHelper _jwlHelper = new();
 	private const string _tokenKey = "authToken";
 
 	public CustomAuthStateProvider(ILocalStorageService localStorage, ISessionStorageService sessionStorage,  APIService apiService)
@@ -42,7 +44,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		_apiService.SetBearerToken(cleanToken);
 
 		//If token exists, parse claims and create authenticated user
-		var claims = ParseClaimsFromJwt(cleanToken);
+		var claims = _jwlHelper.GetClaimsFromJwt(cleanToken);
 
 		// Create a ClaimsIdentity with the parsed claims and authentication type "jwt"
 		var identity = new ClaimsIdentity(claims, "jwt");
@@ -57,7 +59,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	public void NotifyUserAuthentication (string token)
 	{
 		var cleanToken = token.Trim('"');
-		var claims = ParseClaimsFromJwt(cleanToken);
+		var claims = _jwlHelper.GetClaimsFromJwt(cleanToken);
 		var identity = new ClaimsIdentity(claims, "jwt");
 		var user = new ClaimsPrincipal(identity);
 
@@ -76,12 +78,5 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		var authState = Task.FromResult(new AuthenticationState(anonymousUser));
 		// Notify Blazor that the authentication state has changed
 		NotifyAuthenticationStateChanged(authState);
-	}
-
-	//Helper method to parse claims from JWT
-	private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
-	{
-		var token = _tokenHandler.ReadJwtToken(jwt);
-		return token.Claims;
 	}
 }
