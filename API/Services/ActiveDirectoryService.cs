@@ -37,6 +37,13 @@ namespace API.Services
             _password = _configuration["ActiveDirectory:ReaderPassword"];
             _port = int.Parse(_configuration["ActiveDirectory:Port"]);
             _useSSL = bool.Parse(_configuration["ActiveDirectory:UseSSL"]);
+
+            _configuration = configuration;
+            _secretKey = "MyVerySecureSecretKeyThatIsAtLeast32CharactersLong123456789";
+            _issuer = _configuration["AppSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "NOVAHotels";
+            _audience = _configuration["AppSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "NOVAHotelsUsers";
+
+            Console.WriteLine($"Loaded JWT Secret Key: {_secretKey}");
             
         }
         /// <summary>

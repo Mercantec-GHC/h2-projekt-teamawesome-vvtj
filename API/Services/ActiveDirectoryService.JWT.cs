@@ -15,21 +15,6 @@ namespace API.Services
         private readonly string _issuer;
         private readonly string _audience;
 
-        /// <summary>
-        /// Initialiserer en ny instans af JwtService
-        /// </summary>
-        /// <param name="configuration">Konfiguration til JWT indstillinger</param>
-        public ActiveDirectoryService(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            _secretKey = "MyVerySecureSecretKeyThatIsAtLeast32CharactersLong123456789";
-            _issuer = _configuration["AppSettings:Issuer"] ?? Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "NOVAHotels";
-            _audience = _configuration["AppSettings:Audience"] ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "NOVAHotelsUsers";
-
-            Console.WriteLine($"Loaded JWT Secret Key: {_secretKey}");
-
-        }
-
         public string GenerateTokenForADUser(ADUserInfo adUser)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
