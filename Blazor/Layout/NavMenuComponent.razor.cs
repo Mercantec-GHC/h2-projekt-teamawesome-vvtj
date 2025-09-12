@@ -9,7 +9,6 @@ public partial class NavMenuComponent
 	public IAuthService AuthService { get; set; } = default!;
 	[Inject]
 	public NavigationManager Navigation { get; set; } = default!;
-
 	private async Task HandleLogout()
 	{
 		await AuthService.LogoutAsync();

@@ -6,7 +6,7 @@ public class RoomTypeDto
     public required RoomTypeEnum TypeofRoom { get; set; }
     public int MaxCapacity { get; set; }
     public string? Description { get; set; }
-    public decimal? PricePerNight{ get; set; }
+    public decimal? PricePerNight { get; set; }
 
     //rules
     public bool? HasKitchenette { get; set; }

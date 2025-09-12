@@ -1,8 +1,13 @@
-﻿using API.Data;
+﻿using System.Security.Claims;
+using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
+using DomainModels.Dto.UserProfileDto;
+using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 
 namespace API.Controllers;
 
@@ -15,16 +20,18 @@ public class UsersController : ControllerBase
 {
 	private readonly IUserService _userService;
 	private readonly ILogger<UsersController> _logger;
+	private readonly AppDBContext _context;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="UsersController"/> class.
 	/// </summary>
 	/// <param name="userService">The user service for user operations.</param>
 	/// <param name="logger">The logger instance for logging errors and information.</param>
-	public UsersController(IUserService userService, ILogger<UsersController> logger)
+	public UsersController(IUserService userService, ILogger<UsersController> logger, AppDBContext context)
 	{
 		_userService = userService;
 		_logger = logger;
+		_context = context;
 	}
 
 	/// <summary>
@@ -86,6 +93,45 @@ public class UsersController : ControllerBase
 			_logger.LogError(ex, "Error occurred while retrieving user with ID {Id}.", id);
 			return StatusCode(500, "An unexpected error occurred.");
 		}
+	}
+
+	/// <summary>
+	/// Retrieves the profile of the currently authenticated user.
+	/// </summary>
+	/// <remarks>
+	/// The user's identifier is extracted from the authentication token.
+	/// Requires a valid JWT.
+	/// </remarks>
+	/// <returns>
+	/// An <see cref="ActionResult{T}"/> containing:
+	/// <list type="bullet">
+	///   <item>
+	///     <description><see cref="UserDto"/> if the user is found.</description>
+	///   </item>
+	///   <item>
+	///     <description><see cref="UnauthorizedResult"/> if the user ID claim is missing.</description>
+	///   </item>
+	///   <item>
+	///     <description><see cref="NotFoundResult"/> if the user profile cannot be found.</description>
+	///   </item>
+	/// </list>
+	/// </returns>
+	[Authorize]
+	[HttpGet("me")]
+	public async Task<ActionResult<UserDto>> GetCurrentUser()
+	{
+		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+		if (userId == null)
+			return Unauthorized("User-ID was not found in a token.");
+
+		var user = await _userService.GetUserFromTokenAsync(userId);
+
+		if (user == null)
+			return NotFound();
+
+		return Ok(user);
+
 	}
 
 	/// <summary>

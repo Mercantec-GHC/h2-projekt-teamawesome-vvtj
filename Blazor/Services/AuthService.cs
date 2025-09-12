@@ -1,9 +1,9 @@
 ﻿using System.Net.Http.Json;
 using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
-using Blazor.Models.Dto.User;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using DomainModels.Dto.UserDto;
 
 namespace Blazor.Services;
 
@@ -27,7 +27,7 @@ public class AuthService : IAuthService
 	public async Task<bool> LoginAsync(string email, string password, bool remember)
 	{
 		// Create the login DTO with data for a login
-		var loginDto = new LoginDto
+		var loginDto = new UserLoginDto
 		{
 			Email = email,
 			Password = password,
@@ -41,7 +41,11 @@ public class AuthService : IAuthService
 			return false;
 
 		// Read the token from the response
-		var token = await response.Content.ReadAsStringAsync();
+		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
+		var token = result?.Token;
+
+		if (string.IsNullOrWhiteSpace(token))
+			return false;
 		var cleanToken = token.Trim('"');
 
 		// Store the token in local storage if remember me is checked, otherwise in session storage
@@ -56,12 +60,16 @@ public class AuthService : IAuthService
 			await _sessionStorage.SetItemAsync(_tokenKey, cleanToken);
 			await _localStorage.RemoveItemAsync(_tokenKey);
 		}
-			
+
 		// Notify Blazor that the user is authenticated
 		_authStateProvider.NotifyUserAuthentication(cleanToken);
 
 		// Set the token in the HttpClient for future requests
 		_apiService.SetBearerToken(cleanToken);
+
+		// Send a message to all administrators about admin login
+		var message = $"Admin {loginDto.Email} has just logged in. Welcome at working!";
+		await _apiService.SendNotificationAsync(message);
 
 		return true;
 	}
@@ -69,7 +77,7 @@ public class AuthService : IAuthService
 	public async Task<bool> RegisterAsync(string email, string userName, string password, string confirmPassword)
 	{
 		// Create the register DTO with data for a new user
-		var registerDto = new RegisterDto
+		var registerDto = new UserRegisterDto
 		{
 			Email = email,
 			Username = userName,

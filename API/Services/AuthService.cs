@@ -135,12 +135,12 @@ public class AuthService : IAuthService
 			Subject = new ClaimsIdentity(claims),
 			Issuer = _configuration.GetValue<string>("AppSettings:Issuer"),
 			Audience = _configuration.GetValue<string>("AppSettings:Audience"),
-			Expires = DateTime.UtcNow.AddHours(1), 
+			Expires = DateTime.UtcNow.AddHours(3), 
 			SigningCredentials = creds
 		};
 
 		var token = tokenHandler.CreateToken(tokenDescriptor);
-		return new JwtSecurityTokenHandler().WriteToken(token);
+		return tokenHandler.WriteToken(token);
 	}
 
 	/// <summary>

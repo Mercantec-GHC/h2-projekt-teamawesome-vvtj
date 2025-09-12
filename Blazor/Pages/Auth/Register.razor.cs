@@ -11,7 +11,7 @@ public partial class Register
 	[Inject]
 	private NavigationManager _navigation { get; set; } = null!;
 	private string _errorMessage = string.Empty;
-	private RegisterDto _registerModel = new();
+	private UserRegisterDto _registerModel = new();
 
 	private async Task HandleRegister()
 	{
