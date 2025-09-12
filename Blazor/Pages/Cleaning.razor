@@ -1,0 +1,106 @@
+﻿@page "/cleaning"
+
+<PageTitle>Cleaning</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="cleaning-container">
+
+            <h3>Cleaning</h3>
+
+            <div class="intro mb-4">
+                <h3>
+                    Rooms Pending Cleaning
+                    <small class="text-muted d-block">Below is the list of rooms that still need to be cleaned 🧹</small>
+                </h3>
+            </div>
+            @if (!string.IsNullOrEmpty(ErrorLoadData))
+            {
+                <div class="alert alert-danger text-center">
+                    @ErrorLoadData
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-start align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Hotel Name</th>
+                                <th>Room Numbers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (CleaningViewModel == null || !CleaningViewModel.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-muted">No rooms to clean ✅</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var roomGroup in CleaningViewModel)
+                                {
+                                    <tr>
+                                        <td>@roomGroup.Hotel</td>
+                                        <td>
+                                            @foreach (var room in roomGroup.RoomNumbers)
+                                            {
+                                                <span class="badge bg-danger me-1">@room</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            
+            <h4 class="text-center mt-5 mb-3">Fill out form with ready rooms: </h4>
+
+            <h4>Mark Rooms as Cleaned</h4>
+
+            @if (!string.IsNullOrEmpty(ErrorMarkedRooms))
+            {
+                <div class="alert alert-danger mt-3">@ErrorMarkedRooms</div>
+            }
+            else
+            {
+                <EditForm Model="@CleaningFormModel" OnValidSubmit="HandleSubmit">
+                    <ChildContent Context="formContext">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Hotel:</label>
+                            <InputSelect @bind-Value="CleaningFormModel.SelectedHotelId" class="form-control">
+                                <option value="">-- Select a hotel --</option>
+                                @foreach (var hotel in HotelDtos)
+                                {
+                                    <option value="@hotel.Id">@hotel.HotelName</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => CleaningFormModel.SelectedHotelId)" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Enter cleaned room numbers (comma separated):</label>
+                            <InputText @bind-Value="CleaningFormModel.RoomNumbersInput" class="form-control" />
+                            <small class="text-muted">Example: 101, 102, 103</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Mark as Cleaned</button>
+                    </ChildContent>
+                </EditForm>
+            }
+        </div>
+
+    </Authorized>
+     <NotAuthorized>
+        <div class="alert alert-warning text-center mt-5">
+            <h4>You are not authorized 🚫</h4>
+            <p>Please log in to view the cleaning information.</p>
+            <a class="btn btn-primary" href="/login">Go to Login</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>

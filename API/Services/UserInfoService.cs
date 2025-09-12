@@ -26,6 +26,16 @@ public class UserInfoService : IUserInfoService
 		return _userInfoMapping.ToUserInfoGetDto(userInfo);
 	}
 
+	public async Task<UserInfoGetDto?> GetCurrentUserInfoAsync(string Id)
+	{
+		var userInfo = await _context.UserInfos.FirstOrDefaultAsync(ui => ui.UserId.ToString() == Id);
+
+		if (userInfo == null)
+			return null;
+
+		return _userInfoMapping.ToUserInfoGetDto(userInfo);
+	}
+
 
 	public async Task<UserInfoGetDto?> UpdateUserInfoAsync(int userId, UserInfoPutDto dto)
 	{

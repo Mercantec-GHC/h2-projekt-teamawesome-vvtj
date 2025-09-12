@@ -2,7 +2,7 @@
 {
     public class RoomToCleanDto
     {
-        public int HotelId { get; set; }
+        public int? HotelId { get; set; }
         public IEnumerable<int> RoomNumbers { get; set; }
     }
 }
