@@ -1,6 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Blazor.Helpers;
 using Blazor.Services;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
@@ -16,7 +15,6 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	private readonly ISessionStorageService _sessionStorage;
 	private readonly JwtSecurityTokenHandler _tokenHandler = new();
 	private readonly APIService _apiService;
-	private readonly JwtHelper _jwlHelper = new();
 	private const string _tokenKey = "authToken";
 
 	public CustomAuthStateProvider(ILocalStorageService localStorage, ISessionStorageService sessionStorage, APIService apiService)
