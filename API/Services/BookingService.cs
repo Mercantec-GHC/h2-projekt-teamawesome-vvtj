@@ -13,9 +13,11 @@ namespace API.Services
     public class BookingService : IBookingService
     {
         private readonly AppDBContext _dbContext;
+        //private readonly SeasonalPricingService _seasonalPricing;
         public BookingService(AppDBContext context)
         {
             _dbContext = context;
+            //_seasonalPricing = seasonalPricing;
         }
 
         public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
@@ -88,8 +90,10 @@ namespace API.Services
             if (dto.isBreakfast == true)
                 roomType.PricePerNight += 200 * guests;
 
+
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            var total = pricePerNight * nights;
+            //var finalPrice = _seasonalPricing.GetSeasonalPrice(pricePerNight, dto.CheckIn.ToDateTime(TimeOnly.MinValue));
+            var total = pricePerNight * nights; // * FinalPrice instead of pricePerNight
 
 
             var booking = new Booking
