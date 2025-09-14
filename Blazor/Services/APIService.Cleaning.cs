@@ -9,7 +9,7 @@ namespace Blazor.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/Cleaning");
+                var response = await GetAsync("api/Cleaning");
                 response.EnsureSuccessStatusCode();
                 var results = await response.Content.ReadFromJsonAsync<List<RoomToCleanDto>>();
                 return results ?? Enumerable.Empty<RoomToCleanDto>();
@@ -21,7 +21,7 @@ namespace Blazor.Services
             }
         }
 
-        public async Task<bool> MarkRoomsAsCleanedAsync(List<int> roomNumbers)
+        public async Task<bool> MarkRoomsAsCleanedAsync(List<RoomToCleanDto> roomNumbers)
         {
             if (roomNumbers == null || !roomNumbers.Any())
             {
@@ -29,7 +29,7 @@ namespace Blazor.Services
             }
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("api/Cleaning/MarkRoomAsCleaned", roomNumbers);
+                var response = await PostAsJsonAsync("api/Cleaning/MarkRoomAsCleaned", roomNumbers);
                 response.EnsureSuccessStatusCode();
                 return response.IsSuccessStatusCode;
             }

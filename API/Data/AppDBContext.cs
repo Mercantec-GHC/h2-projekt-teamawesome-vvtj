@@ -16,6 +16,7 @@ public class AppDBContext : DbContext
 	public DbSet<Room> Rooms { get; set; }
 	public DbSet<RoomType> RoomTypes { get; set; }
 	public DbSet<Hotel> Hotels { get; set; }
+	public DbSet<NotificationSubscriptions> NotificationSubscriptions { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

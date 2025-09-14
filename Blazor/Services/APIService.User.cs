@@ -10,7 +10,6 @@ public partial class APIService
 	{
 		try
 		{
-			// Ensure HttpClient is properly configured for credentials/cookies if needed
 			var response = await GetAsync("api/Users/me");
 
 			if (response.IsSuccessStatusCode)

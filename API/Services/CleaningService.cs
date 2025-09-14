@@ -26,13 +26,22 @@ namespace API.Services
                 List<Booking> bookings = await _dbContext.Bookings.ToListAsync();
                 List<Room> rooms = await _dbContext.Rooms.Include(r => r.RoomType).Include(r => r.Hotel).ToListAsync();
 
-                // Filter rooms that need cleaning
-                var roomsToClean = rooms
-                    .Where(r => !r.LastCleaned.HasValue || (DateTime.UtcNow - r.LastCleaned.Value).TotalDays >= 3 ||
-                        bookings.Any(b => b.RoomId == r.Id && b.CheckOut <= DateOnly.FromDateTime(DateTime.UtcNow)))
-                    .ToList();
+				// Filter rooms that need cleaning. 
+				// Here we have taken into account:
+				// - Rooms that have never been cleaned.
+				// - Rooms that have not been cleaned for a long time.
+				// - Rooms that were checked out today or earlier and have not been cleaned since that check out.
 
-                var roomToCleanDtos = roomsToClean
+				var roomsToClean = rooms
+					.Where(r =>
+						!r.LastCleaned.HasValue
+						|| (DateTime.UtcNow - r.LastCleaned.Value).TotalDays >= 3
+						|| bookings.Any(b => b.RoomId == r.Id
+											 && b.CheckOut <= DateOnly.FromDateTime(DateTime.UtcNow)
+											 && (!r.LastCleaned.HasValue || b.CheckOut > DateOnly.FromDateTime(r.LastCleaned.Value))))
+					.ToList();
+
+				var roomToCleanDtos = roomsToClean
                     .GroupBy(r => r.HotelId)
                     .Select(g => new RoomToCleanDto
                     {
@@ -89,9 +98,5 @@ namespace API.Services
                 return null;
             }
         }
-
-
-
-
     }
 }
