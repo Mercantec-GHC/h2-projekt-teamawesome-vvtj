@@ -36,6 +36,7 @@ public class Program
         builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
 		builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 		builder.Services.AddScoped<IEmailService, EmailService>();
+		builder.Services.AddScoped<SeasonalPricingService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
 		// Add MemoryCache
 		builder.Services.AddMemoryCache();
