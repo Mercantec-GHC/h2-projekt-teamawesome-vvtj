@@ -15,12 +15,16 @@ namespace API.Controllers
         
         private readonly ActiveDirectoryService _activeDirectoryService;
        
-
         public ActiveDirectoryController(ActiveDirectoryService activeDirectoryService)
         {
             _activeDirectoryService = activeDirectoryService;
         }
         
+        /// <summary>
+        /// Authenticates a user via the AD and returns a JWT if successful
+        /// </summary>
+        /// <param name="ADdto">DTO containing the username and password from thr query strimg</param>
+        /// <returns>OK with JWT if authentication succeeds; otherwise null</returns>
         [HttpGet]
         public async Task<IActionResult> ADLogin([FromQuery]ADLoginDto ADdto)
         {

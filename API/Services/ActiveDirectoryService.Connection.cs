@@ -6,32 +6,35 @@ namespace API.Services
     public partial class ActiveDirectoryService
     {
         /// <summary>
-        /// Opretter en forbindelse til Active Directory
+        /// Creates and binds LDAP connection to AD
         /// </summary>
-        /// <returns>LdapConnection objekt</returns>
+        /// <returns>LdapConnection object</returns>
         public LdapConnection GetConnection()
         {
+            //Set server address (hardcoded here for now)
             var server = _config.Server = "10.133.71.114";
+            //Network credentials using username and domain
             var credential = new NetworkCredential($"{_config.Username}@{_config.Domain}", _config.Password);
-            var connection = new LdapConnection(_config.Server)
+            //Initialises LDAP connection with credentials
+            var connection = new LdapConnection(server)
             {
                 Credential = credential,
                 AuthType = AuthType.Negotiate
             };
 
-            connection.Bind(); // Test forbindelse
+            connection.Bind();
             return connection;
         }
 
         /// <summary>
-        /// Tester forbindelsen til Active Directory med detaljeret information
+        /// Tests the connection to AD and prints dialog to console
         /// </summary>
         public void TestConnection()
         {
             Console.WriteLine("=== Test Forbindelse til Active Directory ===");
             Console.WriteLine();
 
-            // Vis forbindelsesoplysninger
+            // Show coonection details
             Console.WriteLine("Forbindelsesoplysninger:");
             Console.WriteLine($"  Server: {_config.Server}");
             Console.WriteLine($"  Domæne: {_config.Domain}");
@@ -43,7 +46,7 @@ namespace API.Services
 
             try
             {
-                // Vis hvad der sker
+                // step-by-step logging of connection setup
                 Console.WriteLine("  → Opretter NetworkCredential...");
                 var credential = new NetworkCredential($"{_config.Username}@{_config.Domain}", _config.Password);
 
@@ -63,7 +66,7 @@ namespace API.Services
                 Console.WriteLine($"   Autentificeret som: {_config.Username}@{_config.Domain}");
                 Console.WriteLine($"   Autentificeringstype: {connection.AuthType}");
 
-                // Test en simpel søgning for at verificere at vi kan læse data
+                //
                 Console.WriteLine();
                 Console.WriteLine("Tester dataadgang...");
                 var testSearchRequest = new SearchRequest(
