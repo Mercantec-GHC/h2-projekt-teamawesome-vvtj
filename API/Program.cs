@@ -36,12 +36,14 @@ public class Program
         builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
 		builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 		builder.Services.AddScoped<IEmailService, EmailService>();
+		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
 		// Add MemoryCache
 		builder.Services.AddMemoryCache();
 
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddSwaggerGen(c =>
+
+		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+		builder.Services.AddSwaggerGen(c =>
 		{
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
