@@ -78,36 +78,33 @@ public class CleaningController : ControllerBase
     /// </para>
     /// </returns>
     [Authorize(Roles = "Admin,Reception,CleaningStaff")]
-	[HttpPut]
-    public async Task<IActionResult> MarkRoomAsCleaned(List<RoomToCleanDto> roomNumbers)
-    {
-        try
-        {
-            if (roomNumbers == null || !roomNumbers.Any())
-            {
-                return BadRequest("Room numbers cannot be null or empty.");
-            }
 
-            var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumbers);
+	[HttpPost("MarkRoomAsCleaned")]
+	public async Task<IActionResult> MarkRoomAsCleaned([FromBody] List<RoomToCleanDto> roomNumbers)
+	{
+		try
+		{
+			if (roomNumbers == null || !roomNumbers.Any())
+				return BadRequest("Room numbers cannot be null or empty.");
 
-            if (result != null && result.Any())
-            {
-                var cleaned = string.Join(", ",
-                    result.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
+			var result = await _cleaningService.MarkRoomAsCleanedAsync(roomNumbers);
 
-                return Ok($"Rooms marked as cleaned today: {cleaned}");
-            }
-            else
-            {
-                var requested = string.Join(", ",
-                    roomNumbers.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
-
-                return NotFound($"Room(s) not found or already cleaned: {requested}");
-            }
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
+			if (result != null && result.Any())
+			{
+				var cleaned = string.Join(", ",
+					result.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
+				return Ok($"Rooms marked as cleaned today: {cleaned}");
+			}
+			else
+			{
+				var requested = string.Join(", ",
+					roomNumbers.SelectMany(r => r.RoomNumbers.Select(n => $"Hotel {r.HotelId} - Room {n}")));
+				return NotFound($"Room(s) not found or already cleaned: {requested}");
+			}
+		}
+		catch (Exception ex)
+		{
+			return StatusCode(500, $"Internal server error: {ex.Message}");
+		}
+	}
 }

@@ -37,6 +37,8 @@ public class Program
 		builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
+		builder.Services.AddScoped<INotificationService, NotificationService>();
+		// Add MemoryCache
 		builder.Services.AddMemoryCache();
 
 

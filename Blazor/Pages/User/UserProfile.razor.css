@@ -1,0 +1,40 @@
+﻿.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4rem;
+}
+
+::deep .card {
+    background-color: rgba(255, 255, 255, .6);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+::deep .card-header {
+    font-size: 4em;
+    font-weight: 600;
+    color: rgb(57 166 168);
+    text-shadow: 2px 1px 3px #ffff;
+    background-color: transparent;
+    border-bottom: .5px solid #dee2e6;
+}
+
+h3, h5 {
+    color: #204343;
+}
+
+.list-group-item {
+    display: flex;
+    font-size: 1.2em;
+    justify-content: flex-start;
+    background: none;
+    color: #204343;
+    padding: 1em;
+}
+
+.item-name {
+    font-weight: 600;
+    margin: 0 .8em;
+}
