@@ -99,9 +99,9 @@ namespace API.Services
 
             //constructs a search request with base DN (domain) and desired attributes
             var searchRequest = new SearchRequest(
-                $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}", // Constructs base DN
+                $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}", // Constructs base DN - Tells LDAP where to search
                 searchFilter,                                             // Filter for user
-                SearchScope.Subtree,                                      //Searches the entire directory tree with the given attributes
+                SearchScope.Subtree,                                      // Searches the entire directory tree with the given attributes
                 "sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName"
             );
 
@@ -181,52 +181,7 @@ namespace API.Services
             //public bool IsEnabled { get; set; } = true;
             public List<string> Groups { get; set; } = new List<string>();
         }
-
-        // Configurationclass for runtime settings
-        public class ADConfig
-        {
-            public string Server { get; set; } = "10.133.71.114";
-            public string Username { get; set; } = string.Empty;
-            public string? Password { get; set; } = string.Empty;
-            public string Domain { get; set; } = string.Empty;
-        }
-
-        private ADConfig _config;
-
-        public ActiveDirectoryService()
-        {
-            _config = new ADConfig();
-        }
-
-        public ActiveDirectoryService(ADConfig config)
-        {
-            _config = config;
-        }
-
-        // Public properties for configuration values
-        public ADConfig Config => _config;
-        public string Server => _config.Server;
-        public string Username => _config.Username;
-        public string Domain => _config.Domain;
-
-        // Updates the AD configuration
-        public void UpdateConfig(ADConfig newConfig)
-        {
-            _config = newConfig;
-        }
-
-        // Updates individual configuration values
-        public void UpdateConfig(string? server = null, string? username = null, string? password = null, string? domain = null)
-        {
-            if (!string.IsNullOrEmpty(server))
-                _config.Server = server;
-            if (!string.IsNullOrEmpty(username))
-                _config.Username = username;
-            if (!string.IsNullOrEmpty(password))
-                _config.Password = password;
-            if (!string.IsNullOrEmpty(domain))
-                _config.Domain = domain;
-        }
+       
 
         //Model for the authenticated AD user
         public class ADUserInfo
