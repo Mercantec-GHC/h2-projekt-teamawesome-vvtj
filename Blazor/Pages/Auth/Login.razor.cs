@@ -13,7 +13,7 @@ public partial class Login
 	[Inject] 
 	private NavigationManager _navigation{ get; set; } = null!;
 	[Inject]
-	private IJSRuntime JSRuntime { get; set; } = null!;
+	private IJSRuntime JSRuntime {  get; set; } = null!;
 	[Inject]
 	private CustomAuthStateProvider _customAuthStateProvider { get; set; }
 
@@ -44,6 +44,22 @@ public partial class Login
 
 	private async Task RequestNotificationSubscriptionAsync()
 	{
+		// Get the current permission status
+		var permission = await JSRuntime.InvokeAsync<string>("blazorPushNotifications.getNotificationPermission");
+
+		// If permission has not yet been requested, ask
+		if (permission == "default")
+		{
+			permission = await JSRuntime.InvokeAsync<string>("blazorPushNotifications.requestPermission");
+		}
+
+		// If the user refused, do not continue
+		if (permission == "denied")
+		{
+			return;
+		}
+
+		// If permission is granted, create a subscription
 		var subscription = await JSRuntime.InvokeAsync<NotificationSubscriptionDto>(
 			"blazorPushNotifications.requestSubscription");
 
