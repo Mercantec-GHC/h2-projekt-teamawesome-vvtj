@@ -1,4 +1,6 @@
 ﻿@using BlazorBootstrap
+
+
 <nav class="navbar fixed-top navbar-expand-sm  shadow">
 	<div class="container-fluid">
 		<div class=" p-0 mt-2">
@@ -27,15 +29,14 @@
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
 						<a class="nav-link text-white" href="contact">Contact us</a>
 					</li>
-					<AuthorizeView>
-						<Authorized >
+					<AuthorizeView Roles="CleaningStaff, Reception">
+						<Authorized>
 							<NavSeparatorComponent />
 							<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-								<a class="nav-link text-white" href="cleaning">Cleaning staff page</a>
+								<a class="nav-link text-white" href="cleaning">Cleaning staff</a>
 							</li>
 						</Authorized>
-					</AuthorizeView>		
-					<NavSeparatorComponent />
+					</AuthorizeView>
 
 					@*TODO: <AuthorizeView>
 						<Authorized>
@@ -47,58 +48,9 @@
 					</AuthorizeView>*@
 
 					<NavSeparatorComponent />
-
-					<AuthorizeView>
-						<NotAuthorized>
-							<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-								<a class="nav-link text-white" href="/login">Log in</a>
-							</li>
-						</NotAuthorized>
-						
-						<Authorized>
-							@*TODO: Create and use a separate component for this*@
-							@* <li class="nav-item py-2 py-sm-1 col-12 col-sm-auto"> *@
-								<Dropdown Color="DropdownColor.None">
-								<DropdownToggleButton Class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-										<Icon Class="bi bi-person-check me-2" />
-										Menu
-									</DropdownToggleButton>
-									<DropdownMenu>
-										<DropdownItem To="/user/account"
-													  Class="text-dark"
-													  Type="DropdownItemType.Link">
-											<Icon Class="bi bi-person-gear custom-color me-3" />
-											Account
-										</DropdownItem>
-										<DropdownItem To="/user/profile"
-													  Class="text-dark"
-													  Type="DropdownItemType.Link">
-										<Icon Class="bi bi-person-vcard custom-color me-3" />
-											Profile
-										</DropdownItem>
-										<DropdownItem To="/user/bookings"
-													  Class="text-dark"
-													  Type="DropdownItemType.Link">
-										<Icon Class="bi bi-suitcase custom-color me-3" />
-											Bookings
-										</DropdownItem>
-										<DropdownItem To="/user/security"
-													  Class="text-dark"
-													  Type="DropdownItemType.Link">
-										<Icon Class="bi bi-shield-lock custom-color me-3" />
-											Security settings
-										</DropdownItem>
-										<DropdownDivider>Dropdown header</DropdownDivider>
-										<DropdownItem Class="text-danger justify-content-center"
-													  Type="DropdownItemType.Button" @onclick="HandleLogout">
-											Log out
-										</DropdownItem>
-									</DropdownMenu>
-								</Dropdown>
-								@* <button class="nav-link custom-btn text-white" @onclick="HandleLogout">Log out</button> *@
-						@* 	</li> *@
-						</Authorized>
-					</AuthorizeView>
+					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
+						<UserMenuComponent OnLoginClicked="OnLoginClicked"></UserMenuComponent>
+					</li>
 				</ul>
 			</div>
 		</div>

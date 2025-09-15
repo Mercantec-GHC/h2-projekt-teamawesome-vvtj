@@ -20,9 +20,11 @@
     background-color: transparent;
     border-bottom: .5px solid #dee2e6;
 }
+
 h3, h5 {
     color: #204343;
 }
+
 .list-group-item {
     display: flex;
     font-size: 1.2em;
@@ -31,7 +33,38 @@ h3, h5 {
     color: #204343;
     padding: 1em;
 }
+
 .item-name {
     font-weight: 600;
     margin: 0 .8em;
 }
+
+::deep .btn.btn-custom {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    transition: background-image 2s ease-in-out;
+}
+
+    ::deep .btn.btn-custom:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255, 255, 255, .5);
+    }
+
+    ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+    }
+
+    ::deep .btn.btn-custom.main {
+        color: #204343;
+        font-weight: 600;
+    }
+
+    ::deep .btn.btn-custom.profile {
+        color: #ffff;
+        font-weight: 700;
+    }

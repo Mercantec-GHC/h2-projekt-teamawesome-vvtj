@@ -1,0 +1,50 @@
+﻿.btn-wrapper .login {
+    color: #fff;
+}
+
+::deep .btn-wrapper:hover, .login:hover {
+    transform: scale(1.2);
+    background-color: rgba(255,255,255,0.1);
+    color: #3a9698;
+}
+
+::deep .dropdown-toggle {
+    color: #ffff;
+    padding: .5em;
+    background-color: #b7d2d4;
+    border: none;
+    border-radius: 10px;
+}
+
+::deep .bi {
+    font-size: 1.5em;
+}
+
+    ::deep .bi.custom-color {
+        color: #3a9698;
+    }
+
+::deep .dropdown-menu {
+    position: absolute !important;
+    right: 0;
+    left: revert-layer;
+    border: none;
+}
+
+::deep .dropdown-item {
+    color: #3a9698;
+    border-radius: 4px;
+    height: 3rem;
+    display: flex;
+    line-height: 3rem;
+    margin-bottom: .5em;
+}
+
+    ::deep .dropdown-item:active,
+    ::deep .dropdown-item:focus {
+        background-color: #dce6e7;
+    }
+
+    ::deep .dropdown-item:hover {
+        background-color: #d5e0e173;
+    }
