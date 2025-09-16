@@ -13,9 +13,12 @@ namespace API.Services
     public class BookingService : IBookingService
     {
         private readonly AppDBContext _dbContext;
-        public BookingService(AppDBContext context)
+        private readonly SeasonalPricingService? _seasonalPricing;
+        public BookingService(AppDBContext context, SeasonalPricingService seasonalPricing)
         {
             _dbContext = context;
+            _seasonalPricing = seasonalPricing;
+
         }
 
         public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
@@ -42,9 +45,9 @@ namespace API.Services
                 r.RoomType.TypeofRoom == dto.TypeOfRoom && r.IsAvailable == true)
                 .Select(r => new { r.Id, r.RoomType })
                  .ToListAsync();
-          
+
             //if there are no rooms with chosen type in the hotel
-            if (roomsQuery.Count == 0) 
+            if (roomsQuery.Count == 0)
                 return null;
 
             var roomIds = roomsQuery.Select(r => r.Id).ToList();
@@ -67,9 +70,8 @@ namespace API.Services
             if (availableRoomId == 0)
                 return null; // No available rooms found
 
-           var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
-            
-            
+            var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
+
             // If no available room is found, return null
             if (availableRoom == null || availableRoom.RoomType == null)
                 return null;
@@ -89,13 +91,14 @@ namespace API.Services
                 roomType.PricePerNight += 200 * guests;
 
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            var total = pricePerNight * nights;
+            decimal finalPrice = await _seasonalPricing.GetSeasonalPrice(pricePerNight, dto.CheckIn.ToDateTime(TimeOnly.MinValue));
+            var total = finalPrice * nights;
 
 
             var booking = new Booking
             {
                 UserId = userId,
-
+              
                 RoomId = availableRoom.Id,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
@@ -167,7 +170,7 @@ namespace API.Services
             return userBookings;
         }
 
-     
+
 
         public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
         {
@@ -195,15 +198,16 @@ namespace API.Services
             {
                 pricePerNight += 200 * booking.GuestsCount;
             }
-
-
-            var total = pricePerNight * nights;
+                       
+            decimal finalPrice = await _seasonalPricing.GetSeasonalPrice(pricePerNight, booking.CheckIn.ToDateTime(TimeOnly.MinValue));
+            var total = finalPrice * nights;
             booking.TotalPrice = total;
 
             await _dbContext.SaveChangesAsync();
 
             return new BookingResponseDto
             {
+                UpdatedAt = booking.UpdatedAt,
                 UserName = booking.User.UserName,
                 HotelName = booking.Room.Hotel.HotelName,
                 RoomType = booking.Room.RoomType.TypeofRoom,
