@@ -1,5 +1,6 @@
 ﻿using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
+using BlazorBootstrap;
 using DomainModels.Dto;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -15,13 +16,16 @@ public partial class Login
 	[Inject]
 	private IJSRuntime JSRuntime { get; set; } = null!;
 	[Inject]
-	private CustomAuthStateProvider _customAuthStateProvider { get; set; }
+	private CustomAuthStateProvider _customAuthStateProvider { get; set; } = null!;
+	[Inject]
+	protected PreloadService PreloadService { get; set; } = default!;
 
 	private string _errorMessage = string.Empty;
 	private UserLoginDto _loginModel = new();
 
 	private async Task HandleLogin()
 	{
+		PreloadService.Show();
 		_errorMessage = string.Empty;
 		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password, _loginModel.RememberMe);
 		if (result)
@@ -40,6 +44,7 @@ public partial class Login
 		{
 			_errorMessage = "Invalid email or password.";
 		}
+		PreloadService.Hide();
 	}
 
 	private async Task RequestNotificationSubscriptionAsync()

@@ -1,6 +1,16 @@
 ﻿@page "/user/profile"
 @using BlazorBootstrap
 
+@if (_userProfileVM == null || _userProfileVM.FirstName == null || _userProfileVM.LastName == null)
+{
+	<PageTitle>Profile</PageTitle>
+}
+else
+{
+	<PageTitle>@_userProfileVM?.FirstName @_userProfileVM?.LastName</PageTitle>
+}
+<Preload LoadingText="Loading..." />
+
 <div class="container">
 	<div class="col-md-8">
 		<AuthorizeView>
@@ -30,8 +40,10 @@
 						<li class="list-group-item"><div class="item-name">Last updated: </div>@_userProfileVM?.LastUpdated</li>
 					</ul>
 					<CardBody>
-						<Button Color="ButtonColor.Light" To="#" Type="ButtonType.Link">Go to main</Button>
-						<Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Link">Go to bookings</Button>
+						<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
+							<Button To="/user/booking" Class="btn-custom booking" Type="ButtonType.Link">Go to bookings</Button>
+							<Button To="#" Class="btn-custom main" Type="ButtonType.Link">Go to main</Button>
+						</div>
 					</CardBody>
 				</Card>
 			</Authorized>
