@@ -25,8 +25,8 @@ namespace API.Controllers
         /// </summary>
         /// <param name="ADdto">DTO containing the username and password from thr query strimg</param>
         /// <returns>OK with JWT if authentication succeeds; otherwise null</returns>
-        [HttpGet]
-        public async Task<IActionResult> ADLogin([FromQuery]ADLoginDto ADdto)
+        [HttpPost]
+        public async Task<IActionResult> ADLogin(ADLoginDto ADdto)
         {
             var adUser = await _activeDirectoryService.AuthenticateUserAsync(ADdto.Username, ADdto.Password);
             if (adUser == null)
@@ -38,6 +38,5 @@ namespace API.Controllers
                 token
             });
         }
-
     }
 }

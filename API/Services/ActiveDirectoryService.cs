@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Crypto.Prng;
 
 namespace API.Services
 {
@@ -82,9 +83,9 @@ namespace API.Services
             // Test authentification
             await Task.Run(() => userConnection.Bind());
            
-
             return userInfo;
         }
+        
         /// <summary>
         /// Searches for a user in Active Directory using sAMAccountName, email, or userPrincipalName
         /// </summary>
@@ -93,7 +94,6 @@ namespace API.Services
         /// <returns>ADUserInfo with user attributes if found; otherwise, null</returns>
         private async Task<ADUserInfo?> SearchUserInADAsync(LdapConnection connection, string username)
         {
-
             //Finds user whose name match the input "username"
             var searchFilter = $"(|(sAMAccountName={username})(mail={username})(userPrincipalName={username}))";
 
@@ -102,18 +102,16 @@ namespace API.Services
                 $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}", // Constructs base DN - Tells LDAP where to search
                 searchFilter,                                             // Filter for user
                 SearchScope.Subtree,                                      // Searches the entire directory tree with the given attributes
-                "sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName"
+                "sAMAccountName", "mail", "givenName", "sn", "memberOf", "userPrincipalName", "title", "department", "distinguishedName"
             );
 
             //Executes the search asynchronously
             var searchResponse = await Task.Run(() => (SearchResponse)connection.SendRequest(searchRequest));
-
             if (searchResponse.Entries.Count == 0)
             {
                 _logger.LogWarning("Ingen bruger fundet i AD for: {Username}", username);
                 return null;
             }
-
             var entry = searchResponse.Entries[0];
 
             // Debugging purposes: Log all available attributtes
@@ -126,29 +124,71 @@ namespace API.Services
             //Map attributes to the ADUserInfo model
             var userInfo = new ADUserInfo
             {
-                SamAccountName = GetAttributeValue(entry, "sAMAccountName"),
-                Email = GetAttributeValue(entry, "mail"),
-                FirstName = GetAttributeValue(entry, "givenName"),
-                LastName = GetAttributeValue(entry, "sn"),
+                SamAccountName = GetAttributeValue(entry, "sAMAccountName").ToString(),
+                Email = GetAttributeValue(entry, "mail").ToString(),
+                FirstName = GetAttributeValue(entry, "givenName").ToString(),
+                LastName = GetAttributeValue(entry, "sn").ToString(),
+                Title = GetAttributeValue(entry, "title").ToString(),
+                Department = GetAttributeValue(entry, "department").ToString(),
+                MemberOf = GetAttributeValue(entry, "memberOf"),
+                DistinguishedName = GetAttributeValue(entry, "distinguishedName").ToString()
             };
+            userInfo.Groups = GetGroupsByUser(connection, userInfo.DistinguishedName);
 
             _logger.LogInformation("Bruger fundet i AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
                 userInfo.SamAccountName, userInfo.Email, userInfo.Groups.Count);
 
             return userInfo;
-
         }
-        private string GetAttributeValue(SearchResultEntry entry, string attributeName)
+        private List<string> GetAttributeValue(SearchResultEntry entry, string attributeName)
         {
+            List<string> values = new List<string>();
             //Checks if an attribute exists and has at least one value
             if (entry.Attributes[attributeName] != null && entry.Attributes[attributeName].Count > 0)
             {
-                return entry.Attributes[attributeName][0].ToString() ?? string.Empty;
+                foreach (var val in entry.Attributes[attributeName])
+                {
+                    values.Add(val.ToString());
+                }
             }
             //If not found or emoty, return empty string
-            return string.Empty;
+            return values;
         }
-        
+
+        private List<string> GetGroupsByUser(LdapConnection connection, string? userDN)
+        {
+            List<string> Groups = new List<string>();
+            var groupSearch = new SearchRequest(
+                    $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
+                    $"(member={userDN})",
+                    SearchScope.Subtree,
+                    "cn", "description"
+                );
+            try
+            {
+                var groupResponse = (SearchResponse)connection.SendRequest(groupSearch);
+                if (groupResponse.Entries.Count == 0)
+                    return Groups;
+
+                foreach (SearchResultEntry entry in groupResponse.Entries)
+                {
+                    if (entry.Attributes.Contains("cn"))
+                    {
+                        var groupName = entry.Attributes["cn"][0]?.ToString();
+                        if (!string.IsNullOrEmpty(groupName))
+                        {
+                            Groups.Add(groupName);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fejl ved hentning af grupper for {userDN}: {ex.Message}");
+            }
+            return Groups;
+        }
+
 
         //-----------------------------------------------------------------------------//
         // Models for AD objects
@@ -186,15 +226,15 @@ namespace API.Services
         //Model for the authenticated AD user
         public class ADUserInfo
         {
-            public string SamAccountName { get; set; } = string.Empty;
-            public string Email { get; set; } = string.Empty;
-            public string Password { get; set; } = string.Empty;
-
-            public string FirstName { get; set; } = string.Empty;
-
-            public string LastName { get; set; } = string.Empty;
-
-            public string Department { get; set; } = string.Empty;
+            public string? SamAccountName { get; set; } = string.Empty;
+            public string? Email { get; set; } = string.Empty;
+            public string? Password { get; set; } = string.Empty;
+            public string? FirstName { get; set; } = string.Empty;
+            public string? LastName { get; set; } = string.Empty;
+            public string? Department { get; set; } = string.Empty;
+            public string? Title { get; set; } = string.Empty;
+            public List<string> MemberOf { get; set; } = new List<string>();
+            public string? DistinguishedName { get; set; } = string.Empty;
             
             //List of AD groups the user belongs to
             public List<string> Groups { get; set; } = new List<string>();
