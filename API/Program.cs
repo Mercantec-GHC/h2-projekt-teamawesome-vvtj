@@ -38,8 +38,9 @@ public class Program
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
-		// Add MemoryCache
-		builder.Services.AddMemoryCache();
+        builder.Services.AddScoped<SeasonalPricingService>();
+        // Add MemoryCache
+        builder.Services.AddMemoryCache();
 
 
 		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

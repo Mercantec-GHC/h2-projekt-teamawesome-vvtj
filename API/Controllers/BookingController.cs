@@ -80,12 +80,38 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-  //  [Authorize(Roles = "Admin,Reception,CleaningStaff")]
+    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetBookingsDto>>> GetAllBookings()
     {
         var bookings = await _bookingService.GetAllBookings();
         return Ok(bookings);
+    }
+
+    /// <summary>
+    /// Get all available rooms in the specified hotel for a given date.  
+    /// </summary>
+    /// <param name="hotelName">The name of the hotel (required).</param>
+    /// <param name="date">
+    /// The date for which to check availability, in the format <c>yyyy-MM-dd</c>  
+    /// </param>
+    /// <returns>A list of available rooms with their IDs, numbers, hotel name, and room type id.</returns>
+    /// <response code="200">OK with list of <see cref="GetAvailableRoomsDto"/>.</response>
+    /// <response code="400">Bad request – invalid request or parameters.</response>
+    /// <response code="401">Unauthorized – the user is not authenticated.</response>
+    /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
+    /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+    [Authorize(Roles = "Admin, Reception")]
+    [HttpGet("available")]
+    public async Task<ActionResult<IEnumerable<GetAvaliableRoomsDto>>> GetAvaliableRooms(
+        [FromQuery] string hotelName,
+        [FromQuery] DateOnly date)
+    {
+        if (string.IsNullOrWhiteSpace(hotelName))
+            return BadRequest("hotelName is required.");
+
+        var rooms = await _bookingService.GetAvaliableRoomsAsync(hotelName, date);
+        return Ok(rooms); // [] if there are no rooms
     }
     /// <summary>
     /// Gets all bookings of a user by user´s ID. 
