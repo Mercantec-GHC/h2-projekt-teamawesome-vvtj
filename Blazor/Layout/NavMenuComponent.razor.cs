@@ -6,13 +6,11 @@ namespace Blazor.Layout;
 public partial class NavMenuComponent
 {
 	[Inject]
-	public IAuthService AuthService { get; set; } = default!;
-	[Inject]
 	public NavigationManager Navigation { get; set; } = default!;
-	private async Task HandleLogout()
+	public UserMenuComponent UserMenu { get; set; } = default!;
+
+	private async Task OnLoginClicked()
 	{
-		await AuthService.LogoutAsync();
-		StateHasChanged();
 		Navigation.NavigateTo("/login");
 	}
 }
