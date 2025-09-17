@@ -46,6 +46,24 @@ public class UserInfoController : ControllerBase
 		return Ok(userInfo);
 	}
 
+	[Authorize]
+	[HttpGet("info")]
+	public async Task<ActionResult<UserInfoGetDto>> GetCurrentUserInfo()
+	{
+		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		if (userId == null)
+		{
+			return Unauthorized();
+		}
+		var userInfo = await _userInfoService.GetCurrentUserInfoAsync(userId);
+		if (userInfo == null)
+		{
+			return NotFound();
+		}
+		return Ok(userInfo);
+
+	}
+
 
 	//INFO: For educational purposes I have two different implementations:
 	//for updating UserInfo I am using service _userInfoService, but for creating UserInfo I am not using services.

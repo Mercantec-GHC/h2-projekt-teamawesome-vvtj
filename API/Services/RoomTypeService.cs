@@ -5,6 +5,8 @@ using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using DomainModels.Enums;
+using DomainModels.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
@@ -64,7 +66,7 @@ namespace API.Services
             }
 
             //Only update if there's a new value
-            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description))
+            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description) && roomTypePutDto.Description != "string")
                 existingRoomType.Description = roomTypePutDto.Description;
 
             //Only update if there's a new value

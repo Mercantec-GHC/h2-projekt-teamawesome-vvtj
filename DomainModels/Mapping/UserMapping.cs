@@ -20,4 +20,5 @@ public class UserMapping
 			UserInfo = user.UserInfo != null ? new UserInfoMapping().ToUserInfoGetDto(user.UserInfo) : null
 		};
 	}
+
 }

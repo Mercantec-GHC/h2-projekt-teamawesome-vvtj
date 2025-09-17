@@ -118,6 +118,35 @@ namespace API.Migrations
                     b.ToTable("Hotels");
                 });
 
+            modelBuilder.Entity("DomainModels.Models.NotificationSubscriptions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("P256DH")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotificationSubscriptions");
+                });
+
             modelBuilder.Entity("DomainModels.Models.Role", b =>
                 {
                     b.Property<int>("Id")

@@ -2,7 +2,16 @@
 @using BlazorBootstrap
 @attribute [Authorize]
 
-<PageTitle>@_currentUserVM?.Username</PageTitle>
+@if (_currentUserVM == null)
+{
+	<PageTitle>Account</PageTitle>
+}
+else
+{
+	<PageTitle>@_currentUserVM?.Username </PageTitle>
+}
+
+<Preload LoadingText="Loading..." />
 
 <div class="container">
 	<div class="col-md-8">
@@ -20,15 +29,18 @@
 							<h5>Here you can manage your account settings and view your activity.</h5>
 						</CardText>
 					</CardBody>
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item"><div class="item-name">Email: </div>@_currentUserVM?.Email</li>
-							<li class="list-group-item"><div class="item-name">Username: </div>@_currentUserVM?.Username</li>
-							<li class="list-group-item"><div class="item-name">Last login: </div>@_currentUserVM?.LastLoginFormated</li>
-							<li class="list-group-item"><div class="item-name">Account created: </div>@_currentUserVM?.CreatedAtFormated</li>
-						</ul>
+					<ul class="list-group list-group-flush ms-5">
+						<li class="list-group-item"><div class="item-name">Email: </div>@_currentUserVM?.Email</li>
+						<li class="list-group-item"><div class="item-name">Username: </div>@_currentUserVM?.Username</li>
+						<li class="list-group-item"><div class="item-name">Last login: </div>@_currentUserVM?.LastLoginFormated</li>
+						<li class="list-group-item"><div class="item-name">Account created: </div>@_currentUserVM?.CreatedAtFormated</li>
+					</ul>
 					<CardBody>
-						<Button Color="ButtonColor.Light" To="#" Type="ButtonType.Link">Go to main</Button>
-						<Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Link">Go to bookings</Button>
+						<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
+							<Button To="/user/profile" Class="btn-custom profile" Type="ButtonType.Link">Go to profile</Button>
+							<Button To="#" Class="btn-custom main" Type="ButtonType.Link">Go to main</Button>
+						</div>
+
 					</CardBody>
 				</Card>
 			</Authorized>
