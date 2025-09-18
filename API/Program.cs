@@ -38,6 +38,7 @@ public class Program
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
+		builder.Services.AddScoped<IJWTService, JWTService>();
 		// Add MemoryCache
 		builder.Services.AddMemoryCache();
 
