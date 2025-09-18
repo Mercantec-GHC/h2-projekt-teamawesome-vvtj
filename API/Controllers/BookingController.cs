@@ -80,7 +80,7 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-    [Authorize(Roles = "Admin,Reception,CleaningStaff")]
+    [Authorize(Roles = "Admin, Reception")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetBookingsDto>>> GetAllBookings()
     {
@@ -89,29 +89,37 @@ public class BookingController : ControllerBase
     }
 
     /// <summary>
-    /// Get all available rooms in the specified hotel for a given date.  
+    /// Get all available rooms in the specified hotel for a given period of time.  
     /// </summary>
-    /// <param name="hotelName">The name of the hotel (required).</param>
-    /// <param name="date">
-    /// The date for which to check availability, in the format <c>yyyy-MM-dd</c>  
-    /// </param>
+    /// <param name="hotelName">Hotel name (case sensitive).Choose one of the hotels: Nova Halo, Nova Eden, Nova Oasis</param>
+    /// <param name="from">Start date in format yyyy-MM-dd</param>
+    /// <param name="to">End date in format yyyy-MM-dd</param>
     /// <returns>A list of available rooms with their IDs, numbers, hotel name, and room type id.</returns>
     /// <response code="200">OK with list of <see cref="GetAvailableRoomsDto"/>.</response>
     /// <response code="400">Bad request – invalid request or parameters.</response>
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-    [Authorize(Roles = "Admin, Reception")]
+   [Authorize(Roles = "Admin, Reception")]
     [HttpGet("available")]
     public async Task<ActionResult<IEnumerable<GetAvaliableRoomsDto>>> GetAvaliableRooms(
         [FromQuery] string hotelName,
-        [FromQuery] DateOnly date)
+        [FromQuery] DateOnly from,
+        [FromQuery] DateOnly to)
     {
         if (string.IsNullOrWhiteSpace(hotelName))
             return BadRequest("hotelName is required.");
+        if (to <= from)
+            return BadRequest("Invalid date range. Use yyyy-MM-dd and ensure 'to' is after 'from'.");
 
-        var rooms = await _bookingService.GetAvaliableRoomsAsync(hotelName, date);
-        return Ok(rooms); // [] if there are no rooms
+        var rooms = await _bookingService.GetAvaliableRoomsAsync(hotelName, from, to);
+        if (!rooms.Any())
+        {
+           
+            return NotFound("No available rooms for the selected period.");
+        }
+
+        return Ok(rooms); 
     }
     /// <summary>
     /// Gets all bookings of a user by user´s ID. 

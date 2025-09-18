@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blazor.Models.ViewModels
 {
-    public class BookingVm
+    public class BookingViewModel
     {
         public string FullName { get; set; } = string.Empty;
 

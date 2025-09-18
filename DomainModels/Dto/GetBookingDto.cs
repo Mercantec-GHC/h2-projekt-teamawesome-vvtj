@@ -26,6 +26,6 @@ namespace DomainModels.Dto
         public string HotelName { get; set; } = string.Empty;
         public int RoomNumber { get; set; }
 
-        public RoomTypeEnum RoomType { get; set; }
+        public string RoomTypeName { get; set; } = string.Empty;
     }
 }
