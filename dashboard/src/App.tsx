@@ -1,24 +1,24 @@
 ﻿import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Login } from './feature/auth/Login'
-import { Index } from './feature/apps/Index'
-import { ProtectedRoute } from './feature/auth/ProtectedRoute'
-
+import { Login } from './app/login/Login'
+import { Dashboard } from './app/dashboard/Dashboard'
+import { ProtectedRoute } from './app/login/ProtectedRoute'
+import { AuthProvider } from './app/login/AuthContext'
+import Rooms from './app/rooms/Room'
+import Bookings from './app/bookings/Bookings'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Index />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+              <Route path="rooms" element={<Rooms />} />
+              <Route path="bookings" element={<Bookings />} />
+          </Route>
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
