@@ -100,7 +100,7 @@ namespace API.Services
             var booking = new Booking
             {
                 UserId = userId,
-
+              
                 RoomId = availableRoom.Id,
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,

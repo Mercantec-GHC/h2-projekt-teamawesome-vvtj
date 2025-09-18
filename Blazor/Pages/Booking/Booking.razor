@@ -1,4 +1,4 @@
-﻿@page "/booking"
+﻿@* @page "/booking"
 @attribute [Authorize]
 @using DomainModels.Enums
 @using DomainModels.Dto
@@ -64,7 +64,7 @@
                         <div>
                             <label>Check-in</label>
                             @* TODO:    connect component DatePicker із DisabledDates from BlazorBootstrap *@
-                            <InputDate class="input" @bind-Value="Vm.CheckIn" @onchange="OnDatesChanged" />
+                       @*      <InputDate class="input" @bind-Value="Vm.CheckIn" @onchange="OnDatesChanged" />
                             <ValidationMessage For="@(() => Vm.CheckIn)" />
                         </div>
 
@@ -129,3 +129,4 @@
         }
     </div>
 </div>
+ *@ 
