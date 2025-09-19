@@ -1,11 +1,13 @@
 ﻿using System.Net;
 using System.DirectoryServices.Protocols;
+using DomainModels.Enums;
 using System.Text.RegularExpressions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto.Prng;
+using DomainModels.Models;
 
 namespace API.Services
 {
@@ -71,6 +73,8 @@ namespace API.Services
             var userInfo = await SearchUserInADAsync(connection, username);
             if (userInfo == null)
                 return null;
+
+            userInfo.Role = MapADGroupToRole(userInfo.Groups);
 
             // Test users credentials
             var userCredentials = new NetworkCredential(userInfo.SamAccountName, password, _domain);
@@ -189,6 +193,26 @@ namespace API.Services
             return Groups;
         }
 
+        private RoleEnum MapADGroupToRole(List<string> adGroups)
+        {
+            //Map AD groups to our RoleEnum
+            Dictionary<string, RoleEnum> GroupToRoleMap = new(StringComparer.OrdinalIgnoreCase) //Case sensitive
+            {
+                {"Admin", RoleEnum.Admin},
+                {"receptionist", RoleEnum.Reception},
+                {"cleaningStaff", RoleEnum.CleaningStaff}
+            };
+
+            return adGroups
+            .Select(group => GroupToRoleMap.GetValueOrDefault(group, RoleEnum.Unknown))
+            .FirstOrDefault(role => role != RoleEnum.Unknown);
+
+            // if (GroupToRoleMap.TryGetValue(group, out var role))
+            // {
+            //     return role;
+            // }
+        }
+
 
         //-----------------------------------------------------------------------------//
         // Models for AD objects
@@ -235,6 +259,7 @@ namespace API.Services
             public string? Title { get; set; } = string.Empty;
             public List<string> MemberOf { get; set; } = new List<string>();
             public string? DistinguishedName { get; set; } = string.Empty;
+            public RoleEnum Role { get; set; } = RoleEnum.Unknown;
             
             //List of AD groups the user belongs to
             public List<string> Groups { get; set; } = new List<string>();

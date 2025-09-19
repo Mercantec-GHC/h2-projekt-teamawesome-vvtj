@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using DomainModels.Models;
 
 namespace API.Services
 {
@@ -33,9 +34,11 @@ namespace API.Services
                 new Claim("adDepartment", adUser.Department),
                 //new Claim("adMemberOf", adUser.MemberOf)
             };
-
-            // claims.Add(new Claim(ClaimTypes.Role, role));
-
+            if (adUser.Role != null)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, adUser.Role.ToString()));
+            }
+            
             //Create token descriptor that defines the tokens content and security
             var tokenDescriptor = new SecurityTokenDescriptor
             {
