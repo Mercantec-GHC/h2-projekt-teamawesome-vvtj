@@ -14,7 +14,6 @@ import {
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -89,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: House,
         items: [
           {
-            title: "Availability",
+            title: "Room list",
             url: "/rooms",
           },
           {
@@ -99,7 +98,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
       {
-        title: "Staff",
+        title: "Hotels",
+        url: "#",
+        icon: Hotel,
+        items: [
+          {
+            title: "All Hotels",
+            url: "#",
+          },
+        ],
+      },
+      {
+        title: "Operational activities",
         url: "#",
         icon: IdCardLanyard,
         items: [
@@ -140,7 +150,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
