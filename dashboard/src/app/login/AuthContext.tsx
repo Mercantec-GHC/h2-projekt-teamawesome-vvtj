@@ -29,7 +29,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
     })
       .then((res) => {
-        if (!res.ok) throw new Error("Не вдалось отримати користувача")
+        if (!res.ok) throw new Error("Failed to get user")
         return res.json()
       })
       .then((data: UserDTO) => setUser(data))
