@@ -19,6 +19,7 @@ namespace DomainModels.Dto
 
     public class BookingResponseDto
     {
+        public DateTime? UpdatedAt { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string HotelName { get; set; }
         public RoomTypeEnum RoomType { get; set; }

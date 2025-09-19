@@ -1,0 +1,54 @@
+﻿@using BlazorBootstrap
+
+<AuthorizeView>
+	<NotAuthorized>
+		<div class="btn-wrapper">
+			<Button @onclick="HandleLogin"
+					Class="p-2 fs-5"
+					Type="ButtonType.Button">
+				<span class="login">Login</span>
+			</Button>
+		</div>
+	</NotAuthorized>
+	<Authorized>
+		<div>
+			<Dropdown Color="DropdownColor.None">
+				<DropdownToggleButton Class="text-white btn-wrapper">
+					<Icon Class="bi bi-person-check me-2" />
+					Menu
+				</DropdownToggleButton>
+				<DropdownMenu>
+					<DropdownItem To="/user/account"
+								  Class="text-dark"
+								  Type="DropdownItemType.Link">
+						<Icon Class="bi bi-person-gear custom-color me-3" />
+						Account
+					</DropdownItem>
+					<DropdownItem To="/user/profile"
+								  Class="text-dark"
+								  Type="DropdownItemType.Link">
+						<Icon Class="bi bi-person-vcard custom-color me-3" />
+						Profile
+					</DropdownItem>
+					<DropdownItem To="/user/bookings"
+								  Class="text-dark"
+								  Type="DropdownItemType.Link">
+						<Icon Class="bi bi-suitcase custom-color me-3" />
+						Bookings
+					</DropdownItem>
+					<DropdownItem To="/user/security"
+								  Class="text-dark"
+								  Type="DropdownItemType.Link">
+						<Icon Class="bi bi-shield-lock custom-color me-3" />
+						Security settings
+					</DropdownItem>
+					<DropdownDivider>Dropdown header</DropdownDivider>
+					<DropdownItem Class="text-danger justify-content-center"
+								  Type="DropdownItemType.Button" @onclick="HandleLogout">
+						Log out
+					</DropdownItem>
+				</DropdownMenu>
+			</Dropdown>
+		</div>
+	</Authorized>
+</AuthorizeView>

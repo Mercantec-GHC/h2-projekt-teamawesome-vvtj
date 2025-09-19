@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using API.Data;
@@ -22,12 +23,14 @@ public class AuthService : IAuthService
 	private readonly AppDBContext _context;
 	private readonly UserMapping _userMapping = new();
 	private readonly ILogger<AuthService> _logger;
+	private readonly IJWTService _jwtService;
 
-	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger)
+	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService)
 	{
 		_configuration = configuration;
 		_context = context;
 		_logger = logger;
+		_jwtService = jwtService;
 	}
 
 	/// <summary>
@@ -112,37 +115,9 @@ public class AuthService : IAuthService
 		user.LastLogin = DateTime.UtcNow.AddHours(2);
 		await _context.SaveChangesAsync();
 
-		string token = CreateToken(user);
+		string token = _jwtService.CreateToken(user);
 		return token;
 	}
-	private string CreateToken(User user)
-	{
-		var tokenHandler = new JwtSecurityTokenHandler();
-		var claims = new List<Claim>
-		{
-			new Claim(ClaimTypes.Email, user.Email),
-			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-			new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString())
-		};
-
-		string secretKey = _configuration["AppSettings:Token"]!;
-		var key = new SymmetricSecurityKey(
-			Encoding.UTF8.GetBytes(secretKey));
-
-		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-		var tokenDescriptor = new SecurityTokenDescriptor
-		{
-			Subject = new ClaimsIdentity(claims),
-			Issuer = _configuration.GetValue<string>("AppSettings:Issuer"),
-			Audience = _configuration.GetValue<string>("AppSettings:Audience"),
-			Expires = DateTime.UtcNow.AddHours(3), 
-			SigningCredentials = creds
-		};
-
-		var token = tokenHandler.CreateToken(tokenDescriptor);
-		return tokenHandler.WriteToken(token);
-	}
-
 	/// <summary>
 	/// Changes the password for a user.
 	/// </summary>
