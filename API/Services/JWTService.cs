@@ -61,12 +61,15 @@ public class JWTService : IJWTService
 		var tokenHandler = new JwtSecurityTokenHandler();
 		var secretKey = _configuration["AppSettings:Token"]!;
 		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+		var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 		var claimsIdentity = new ClaimsIdentity(claims);
 		var tokenDescriptor = new SecurityTokenDescriptor
 		{
 			Subject = claimsIdentity,
+			Issuer = _configuration.GetValue<string>("AppSettings:Issuer"),
+			Audience = _configuration.GetValue<string>("AppSettings:Audience"),
 			Expires = DateTime.UtcNow.AddHours(1),
-			SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature)
+			SigningCredentials = creds
 		};
 		var token = tokenHandler.CreateToken(tokenDescriptor);
 		return tokenHandler.WriteToken(token);
