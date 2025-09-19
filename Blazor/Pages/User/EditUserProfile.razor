@@ -1,0 +1,74 @@
+﻿@page "/user/profile/edit"
+@using BlazorBootstrap
+@attribute [Authorize]
+<PageTitle>Edit Info</PageTitle>
+
+@* <Preload LoadingText="Loading..." /> *@
+
+@if (_userProfileVM != null)
+{
+	<div class="container">
+		<div class="col-md-8">
+			<Card>
+				<CardBody>
+					<CardTitle Class="d-flex justify-content-center mt-3">
+						<h3>Edit your profile information, @_userProfileVM?.FirstName @_userProfileVM?.LastName</h3>
+					</CardTitle>
+					<CardText Class="d-flex justify-content-center my-3">
+						<h5>Update your personal information below and click "Save Changes" to apply the updates.</h5>
+					</CardText>
+					<hr />
+					<EditForm Model="@EditInfoForm" OnValidSubmit="HandleOnValidSubmit">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.FirstName" placeholder="First Name" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.LastName" placeholder="Last Name" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputDate @bind-Value="EditInfoForm.DateOfBirth" placeholder="Date of Birth" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.Address" placeholder="Address" class="form-control" />
+
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.City" placeholder="City" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.PostalCode" placeholder="Postal Code" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.Country" placeholder="Country" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="EditInfoForm.PhoneNumber" placeholder="Phone Number" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputTextArea @bind-Value="EditInfoForm.SpecialRequests" placeholder="Special Requests" class="form-control" rows="4" />
+						</div>
+						<hr />
+						<div class="mb-3 text-muted">
+							Last updated: @_userProfileVM?.LastUpdated
+						</div>
+
+						<Button type="ButtonType.Submit" Class="btn btn-primary">
+							Save Changes
+						</Button>
+						<Button type="ButtonType.Button" Class="btn" Outline="true">
+							Cancel
+						</Button>
+					</EditForm>
+				</CardBody>
+			</Card>
+		</div>
+	</div>
+}
+else
+{
+	<Preload LoadingText="Loading..." />
+}
+
