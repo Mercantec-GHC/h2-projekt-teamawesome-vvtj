@@ -1,0 +1,97 @@
+@using BootstrapBlazor.Components
+@page "/rooms"
+
+<PageTitle>Rooms</PageTitle>
+
+<div class="page-wrapper">
+    <div class="container mt-4">
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 ">
+
+            <BlazorBootstrap.Modal @ref="modal" title="Modal title" IsVerticallyCentered="true">
+                <button @onclick="OnShowModalClick">
+                    <div class="col">
+                        <div class="card h-100 ">
+                            <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Standard room</h5>
+                                <p class="card-text">This card has supporting text below as a natural lead-in to
+                                    additional
+                                    content.
+                                </p>
+                                <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+            </BlazorBootstrap.Modal>
+
+
+            <div class="col">
+                <div class="card h-100">
+                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Single room</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                            content.
+                        </p>
+                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100">
+                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Family room</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                            content.
+                        </p>
+                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100">
+                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Royal Room</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                            content.
+                        </p>
+                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card h-100">
+                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Penthouse</h5>
+                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                            content.
+                        </p>
+                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private BlazorBootstrap.Modal modal = default!;
+
+    private async Task OnShowModalClick()
+    {
+        await modal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal.HideAsync();
+    }
+}
