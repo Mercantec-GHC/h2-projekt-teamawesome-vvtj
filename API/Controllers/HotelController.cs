@@ -12,9 +12,6 @@ using Azure;
 using DomainModels.Mapping;
 
 
-
-
-
 [ApiController]
 [Route("api/[controller]")]
 public class HotelController : ControllerBase

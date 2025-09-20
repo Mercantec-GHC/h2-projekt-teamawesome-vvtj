@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.DirectoryServices.Protocols;
+using DomainModels.Enums;
 using API.Interfaces;
 
 namespace API.Services
@@ -225,13 +226,7 @@ namespace API.Services
             return adGroups
             .Select(group => GroupToRoleMap.GetValueOrDefault(group, RoleEnum.Unknown))
             .FirstOrDefault(role => role != RoleEnum.Unknown);
-
-            // if (GroupToRoleMap.TryGetValue(group, out var role))
-            // {
-            //     return role;
-            // }
         }
-
 
 		//-----------------------------------------------------------------------------//
 		// Models for AD objects
