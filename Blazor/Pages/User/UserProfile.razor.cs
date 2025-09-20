@@ -17,17 +17,17 @@ public partial class UserProfile : ComponentBase
 	protected override async Task OnInitializedAsync()
 	{
 		PreloadService.Show();
-		var authState = await _authState.GetAuthenticationStateAsync();
 
+		var authState = await _authState.GetAuthenticationStateAsync();
 		if (authState.User.Identity?.IsAuthenticated ?? false)
 		{
 			var user = await _apiService.GetCurrentUserInfoAsync();
-
 			if (user != null)
 			{
-				_userProfileVM = user.ToViewModel();
+				_userProfileVM = user.ToUserInfoViewModel();
 			}
 		}
+
 		PreloadService.Hide();
 	}
 }
