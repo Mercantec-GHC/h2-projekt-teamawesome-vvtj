@@ -11,12 +11,10 @@ public partial class EditUserProfile : ComponentBase
 	[Inject]
 	private APIService _apiService { get; set; } = default!;
 	[Inject]
-	private CustomAuthStateProvider _authState { get; set; } = default!;
-	[Inject]
 	protected PreloadService PreloadService { get; set; } = default!;
-	private CurrentUserProfileViewModel? _userProfileVM { get; set; } = new();
-	[SupplyParameterFromForm(FormName = "EditInfoForm")]
-	CurrentUserProfileViewModel EditInfoForm { get; set; } = new();
+	[Inject]
+	private NavigationManager _navigation {  get; set; } = default!;
+	private CurrentUserProfileViewModel? _editInfoForm { get; set; } = new();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -25,33 +23,34 @@ public partial class EditUserProfile : ComponentBase
 		PreloadService.Hide();
 		if (currentUser != null)
 		{
-			_userProfileVM = currentUser.ToViewModel();
-			EditInfoForm = currentUser.ToViewModel();
+			_editInfoForm = currentUser.ToUserInfoViewModel();
 		}
 	}
 
 	private async Task HandleOnValidSubmit()
 	{
-		if (EditInfoForm != null)
+		if (_editInfoForm != null)
 		{
-			var userInfoPutDto = new UserInfoPutDto();
-			EditInfoForm.ToUserInfoPutDto(EditInfoForm, userInfoPutDto);
+			var userInfoPutDto = _editInfoForm.ToUserInfoPutDto();
 
 			PreloadService.Show();
 			var success = await _apiService.UpdateUserInfoAsync(userInfoPutDto);
-
 			PreloadService.Hide();
 
-			StateHasChanged();
-			if (success)
+			if (success != null)
 			{
 				var updatedUser = await _apiService.GetCurrentUserInfoAsync();
 				if (updatedUser != null)
 				{
-					EditInfoForm = updatedUser.ToViewModel();
+					_navigation.NavigateTo("/user/profile", forceLoad: true);
 				}
 			}
 
 		}
+	}
+
+	private void CancelEdit()
+	{
+		_navigation.NavigateTo("/user/profile");
 	}
 }

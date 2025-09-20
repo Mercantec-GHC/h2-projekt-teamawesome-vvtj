@@ -33,22 +33,43 @@ public partial class APIService
 		}
 	}
 
-	public async Task<bool> UpdateUserInfoAsync(UserInfoPutDto userInfo)
+	public async Task<UserInfoGetDto?> UpdateUserInfoAsync(UserInfoPutDto userInfo)
 	{
 		try
 		{
-			var response = await PostAsJsonAsync("api/UserInfo/update-my-profile", userInfo);
+			var response = await PutAsJsonAsync("api/UserInfo/update-my-profile", userInfo);
 			if (response.IsSuccessStatusCode)
 			{
-				return true;
+				var userInfoResponse = await response.Content.ReadFromJsonAsync<UserInfoGetDto>();
+				return userInfoResponse;
 			}
 			_logger.LogError("Failed to update user profile. Status: {StatusCode}", response.StatusCode);
-			return false;
+			return null;
 		}
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Unexpected error updating user profile.");
-			return false;
+			return null;
+		}
+	}
+
+	public async Task<UserInfoGetDto?> CreateUserInfoAsync(UserInfoPostDto userInfo)
+	{
+		try
+		{
+			var response = await PostAsJsonAsync("api/UserInfo/create-my-profile", userInfo);
+			if (response.IsSuccessStatusCode)
+			{
+				var userInfoResponse = await response.Content.ReadFromJsonAsync<UserInfoGetDto>();
+				return userInfoResponse;
+			}
+			_logger.LogError("Failed to create user profile. Status: {StatusCode}", response.StatusCode);
+			return null;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Unexpected error creating user profile.");
+			return null;
 		}
 	}
 }

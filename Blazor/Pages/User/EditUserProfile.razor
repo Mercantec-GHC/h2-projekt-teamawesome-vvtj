@@ -1,74 +1,91 @@
 ﻿@page "/user/profile/edit"
 @using BlazorBootstrap
 @attribute [Authorize]
-<PageTitle>Edit Info</PageTitle>
 
-@* <Preload LoadingText="Loading..." /> *@
+<Preload LoadingText="Loading..." />
 
-@if (_userProfileVM != null)
+@if (_editInfoForm == null)
 {
+
+	<PageTitle>Create Profile</PageTitle>
 	<div class="container">
 		<div class="col-md-8">
 			<Card>
+				<CardHeader Class="align-self-center py-4">
+					Profile Details Not Found
+				</CardHeader>
 				<CardBody>
 					<CardTitle Class="d-flex justify-content-center mt-3">
-						<h3>Edit your profile information, @_userProfileVM?.FirstName @_userProfileVM?.LastName</h3>
+						<h3>You don’t have a profile yet. Please create one to continue.</h3>
 					</CardTitle>
-					<CardText Class="d-flex justify-content-center my-3">
-						<h5>Update your personal information below and click "Save Changes" to apply the updates.</h5>
-					</CardText>
-					<hr />
-					<EditForm Model="@EditInfoForm" OnValidSubmit="HandleOnValidSubmit">
-						<DataAnnotationsValidator />
-						<ValidationSummary />
-
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.FirstName" placeholder="First Name" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.LastName" placeholder="Last Name" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputDate @bind-Value="EditInfoForm.DateOfBirth" placeholder="Date of Birth" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.Address" placeholder="Address" class="form-control" />
-
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.City" placeholder="City" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.PostalCode" placeholder="Postal Code" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.Country" placeholder="Country" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputText @bind-Value="EditInfoForm.PhoneNumber" placeholder="Phone Number" class="form-control" />
-						</div>
-						<div class="mb-1">
-							<InputTextArea @bind-Value="EditInfoForm.SpecialRequests" placeholder="Special Requests" class="form-control" rows="4" />
-						</div>
-						<hr />
-						<div class="mb-3 text-muted">
-							Last updated: @_userProfileVM?.LastUpdated
-						</div>
-
-						<Button type="ButtonType.Submit" Class="btn btn-primary">
-							Save Changes
-						</Button>
-						<Button type="ButtonType.Button" Class="btn" Outline="true">
-							Cancel
-						</Button>
-					</EditForm>
 				</CardBody>
+				<div class="d-flex justify-content-center my-3">
+					<Button To="/user/profile/create" Class="btn-custom main" Type="ButtonType.Link">
+						Create Profile
+					</Button>
+				</div>
 			</Card>
 		</div>
 	</div>
 }
 else
 {
-	<Preload LoadingText="Loading..." />
-}
+	<PageTitle>Edit Info</PageTitle>
 
+	<div class="container">
+		<div class="col-md-8">
+			<Card>
+				<CardBody>
+					<CardTitle Class="d-flex justify-content-center mt-3">
+						<h3>Edit your profile information, @_editInfoForm?.FirstName @_editInfoForm?.LastName</h3>
+					</CardTitle>
+					<CardText Class="d-flex justify-content-center my-3">
+						<h5>Update your personal information below and click "Save Changes" to apply the updates.</h5>
+					</CardText>
+					<hr />
+					<EditForm Model="@_editInfoForm" OnValidSubmit="HandleOnValidSubmit">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.FirstName" placeholder="First Name" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.LastName" placeholder="Last Name" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputDate @bind-Value="_editInfoForm.DateOfBirth" placeholder="Date of Birth" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.Address" placeholder="Address" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.City" placeholder="City" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.PostalCode" placeholder="Postal Code" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.Country" placeholder="Country" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputText @bind-Value="_editInfoForm.PhoneNumber" placeholder="Phone Number" class="form-control" />
+						</div>
+						<div class="mb-1">
+							<InputTextArea @bind-Value="_editInfoForm.SpecialRequests" placeholder="Special Requests" class="form-control" rows="4" />
+						</div>
+
+						<div class="d-flex flex-column flex-sm-row gap-3">
+						<Button type="ButtonType.Submit" Class="btn btn-primary">
+							Save Changes
+						</Button>
+							<Button Type="ButtonType.Button" Class="btn btn-secondary" @onclick="CancelEdit">
+							Cancel
+						</Button>
+						</div>
+					</EditForm>
+				</CardBody>
+			</Card>
+		</div>
+	</div>
+}
