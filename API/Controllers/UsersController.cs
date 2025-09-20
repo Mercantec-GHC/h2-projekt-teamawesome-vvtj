@@ -2,12 +2,8 @@
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
-using DomainModels.Dto.UserProfileDto;
-using DomainModels.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
 
 namespace API.Controllers;
 

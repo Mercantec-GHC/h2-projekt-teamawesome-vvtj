@@ -21,6 +21,7 @@ public class Program
 		builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
 			provider.GetRequiredService<CustomAuthStateProvider>());
 		builder.Services.AddScoped<IAuthService, AuthService>();
+		builder.Services.AddScoped<PreloadService>();
 
 		builder.Services.AddAuthorizationCore();
 		builder.Services.AddBlazoredLocalStorage();
