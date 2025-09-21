@@ -14,7 +14,7 @@ namespace Blazor.Services
 			_logger = logger;
 		}
 
-		public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T body)
+    public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T body)
 		{
 			try
 			{
@@ -27,18 +27,6 @@ namespace Blazor.Services
 			}
 		}
 
-		public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T body)
-		{
-			try
-			{
-				return await _httpClient.PutAsJsonAsync(url, body);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "PUT request failed: {Url}", url);
-				throw;
-			}
-		}
 		public async Task<HttpResponseMessage> GetAsync(string url)
 		{
 			try
