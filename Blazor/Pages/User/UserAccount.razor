@@ -18,14 +18,14 @@ else
 		<AuthorizeView>
 			<Authorized>
 				<Card>
-					<CardHeader Class="align-self-center py-4">
+					<CardHeader Class="text-center py-4">
 						Account Details
 					</CardHeader>
 					<CardBody>
-						<CardTitle Class="d-flex justify-content-center mt-3">
+						<CardTitle Class="text-center mt-3">
 							<h3>Welcome to your account page, @_currentUserVM?.Username</h3>
 						</CardTitle>
-						<CardText Class="d-flex justify-content-center my-3">
+						<CardText Class="text-center my-3">
 							<h5>Here you can manage your account settings and view your activity.</h5>
 						</CardText>
 					</CardBody>
@@ -36,7 +36,7 @@ else
 						<li class="list-group-item"><div class="item-name">Account created: </div>@_currentUserVM?.CreatedAtFormated</li>
 					</ul>
 					<CardBody>
-						<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
+						<div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-3 gap-md-5">
 							<Button To="/user/profile" Class="btn-custom profile" Type="ButtonType.Link">Go to profile</Button>
 							<Button To="#" Class="btn-custom main" Type="ButtonType.Link">Go to main</Button>
 						</div>
