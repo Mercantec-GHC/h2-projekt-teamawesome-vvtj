@@ -41,7 +41,7 @@ public static class CurrentUserProfileViewModelExtentions
 		};
 	}
 
-	public static UserInfoPostDto ToUserInfoPostDto(this CurrentUserProfileViewModel vm, int userId)
+	public static UserInfoPostDto ToUserInfoPostDto(this CurrentUserProfileViewModel vm)
 	{
 		return new UserInfoPostDto
 		{

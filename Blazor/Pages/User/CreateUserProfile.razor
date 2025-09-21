@@ -1,0 +1,116 @@
+﻿@page "/user/profile/create"
+@using BlazorBootstrap
+@attribute [Authorize]
+
+<PageTitle>Create Profile</PageTitle>
+
+@if (isLoading)
+{
+	<Preload LoadingText="Loading the card..." />
+}
+
+else
+{
+	<div class="container">
+		<div class="col-md-8">
+			<Card>
+				<CardHeader Class="py-3">Create Your Profile</CardHeader>
+				<CardBody>
+					<CardTitle Class="d-flex justify-content-center mt-3">
+						<h5>Please fill out the form below. Some of the field are required and marked with *.</h5>
+					</CardTitle>
+					<hr />
+					@if (!string.IsNullOrEmpty(errorMessage))
+					{
+						<div class="alert alert-danger">@errorMessage</div>
+					}
+					@if (!string.IsNullOrEmpty(successMessage))
+					{
+						<div class="alert alert-success">@successMessage</div>
+					}
+
+					<EditForm Model="@_createInfoForm" OnValidSubmit="HandleSubmit">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						<div class="floating-label">
+							<label for="input-field-first-name">First Name * </label>
+							<InputText @bind-Value="_createInfoForm.FirstName"
+									   placeholder="First Name"
+									   class="form-control"
+									   id="input-field-first-name" />
+						</div>
+
+						<div class="floating-label">
+							<label for="input-last-first-name" >Last Name * </label>
+							<InputText @bind-Value="_createInfoForm.LastName"
+									   placeholder="Last Name"
+									   class="form-control"
+									   id="input-field-last-name" />
+						</div>
+
+						<div class="floating-label">
+							<label for="input-field-date-of-birth" >Date of Birth * </label>
+							<InputDate @bind-Value="_createInfoForm.DateOfBirth"
+									   placeholder="Date of Birth"
+									   class="form-control"
+									   id="input-field-date-of-birth" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-address" >Address * </label>
+							<InputText @bind-Value="_createInfoForm.Address"
+									   placeholder="Address"
+									   class="form-control"
+									   id="input-field-address" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-city" >City</label>
+							<InputText @bind-Value="_createInfoForm.City"
+									   placeholder="City"
+									   class="form-control"
+									   id="input-field-city" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-postal-code" >Postal Code *</label>
+							<InputText @bind-Value="_createInfoForm.PostalCode"
+									   placeholder="Postal Code"
+									   class="form-control"
+									   id="input-field-postal-code" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-country" >Country</label>
+							<InputText @bind-Value="_createInfoForm.Country"
+									   placeholder="Country"
+									   class="form-control"
+									   id="input-field-country" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-phone-number" >Phone Number *</label>
+							<InputText @bind-Value="_createInfoForm.PhoneNumber"
+									   placeholder="Phone Number"
+									   class="form-control"
+									   id="input-field-phone-number" />
+						</div>
+						<div class="floating-label">
+							<label for="input-field-special-request" >Special Requests</label>
+							<InputTextArea @bind-Value="_createInfoForm.SpecialRequests"
+										   placeholder="Here you can let us know if there is anything extra we can do for you, so you enjoy your stay at our hotels."
+										   class="form-control"
+										   rows="4"
+										   id="input-field-special-request" />
+						</div>
+
+						<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
+							<Button type="ButtonType.Submit" Class="btn btn-custom">
+								Save Changes
+							</Button>
+							<Button Type="ButtonType.Button" Class="btn btn-outline" @onclick="CancelCreate">
+								Cancel
+							</Button>
+						</div>
+					</EditForm>
+				</CardBody>
+			</Card>
+		</div>
+	</div>
+}
