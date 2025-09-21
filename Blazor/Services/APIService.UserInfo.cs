@@ -32,23 +32,4 @@ public partial class APIService
 			return null;
 		}
 	}
-
-	public async Task<bool> UpdateUserInfoAsync(UserInfoPutDto userInfo)
-	{
-		try
-		{
-			var response = await PostAsJsonAsync("api/UserInfo/update-my-profile", userInfo);
-			if (response.IsSuccessStatusCode)
-			{
-				return true;
-			}
-			_logger.LogError("Failed to update user profile. Status: {StatusCode}", response.StatusCode);
-			return false;
-		}
-		catch (Exception ex)
-		{
-			_logger.LogError(ex, "Unexpected error updating user profile.");
-			return false;
-		}
-	}
 }
