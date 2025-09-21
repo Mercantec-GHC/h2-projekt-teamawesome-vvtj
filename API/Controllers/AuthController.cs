@@ -1,4 +1,5 @@
-﻿using API.Data;
+﻿using System.Security.Claims;
+using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
 using Microsoft.AspNetCore.Authorization;
@@ -130,7 +131,7 @@ public class AuthController : ControllerBase
 				return BadRequest("New password cannot be empty.");
 
 			var result = await _authService.ChangeUserPasswordAsync(email, request.NewPassword);
-			
+
 			if (!result)
 				return NotFound("User not found or failed to update password.");
 
@@ -143,6 +144,33 @@ public class AuthController : ControllerBase
 		{
 			_logger.LogError(ex, "Error changing password for user with email {Email}", email);
 			return StatusCode(500, "An error occurred while retrieving the user.");
-		}	
+		}
+	}
+
+	[Authorize]
+	[HttpPost("change-own-password")]
+	public async Task<IActionResult> ChangeOwnPassword([FromBody] ChangePasswordDto changePassword)
+	{
+		try
+		{
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			if (userId == null)
+				return Unauthorized("User ID claim not found.");
+
+			if (string.IsNullOrWhiteSpace(changePassword.NewPassword)
+				|| string.IsNullOrWhiteSpace(changePassword.ConfirmPassword))
+				return BadRequest("New password and confirmation cannot be empty.");
+
+			var result = await _authService.ChangeOwnPasswordAsync(userId, changePassword.NewPassword, changePassword.ConfirmPassword);
+			
+			if (!result)
+				return BadRequest("Failed to change password. Please ensure your current password is correct.");
+			return Ok("Password changed successfully.");
+		}
+		catch
+		{
+			return StatusCode(500, "An error occurred while changing the password.");
+		}
 	}
 }
