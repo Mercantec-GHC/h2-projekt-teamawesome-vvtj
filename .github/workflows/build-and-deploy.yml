@@ -102,4 +102,4 @@ jobs:
         with:
           app-name: ${{ env.BLAZOR_AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_BLAZOR_PUBLISH_PROFILE }}
-          package: ${{ env.BLAZOR_PUBLISH_PATH }}/wwwroot
+          package: ${{ env.BLAZOR_PUBLISH_PATH }}
