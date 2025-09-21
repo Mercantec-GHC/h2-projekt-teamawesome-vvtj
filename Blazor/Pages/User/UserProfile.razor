@@ -3,26 +3,42 @@
 @attribute [Authorize]
 
 <Preload LoadingText="Loading..." />
-
-@if (_userProfileVM == null)
+@if (_userProfileVM == null || _userProfileVM.FirstName == null || _userProfileVM.LastName == null)
 {
-	<PageTitle>Create Profile</PageTitle>
+	<PageTitle>Profile</PageTitle>
 	<div class="container">
 		<div class="col-md-8">
 			<Card>
 				<CardHeader Class="align-self-center py-4">
-					Profile Details Not Found
+					Profile Details
 				</CardHeader>
 				<CardBody>
 					<CardTitle Class="d-flex justify-content-center mt-3">
-						<h3>You don’t have a profile yet. Please create one to continue.</h3>
+						<h3>Welcome to your profile page, @_userProfileVM?.FirstName @_userProfileVM?.LastName</h3>
 					</CardTitle>
+					<CardText Class="d-flex justify-content-center my-3">
+						<h5>Here you can see and manage your personal information. If you want to update your information, press here</h5>
+						<Button To="/user/profile/edit" Class="btn-custom main ms-3" Type="ButtonType.Link">Edit profile</Button>
+					</CardText>
 				</CardBody>
-				<div class="d-flex justify-content-center my-3">
-					<Button To="/user/profile/create" Class="btn-custom main" Type="ButtonType.Link">
-						Create Profile
-					</Button>
-				</div>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item"><div class="item-name">First name: </div>@_userProfileVM?.FirstName</li>
+					<li class="list-group-item"><div class="item-name">Last name: </div>@_userProfileVM?.LastName</li>
+					<li class="list-group-item"><div class="item-name">Date of birth: </div>@_userProfileVM?.DateOfBirth</li>
+					<li class="list-group-item"><div class="item-name">Address: </div>@_userProfileVM?.Address</li>
+					<li class="list-group-item"><div class="item-name">City: </div>@_userProfileVM?.City</li>
+					<li class="list-group-item"><div class="item-name">Postal code: </div>@_userProfileVM?.PostalCode</li>
+					<li class="list-group-item"><div class="item-name">Country: </div>@_userProfileVM?.Country</li>
+					<li class="list-group-item"><div class="item-name">Phone number: </div>@_userProfileVM?.PhoneNumber</li>
+					<li class="list-group-item"><div class="item-name">Special requests: </div>@_userProfileVM?.SpecialRequests</li>
+					<li class="list-group-item"><div class="item-name">Last updated: </div>@_userProfileVM?.LastUpdated</li>
+				</ul>
+				<CardBody>
+					<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
+						<Button To="/user/booking" Class="btn-custom booking" Type="ButtonType.Link">Go to bookings</Button>
+						<Button To="#" Class="btn-custom main" Type="ButtonType.Link">Go to main</Button>
+					</div>
+				</CardBody>
 			</Card>
 		</div>
 	</div>
@@ -30,48 +46,6 @@
 else
 {
 	<PageTitle>@_userProfileVM?.FirstName @_userProfileVM?.LastName</PageTitle>
-
-	<div class="container">
-		<div class="col-md-8">
-			<Card>
-				<CardHeader Class="align-self-center py-4">Profile Details</CardHeader>
-				<CardBody>
-					<CardTitle Class="d-flex justify-content-center mt-3">
-						<h3>Welcome to your profile page, @_userProfileVM?.FirstName @_userProfileVM?.LastName</h3>
-					</CardTitle>
-					<CardText Class="d-flex flex-column justify-content-center my-3">
-						<h5>If you want to update your information, click here</h5>
-						<Button To="/user/profile/edit" Class="btn-custom main my-3" Type="ButtonType.Link">
-							Edit Profile
-						</Button>
-						<h5>Here is your current profile details: </h5>
-					</CardText>
-				</CardBody>
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item"><div class="item-name">First name: </div>@_userProfileVM.FirstName</li>
-					<li class="list-group-item"><div class="item-name">Last name: </div>@_userProfileVM.LastName</li>
-					<li class="list-group-item"><div class="item-name">Date of birth: </div>@_userProfileVM.DateOfBirth?.ToString("dd-MM-yyyy")</li>
-					<li class="list-group-item"><div class="item-name">Address: </div>@_userProfileVM.Address</li>
-					<li class="list-group-item"><div class="item-name">City: </div>@_userProfileVM.City</li>
-					<li class="list-group-item"><div class="item-name">Postal code: </div>@_userProfileVM.PostalCode</li>
-					<li class="list-group-item"><div class="item-name">Country: </div>@_userProfileVM.Country</li>
-					<li class="list-group-item"><div class="item-name">Phone number: </div>@_userProfileVM.PhoneNumber</li>
-					<li class="list-group-item"><div class="item-name">Special requests: </div>@_userProfileVM.SpecialRequests</li>
-					<li class="list-group-item"><div class="item-name">Last updated: </div>@_userProfileVM.LastUpdatedFormated</li>
-				</ul>
-				<CardBody>
-					<div class="d-flex flex-column flex-sm-row justify-content-around gap-3 gap-md-5">
-						<Button To="/user/booking" Class="btn-custom booking" Type="ButtonType.Link">
-							Go to bookings
-						</Button>
-						<Button To="/" Class="btn-custom main" Type="ButtonType.Link">
-							Go to main
-						</Button>
-					</div>
-				</CardBody>
-			</Card>
-		</div>
-	</div>
 }
 
 

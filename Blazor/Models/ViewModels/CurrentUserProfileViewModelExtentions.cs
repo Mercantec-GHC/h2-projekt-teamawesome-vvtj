@@ -4,7 +4,7 @@ namespace Blazor.Models.ViewModels;
 
 public static class CurrentUserProfileViewModelExtentions
 {
-	public static CurrentUserProfileViewModel ToUserInfoViewModel(this UserInfoGetDto dto)
+	public static CurrentUserProfileViewModel ToViewModel(this UserInfoGetDto dto)
 	{
 		return new CurrentUserProfileViewModel
 		{
@@ -17,14 +17,14 @@ public static class CurrentUserProfileViewModelExtentions
 			PhoneNumber = dto.PhoneNumber,
 			DateOfBirth = dto.DateOfBirth,
 			SpecialRequests = dto.SpecialRequests,
-			CreatedAtFormated = dto.CreatedAt.ToString("dd-MM-yyyy HH:mm:ss"),
+			CreatedAtFormated = dto.CreatedAt.ToString("dd-mm-yyyy HH:mm:ss"),
 			CreatedAt = dto.CreatedAt,
-			LastUpdatedFormated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
+			LastUpdatedFormated = dto.UpdatedAt?.ToString("dd-mm-yyyy HH:mm:ss"),
 			LastUpdated = dto.UpdatedAt
 		};
 	}
 
-	public static UserInfoPutDto ToUserInfoPutDto(this CurrentUserProfileViewModel vm)
+	public static UserInfoPutDto ToPutDto(this CurrentUserProfileViewModel vm)
 	{
 		return new UserInfoPutDto
 		{
@@ -41,7 +41,7 @@ public static class CurrentUserProfileViewModelExtentions
 		};
 	}
 
-	public static UserInfoPostDto ToUserInfoPostDto(this CurrentUserProfileViewModel vm, int userId)
+	public static UserInfoPostDto UserInfoPostDto(this CurrentUserProfileViewModel vm, int userId)
 	{
 		return new UserInfoPostDto
 		{
