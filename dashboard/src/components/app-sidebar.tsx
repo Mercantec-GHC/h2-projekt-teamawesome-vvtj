@@ -115,7 +115,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "Cleaning",
-            url: "#",
+            url: "/cleaning",
           },
           {
             title: "Team",
