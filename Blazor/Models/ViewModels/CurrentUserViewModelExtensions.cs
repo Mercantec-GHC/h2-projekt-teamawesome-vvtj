@@ -34,7 +34,7 @@ public static class CurrentUserViewModelExtensions
 			DateOfBirth = dto.DateOfBirth,
 			SpecialRequests = dto.SpecialRequests,
 			LastUpdatedFormated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm"),
-			UpdatedAt = dto.UpdatedAt
+			LastUpdated = dto.UpdatedAt
 		};
 	}
 }

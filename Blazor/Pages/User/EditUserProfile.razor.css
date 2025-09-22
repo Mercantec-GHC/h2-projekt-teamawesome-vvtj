@@ -13,6 +13,7 @@
 }
 
 ::deep .card-header {
+    font-size: 4em;
     font-weight: 600;
     color: rgb(57 166 168);
     text-shadow: 2px 1px 3px #ffff;
