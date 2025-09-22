@@ -156,7 +156,7 @@ namespace API.Services
 			userInfo.Groups = GetGroupsByUser(connection, userInfo.DistinguishedName);
 			userInfo.Role = MapADGroupToRole(userInfo.Groups);
 
-			_logger.LogInformation("Bruger fundet i AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
+			_logger.LogInformation("User found in AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
 				userInfo.SamAccountName, userInfo.Email, userInfo.Groups.Count);
 
 			return userInfo;
@@ -200,7 +200,7 @@ namespace API.Services
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine($"Fejl ved hentning af grupper for {userDN}: {ex.Message}");
+				Console.WriteLine($"Could not find groups for {userDN}: {ex.Message}");
 			}
 			return groups;
 		}
