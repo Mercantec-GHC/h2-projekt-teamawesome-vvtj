@@ -19,4 +19,22 @@ public static class CurrentUserViewModelExtensions
 			UserInfo = dto.UserInfo
 		};
 	}
+
+	public static CurrentUserProfileViewModel ToViewModel(this UserInfoGetDto dto)
+	{
+		return new CurrentUserProfileViewModel
+		{
+			FirstName = dto.FirstName,
+			LastName = dto.LastName,
+			Address = dto.Address,
+			PostalCode = dto.PostalCode,
+			City = dto.City,
+			Country = dto.Country,
+			PhoneNumber = dto.PhoneNumber,
+			DateOfBirth = dto.DateOfBirth,
+			SpecialRequests = dto.SpecialRequests,
+			LastUpdated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm"),
+			UpdatedAt = dto.UpdatedAt
+		};
+	}
 }

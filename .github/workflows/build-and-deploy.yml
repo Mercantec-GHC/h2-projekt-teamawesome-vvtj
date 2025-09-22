@@ -53,8 +53,12 @@ jobs:
           path: ${{ env.API_PUBLISH_PATH }}
 
       # Publish Blazor
+      
+      - name: Clean Blazor publish folder
+        run: rm -rf ${{ env.BLAZOR_PUBLISH_PATH }}/*
+
       - name: Publish Blazor
-        run: dotnet publish ${{ env.BLAZOR_PROJECT_PATH }} --configuration Release --no-restore --no-build --property:PublishDir=${{ env.BLAZOR_PUBLISH_PATH }}
+        run: dotnet publish ${{ env.BLAZOR_PROJECT_PATH }} --configuration Release --output ${{ env.BLAZOR_PUBLISH_PATH }}
 
       - name: Upload Blazor Artifact
         uses: actions/upload-artifact@v4
