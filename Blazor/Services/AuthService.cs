@@ -67,8 +67,8 @@ public class AuthService : IAuthService
 		// Set the token in the HttpClient for future requests
 		_apiService.SetBearerToken(cleanToken);
 
-		// Send a message to all administrators about admin login
-		var message = $"Admin {loginDto.Email} has just logged in. Welcome at working!";
+		// Send a message to admin dashboard to about the login event
+		var message = $"User {loginDto.Email} has just logged in";
 		await _apiService.SendNotificationAsync(message);
 
 		return true;
