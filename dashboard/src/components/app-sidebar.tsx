@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
           {
             title: "Room types",
-            url: "#",
+            url: "/room-types",
           },
         ],
       },
