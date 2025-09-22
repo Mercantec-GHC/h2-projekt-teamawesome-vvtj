@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.DirectoryServices.Protocols;
-using DomainModels.Enums;
 using API.Interfaces;
 
 namespace API.Services
@@ -91,8 +90,6 @@ namespace API.Services
 			if (userInfo == null)
 				return null;
 
-            userInfo.Role = MapADGroupToRole(userInfo.Groups);
-
 			// Test users credentials
 			var userCredentials = new NetworkCredential(userInfo.SamAccountName, password, _domain);
 			using var userConnection = new LdapConnection(new LdapDirectoryIdentifier(_server, _port));
@@ -145,88 +142,32 @@ namespace API.Services
 				_logger.LogInformation("Attribut: {AttrName}, Værdier: {Count}", attrName, entry.Attributes[attrName].Count);
 			}
 
-            //Map attributes to the ADUserInfo model
-            var userInfo = new ADUserInfo
-            {
-                SamAccountName = GetAttributeValue(entry, "sAMAccountName").ToString(),
-                Email = GetAttributeValue(entry, "mail").ToString(),
-                FirstName = GetAttributeValue(entry, "givenName").ToString(),
-                LastName = GetAttributeValue(entry, "sn").ToString(),
-                Title = GetAttributeValue(entry, "title").ToString(),
-                Department = GetAttributeValue(entry, "department").ToString(),
-                MemberOf = GetAttributeValue(entry, "memberOf"),
-                DistinguishedName = GetAttributeValue(entry, "distinguishedName").ToString()
-            };
-            userInfo.Groups = GetGroupsByUser(connection, userInfo.DistinguishedName);
+			//Map attributes to the ADUserInfo model
+			var userInfo = new ADUserInfo
+			{
+				SamAccountName = GetAttributeValue(entry, "sAMAccountName"),
+				Email = GetAttributeValue(entry, "mail"),
+				FirstName = GetAttributeValue(entry, "givenName"),
+				LastName = GetAttributeValue(entry, "sn"),
+			};
 
 			_logger.LogInformation("Bruger fundet i AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
 				userInfo.SamAccountName, userInfo.Email, userInfo.Groups.Count);
 
-            return userInfo;
-        }
-        private List<string> GetAttributeValue(SearchResultEntry entry, string attributeName)
-        {
-            List<string> values = new List<string>();
-            //Checks if an attribute exists and has at least one value
-            if (entry.Attributes[attributeName] != null && entry.Attributes[attributeName].Count > 0)
-            {
-                foreach (var val in entry.Attributes[attributeName])
-                {
-                    values.Add(val.ToString());
-                }
-            }
-            //If not found or emoty, return empty string
-            return values;
-        }
+			return userInfo;
 
-        private List<string> GetGroupsByUser(LdapConnection connection, string? userDN)
-        {
-            List<string> Groups = new List<string>();
-            var groupSearch = new SearchRequest(
-                    $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
-                    $"(member={userDN})",
-                    SearchScope.Subtree,
-                    "cn", "description"
-                );
-            try
-            {
-                var groupResponse = (SearchResponse)connection.SendRequest(groupSearch);
-                if (groupResponse.Entries.Count == 0)
-                    return Groups;
+		}
+		private string GetAttributeValue(SearchResultEntry entry, string attributeName)
+		{
+			//Checks if an attribute exists and has at least one value
+			if (entry.Attributes[attributeName] != null && entry.Attributes[attributeName].Count > 0)
+			{
+				return entry.Attributes[attributeName][0].ToString() ?? string.Empty;
+			}
+			//If not found or emoty, return empty string
+			return string.Empty;
+		}
 
-                foreach (SearchResultEntry entry in groupResponse.Entries)
-                {
-                    if (entry.Attributes.Contains("cn"))
-                    {
-                        var groupName = entry.Attributes["cn"][0]?.ToString();
-                        if (!string.IsNullOrEmpty(groupName))
-                        {
-                            Groups.Add(groupName);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fejl ved hentning af grupper for {userDN}: {ex.Message}");
-            }
-            return Groups;
-        }
-
-        private RoleEnum MapADGroupToRole(List<string> adGroups)
-        {
-            //Map AD groups to our RoleEnum
-            Dictionary<string, RoleEnum> GroupToRoleMap = new(StringComparer.OrdinalIgnoreCase) //Case sensitive
-            {
-                {"Admin", RoleEnum.Admin},
-                {"receptionist", RoleEnum.Reception},
-                {"cleaningStaff", RoleEnum.CleaningStaff}
-            };
-
-            return adGroups
-            .Select(group => GroupToRoleMap.GetValueOrDefault(group, RoleEnum.Unknown))
-            .FirstOrDefault(role => role != RoleEnum.Unknown);
-        }
 
 		//-----------------------------------------------------------------------------//
 		// Models for AD objects
@@ -261,22 +202,17 @@ namespace API.Services
 		}
 
 
-        //Model for the authenticated AD user
-        public class ADUserInfo
-        {
-            public string? SamAccountName { get; set; } = string.Empty;
-            public string? Email { get; set; } = string.Empty;
-            public string? Password { get; set; } = string.Empty;
-            public string? FirstName { get; set; } = string.Empty;
-            public string? LastName { get; set; } = string.Empty;
-            public string? Department { get; set; } = string.Empty;
-            public string? Title { get; set; } = string.Empty;
-            public List<string> MemberOf { get; set; } = new List<string>();
-            public string? DistinguishedName { get; set; } = string.Empty;
-            public RoleEnum Role { get; set; } = RoleEnum.Unknown;
-            
-            //List of AD groups the user belongs to
-            public List<string> Groups { get; set; } = new List<string>();
-        }
-    }
+		//Model for the authenticated AD user
+		public class ADUserInfo
+		{
+			public string SamAccountName { get; set; } = string.Empty;
+			public string Email { get; set; } = string.Empty;
+			public string Password { get; set; } = string.Empty;
+			public string FirstName { get; set; } = string.Empty;
+			public string LastName { get; set; } = string.Empty;
+			public string Department { get; set; } = string.Empty;
+			//List of AD groups the user belongs to
+			public List<string> Groups { get; set; } = new List<string>();
+		}
+	}
 }
