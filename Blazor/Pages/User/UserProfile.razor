@@ -1,35 +1,15 @@
 ﻿@page "/user/profile"
 @using BlazorBootstrap
-@attribute [Authorize]
 
-<Preload LoadingText="Loading..." />
-
-@if (_userProfileVM == null)
+@if (_userProfileVM == null || _userProfileVM.FirstName == null || _userProfileVM.LastName == null)
 {
-	<PageTitle>Create Profile</PageTitle>
-	<div class="container">
-		<div class="col-md-8">
-			<Card>
-				<CardHeader Class="align-self-center py-4">
-					Profile Details Not Found
-				</CardHeader>
-				<CardBody>
-					<CardTitle Class="d-flex justify-content-center mt-3">
-						<h3>You don’t have a profile yet. Please create one to continue.</h3>
-					</CardTitle>
-				</CardBody>
-				<div class="d-flex justify-content-center my-3">
-					<Button To="/user/profile/create" Class="btn-custom main" Type="ButtonType.Link">
-						Create Profile
-					</Button>
-				</div>
-			</Card>
-		</div>
-	</div>
+	<PageTitle>Profile</PageTitle>
 }
 else
 {
 	<PageTitle>@_userProfileVM?.FirstName @_userProfileVM?.LastName</PageTitle>
+}
+<Preload LoadingText="Loading..." />
 
 	<div class="container">
 		<div class="col-md-8">

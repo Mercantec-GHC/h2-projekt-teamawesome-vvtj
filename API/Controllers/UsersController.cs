@@ -114,7 +114,7 @@ public class UsersController : ControllerBase
 	/// </returns>
 	[Authorize]
 	[HttpGet("me")]
-	public async Task<ActionResult<UserDto>> GetCurrentUser()
+	public async Task<ActionResult<UserDtoUnsafe>> GetCurrentUser()
 	{
 		var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

@@ -107,4 +107,19 @@ public class AuthService : IAuthService
 		_authStateProvider.NotifyUserLogout();
 	}
 
+	public async Task <bool> ChangePasswordAsync(string newPassword, string confirmNewPassword)
+	{
+		if (newPassword != confirmNewPassword)
+			return false;
+
+		var changePasswordDto = new ChangePasswordDto
+		{
+			NewPassword = newPassword,
+			ConfirmPassword = confirmNewPassword
+		};
+
+		var response = await _apiService.PostAsJsonAsync("api/Auth/change-own-password", changePasswordDto);
+		return response.IsSuccessStatusCode;
+	}
+
 }

@@ -14,7 +14,7 @@ namespace Blazor.Services
 			_logger = logger;
 		}
 
-		public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T body)
+    public async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T body)
 		{
 			try
 			{
@@ -26,7 +26,6 @@ namespace Blazor.Services
 				throw;
 			}
 		}
-
 		public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T body)
 		{
 			try

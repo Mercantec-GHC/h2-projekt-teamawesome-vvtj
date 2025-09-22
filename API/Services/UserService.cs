@@ -80,7 +80,7 @@ namespace API.Services
 		/// <returns>
 		/// A <see cref="UserDto"/> representing the user if found; otherwise, <c>null</c>.
 		/// </returns>
-		public async Task<UserDto?> GetUserFromTokenAsync(string userId)
+		public async Task<UserDtoUnsafe?> GetUserFromTokenAsync(string userId)
 		{
 			var user = await _context.Users
 							.Include(u => u.UserRole)
@@ -91,7 +91,7 @@ namespace API.Services
 			{
 				return null;
 			}
-			var userDto = _userMapping.ToUserDto(user);
+			var userDto = _userMapping.ToUserDtoUnsafe(user);
 			return userDto;
 
 		}

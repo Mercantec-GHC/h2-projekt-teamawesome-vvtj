@@ -1,7 +1,6 @@
 ﻿using Blazor.Models.ViewModels;
 using Blazor.Services;
 using BlazorBootstrap;
-using DomainModels.Dto.UserProfileDto;
 using Microsoft.AspNetCore.Components;
 
 namespace Blazor.Pages.User;
@@ -13,7 +12,7 @@ public partial class EditUserProfile : ComponentBase
 	[Inject]
 	protected PreloadService PreloadService { get; set; } = default!;
 	[Inject]
-	private NavigationManager _navigation {  get; set; } = default!;
+	private NavigationManager _navigation { get; set; } = default!;
 	private CurrentUserProfileViewModel? _editInfoForm { get; set; } = new();
 
 	protected override async Task OnInitializedAsync()

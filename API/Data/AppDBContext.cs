@@ -17,6 +17,7 @@ public class AppDBContext : DbContext
 	public DbSet<RoomType> RoomTypes { get; set; }
 	public DbSet<Hotel> Hotels { get; set; }
 	public DbSet<NotificationSubscriptions> NotificationSubscriptions { get; set; }
+	public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -34,6 +35,22 @@ public class AppDBContext : DbContext
 				.WithOne(ui => ui.User)
 				.HasForeignKey<UserInfo>(ui => ui.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
+		});
+
+		modelBuilder.Entity<RefreshToken>(entity =>
+		{
+			entity.HasOne(rt => rt.User)
+			.WithMany(u => u.RefreshTokens)
+				.HasForeignKey(rt => rt.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			entity.Property(rt => rt.Device)
+			.HasDefaultValue("Unknown device")
+			.HasMaxLength(200)
+			.IsRequired();
+
+			entity.Property(rt => rt.CreatedByIp)
+			.HasMaxLength(64);
 		});
 
 		modelBuilder.Entity<Role>(entity =>

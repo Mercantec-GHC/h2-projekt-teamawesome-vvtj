@@ -20,7 +20,7 @@ public static class CurrentUserProfileViewModelExtentions
 			CreatedAtFormated = dto.CreatedAt.ToString("dd-MM-yyyy HH:mm:ss"),
 			CreatedAt = dto.CreatedAt,
 			LastUpdatedFormated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
-			LastUpdated = dto.UpdatedAt
+			UpdatedAt = dto.UpdatedAt
 		};
 	}
 

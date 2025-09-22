@@ -22,4 +22,5 @@ public interface IAuthService
 	Task<string?> LoginUserAsync(LoginDto request);
 
 	Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword);
+	Task<bool> ChangeOwnPasswordAsync(string userId, string currentPassword, string newPassword);
 }

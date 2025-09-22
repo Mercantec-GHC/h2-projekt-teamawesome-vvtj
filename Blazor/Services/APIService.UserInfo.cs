@@ -32,7 +32,6 @@ public partial class APIService
 			return null;
 		}
 	}
-
 	public async Task<UserInfoGetDto?> UpdateUserInfoAsync(UserInfoPutDto userInfo)
 	{
 		try

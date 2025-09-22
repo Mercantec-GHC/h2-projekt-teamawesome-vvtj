@@ -5,13 +5,13 @@ namespace DomainModels.Dto.UserProfileDto;
 public class UserInfoGetDto
 {
 	public int UserId { get; set; }
-	[Required, MaxLength(50)]
+	[Required, MaxLength(100)]
 	public string FirstName { get; set; } = "";
-	[Required, MaxLength(80)]
+	[Required, MaxLength(100)]
 	public string LastName { get; set; } = "";
 	[Required, MaxLength(200)]
 	public string Address { get; set; } = "";
-	[Required, MaxLength(20)]
+	[MaxLength(20)]
 	public string? PostalCode { get; set; }
 	[MaxLength(100)]
 	public string? City { get; set; }
