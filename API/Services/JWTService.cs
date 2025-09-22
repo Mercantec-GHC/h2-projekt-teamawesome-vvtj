@@ -47,8 +47,8 @@ public class JWTService : IJWTService
 				new Claim("username", adUser.SamAccountName),
 				new Claim("adUser", "true"), //Indicate that the user is AD-authenticated
                 new Claim("adGroups", string.Join(",", adUser.Groups)),
-				// new Claim("adDistinguishedName", adUser.DistinguishedName),
-				// new Claim("role", adUser.Role.ToString())
+				new Claim("adDistinguishedName", adUser.DistinguishedName),
+				new Claim("role", adUser.Role.ToString())
 		});
 		}
 		catch (Exception ex)
