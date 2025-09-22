@@ -13,6 +13,7 @@ namespace DomainModels.Mapping
             {
                 Id = roomType.Id,
                 TypeofRoom = roomType.TypeofRoom,
+                RoomTypeName = roomType.TypeofRoom.ToString(),
                 MaxCapacity = roomType.MaxCapacity,
                 Description = roomType.Description,
                 HasBalcony = roomType.HasBalcony,

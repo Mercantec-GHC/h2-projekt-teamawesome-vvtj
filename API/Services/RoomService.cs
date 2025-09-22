@@ -23,7 +23,10 @@ namespace API.Services
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
                 RoomType = r.RoomType,
+                RoomTypeName = r.RoomType.TypeofRoom.ToString(),
                 HotelId = r.Hotel.Id,
+                HotelName = r.Hotel.HotelName,
+                RoomNumber = r.RoomNumber,
 
             });
         }
@@ -36,17 +39,28 @@ namespace API.Services
             }
 
             var room = await _context.Rooms.FindAsync(id);
+            if (room == null)
+            {
+                return null;
+            }
+            Console.WriteLine(room.Id);
+            Console.WriteLine(room.IsAvailable);
 
-            RoomsDto getRoom = new RoomsDto
+
+            var getRoom = new RoomsDto
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
                 RoomType = room.RoomType,
+                RoomTypeName = room.RoomType.TypeofRoom.ToString(),
+                HotelName = room.Hotel.HotelName
             };
 
+
+            Console.WriteLine("New Room ID" + getRoom.Id);
+            Console.WriteLine(getRoom.RoomType);
             return getRoom;
         }
 
@@ -69,12 +83,12 @@ namespace API.Services
             var newRoom = new Room
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 RoomNumber = room.RoomNumber,
                 TypeId = type.Id,
                 HotelId = room.HotelId,
+                
             };
             _context.Rooms.Add(newRoom);
             await _context.SaveChangesAsync();
@@ -95,8 +109,9 @@ namespace API.Services
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
                 RoomType = r.RoomType,
+                RoomTypeName = r.RoomType.TypeofRoom.ToString(),
                 HotelName = r.Hotel.HotelName,
-                HotelId = r.HotelId
+                HotelId = r.HotelId,
 
             });
 

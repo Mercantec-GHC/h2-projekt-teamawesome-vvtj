@@ -4,6 +4,7 @@ public class RoomTypeDto
 {
     public int Id { get; set; }
     public required RoomTypeEnum TypeofRoom { get; set; }
+    public string RoomTypeName { get; set; }
     public int MaxCapacity { get; set; }
     public string? Description { get; set; }
     public decimal? PricePerNight { get; set; }
