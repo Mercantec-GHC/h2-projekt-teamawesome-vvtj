@@ -3,7 +3,6 @@
     align-items: center;
     justify-content: center;
     margin-top: 4rem;
-    margin-top: 4rem;
 }
 
 ::deep .card {
@@ -22,22 +21,8 @@
     border-bottom: .5px solid #dee2e6;
 }
 
-h3, h5 {
+h5 {
     color: #204343;
-}
-
-.list-group-item {
-    display: flex;
-    font-size: 1.2em;
-    justify-content: flex-start;
-    background: none;
-    color: #204343;
-    padding: 1em;
-}
-
-.item-name {
-    font-weight: 600;
-    margin: 0 .8em;
 }
 
 ::deep .btn.btn-custom {
@@ -51,21 +36,36 @@ h3, h5 {
     transition: background-image 2s ease-in-out;
 }
 
-    ::deep .btn.btn-custom:hover {
+::deep .btn.btn-outline {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    border-radius: 35px;
+    color: #3a9698;
+    font-weight: 600;
+    border: 2px solid #3a9698;
+    transition: background-image 2s ease-in-out;
+}
+
+    ::deep .btn.btn-custom:hover,
+    ::deep .btn.btn-outline:hover {
         background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
         border: 2px solid rgba(255, 255, 255, .5);
     }
 
-    ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
-        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
-    }
+::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+}
 
-    ::deep .btn.btn-custom.main {
-        color: #204343;
-        font-weight: 600;
-    }
+::deep .btn.btn-custom {
+    color: #204343;
+    font-weight: 600;
+}
 
-    ::deep .btn.btn-custom.profile {
-        color: #ffff;
-        font-weight: 700;
-    }
+.floating-label {
+    position: relative;
+    margin-bottom: 1.5em;
+    left: 8px;
+    font-size: 0.85em;
+    color: #495057;
+}
