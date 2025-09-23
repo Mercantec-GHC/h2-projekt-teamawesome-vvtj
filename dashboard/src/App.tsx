@@ -6,6 +6,7 @@ import { AuthProvider } from './app/login/AuthContext'
 import Rooms from './app/rooms/Room'
 import Bookings from './app/bookings/Bookings'
 import { RoomTypesList } from './app/rooms/RoomTypesList'
+import CleaningPage from './app/operational activities/Cleaning'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="rooms" element={<Rooms />} />
               <Route path="bookings" element={<Bookings />} />
               <Route path='room-types' element={<RoomTypesList />} />
+              <Route path="cleaning" element={<CleaningPage />} />
           </Route>
           <Route path="/login" element={<Login />} />
         </Routes>
