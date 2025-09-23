@@ -60,15 +60,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "#",
         icon: NotebookPen,
         items: [
-          {
-            title: "New Bookings",
-            url: "#",
-          },
           { 
             title: "All Bookings",
              url: "/bookings" 
           },
-          { title: "Calendar", url: "#" },
         ],
       },
       {
