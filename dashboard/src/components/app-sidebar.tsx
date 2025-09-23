@@ -72,17 +72,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
       {
-        title: "Guests",
-        url: "#",
-        icon: User,
-        items: [
-          {
-            title: "List of Guests",
-            url: "#",
-          },
-        ],
-      },
-      {
         title: "Rooms",
         url: "/rooms",
         icon: House,
@@ -104,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "All Hotels",
-            url: "#",
+            url: "/hotels",
           },
         ],
       },
@@ -118,27 +107,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/cleaning",
           },
           {
-            title: "Team",
-            url: "#",
+            title: "Users",
+            url: "/users",
           },
         ],
-      },
-    ],
-    projects: [
-      {
-        name: "Design Engineering",
-        url: "#",
-        icon: Frame,
-      },
-      {
-        name: "Sales & Marketing",
-        url: "#",
-        icon: PieChart,
-      },
-      {
-        name: "Travel",
-        url: "#",
-        icon: Map,
       },
     ],
   }

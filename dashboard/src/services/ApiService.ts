@@ -3,6 +3,7 @@ import type { HotelDto } from "@/types/HotelDTO";
 import type { RoomDto } from "@/types/RoomDTO";
 import type { RoomTypeDto } from "@/types/RoomTypesDTO";
 import type { RoomTypeUpdateDto } from "@/types/RoomTypeUpdateDTO";
+import type { UserDTO } from "@/types/UserDTO";
 
 export const ApiService = {
   getAllRoomsToClean: async (): Promise<RoomToCleanDto[] | null> => {
@@ -80,6 +81,36 @@ export const ApiService = {
       return null;
     }
   },
+    updateUserRole: async (userId: number, newRole: string): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return false;
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/Roles/${userId}/assign-role-to-user?newRole=${newRole}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update user role:", response.status, response.statusText);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      return false;
+    }
+  },
 
    updateRoomType: async (id: number, updatedData: RoomTypeUpdateDto): Promise<boolean> => {
     try {
@@ -110,6 +141,36 @@ export const ApiService = {
     }
   },
 
+   updateHotel: async (updatedData: HotelDto): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return false;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Hotel/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update room type:", response.status, response.statusText);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error updating room type:", error);
+      return false;
+    }
+  },
+
+
   getAllHotels: async (): Promise<HotelDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
@@ -124,6 +185,17 @@ export const ApiService = {
     }
   },
 
-  
-
+  getAllUsers: async (): Promise<UserDTO[] | null> => {
+     try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return null;
+      return res.json();
+    } catch (err) {
+      console.error("Error fetching hotels:", err);
+      return null;
+    }
+  },
 };
