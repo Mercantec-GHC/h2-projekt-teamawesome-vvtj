@@ -1,0 +1,46 @@
+name: React Admin CI/CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  ADMIN_PROJECT_PATH: "Dashboard"        
+  ADMIN_BUILD_PATH: "Dashboard/dist"   
+  ADMIN_AZURE_WEBAPP_NAME: "prod-novahotels-admin-mercantec-tech"
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.ADMIN_PROJECT_PATH }}
+
+      - name: Build React Admin
+        run: npm run build
+        working-directory: ${{ env.ADMIN_PROJECT_PATH }}
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY }}
+          VITE_VAPID_PRIVATE_KEY: ${{ secrets.VITE_VAPID_PRIVATE_KEY }}
+
+      - name: List build folder
+        run: ls -la ${{ env.ADMIN_BUILD_PATH }}
+
+      - name: Deploy Admin to Azure
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.ADMIN_AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_ADMIN_PUBLISH_PROFILE }}
+          package: ${{ env.ADMIN_BUILD_PATH }}
