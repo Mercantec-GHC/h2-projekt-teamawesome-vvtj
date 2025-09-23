@@ -4,6 +4,7 @@ import type { RoomDto } from "@/types/RoomDTO";
 import type { RoomTypeDto } from "@/types/RoomTypesDTO";
 import type { RoomTypeUpdateDto } from "@/types/RoomTypeUpdateDTO";
 import type { UserDTO } from "@/types/UserDTO";
+import type { BookingDto } from "@/types/BookingDTO";
 
 export const ApiService = {
   getAllRoomsToClean: async (): Promise<RoomToCleanDto[] | null> => {
@@ -170,7 +171,56 @@ export const ApiService = {
     }
   },
 
+  updateBookingDates: async (
+      id: number,
+      checkIn: string,
+      checkOut: string,
+      token: string
+    ): Promise<BookingDto | null> => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking?id=${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ checkIn, checkOut }),
+        })
 
+        if (!res.ok) {
+          const errorText = await res.text()
+          console.error("Failed to update booking dates:", errorText)
+          return null
+        }
+
+        const updatedBooking: BookingDto = await res.json()
+        return updatedBooking
+      } catch (error) {
+        console.error("Error updating booking:", error)
+        return null
+      }
+    },
+  deleteBooking: async (id: number, token: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error("Failed to delete booking:", errorText)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error(error)
+      return false
+    }
+  },
   getAllHotels: async (): Promise<HotelDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
