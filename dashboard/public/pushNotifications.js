@@ -21,7 +21,7 @@
         return outputArray;
     }
 
-    window.blazorPushNotifications = {
+    window.PushNotifications = {
         getNotificationPermission: function () {
             return Notification.permission;
         },
