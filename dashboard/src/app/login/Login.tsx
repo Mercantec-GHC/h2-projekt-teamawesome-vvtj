@@ -15,7 +15,8 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState("");
+  const [, setToken] = useState("");
+  
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
