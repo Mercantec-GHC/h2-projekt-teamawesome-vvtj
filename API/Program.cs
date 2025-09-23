@@ -121,7 +121,8 @@ public class Program
                     policy =>
                     {
                         policy
-                            .WithOrigins("https://prod-novahotels-blazor-mercantec-tech.azurewebsites.net")
+                            .WithOrigins("https://prod-novahotels-blazor-mercantec-tech.azurewebsites.net",
+							"https://prod-novahotels-admin-dashboard.azurewebsites.net")
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();
