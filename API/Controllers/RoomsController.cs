@@ -53,13 +53,15 @@ public class RoomsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<RoomsDto>> GetSpecificRoom(int id)
     {
-        if (id == null)
+        try
         {
-            return NotFound();
+            return await _roomService.GetRoomByID(id);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex);
         }
 
-        var room = await _roomService.GetRoomByID(id);
-        return Ok(room);
     }
     /// <summary>
     /// Creates a new room

@@ -14,11 +14,12 @@ namespace API.Services
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
         {
-            var rooms = await _context.Rooms.Include(r => r.RoomType).Include(r => r.Hotel).ToListAsync();
+            var rooms = await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.Hotel).ToListAsync();
             return rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
-                //GuestCount = r.GuestCount,
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
@@ -30,14 +31,17 @@ namespace API.Services
 
         public async Task<RoomsDto> GetRoomByID(int id)
         {
-            if (id == null)
-            {
-                return null;
-            }
+            //if statement and ??
+            if (id == 0)
+                throw new ArgumentException("id cant be 0");
 
-            var room = await _context.Rooms.FindAsync(id);
+            var room = await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.Hotel)
+            .FirstOrDefaultAsync(r => r.Id == id)
+                ?? throw new ArgumentException($"Couldnt find room with id; {id}");
 
-            RoomsDto getRoom = new RoomsDto
+            return new RoomsDto
             {
                 Id = room.Id,
                 //GuestCount = room.GuestCount,
@@ -45,9 +49,11 @@ namespace API.Services
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
                 RoomType = room.RoomType,
+                RoomTypeName = room.RoomType.TypeofRoom.ToString(),
+                HotelName = room.Hotel.HotelName,
+                HotelId = room.HotelId
             };
 
-            return getRoom;
         }
 
         //Use type Room instead of RoomsDto, as we want the new room into the DB
