@@ -2,15 +2,11 @@
 
 import * as React from "react"
 import {
-  Frame,
   Hotel,
   House,
   IdCardLanyard,
   Kanban,
-  Map,
   NotebookPen,
-  PieChart,
-  User,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"

@@ -12,7 +12,6 @@ import {
 import { useAuth } from "../login/AuthContext"
 import type { UserDTO } from "@/types/UserDTO"
 import { ApiService } from "@/services/ApiService"
-import { Button } from "@/components/ui/button"
 
 export function UserList() {
   const { token } = useAuth()
