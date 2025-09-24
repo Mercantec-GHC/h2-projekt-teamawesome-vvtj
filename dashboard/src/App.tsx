@@ -6,6 +6,9 @@ import { AuthProvider } from './app/login/AuthContext'
 import Rooms from './app/rooms/Room'
 import Bookings from './app/bookings/Bookings'
 import { RoomTypesList } from './app/rooms/RoomTypesList'
+import CleaningPage from './app/operational activities/Cleaning'
+import { HotelList } from './app/hotels/HotelsList'
+import {UserList } from './app/operational activities/UserList'
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
               <Route path="rooms" element={<Rooms />} />
               <Route path="bookings" element={<Bookings />} />
               <Route path='room-types' element={<RoomTypesList />} />
+              <Route path="cleaning" element={<CleaningPage />} />
+              <Route path="hotels" element={<HotelList />} />
+              <Route path='users' element={<UserList />} />
           </Route>
           <Route path="/login" element={<Login />} />
         </Routes>

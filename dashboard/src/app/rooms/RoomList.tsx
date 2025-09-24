@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 import { useAuth } from "../login/AuthContext"
 import type { RoomDto } from "@/types/RoomDTO"
+import { ApiService } from "@/services/ApiService";
 
 export function RoomList() {
   const { token } = useAuth()
@@ -19,16 +20,22 @@ export function RoomList() {
   const [hotelFilter, setHotelFilter] = useState<string>("") // State for hotel filter
 
 
-  useEffect(() => {
-    if (!token) return
-    fetch(`${import.meta.env.VITE_API_URL}/api/Rooms`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data: RoomDto[]) => setRooms(data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [token])
+    useEffect(() => {
+    const fetchRooms = async () => {
+      setLoading(true);
+      const roomsData = await ApiService.getAllRooms();
+      if (roomsData) {
+        setRooms(roomsData);
+      }
+      setLoading(false);
+    };
+
+    if (token) {
+      fetchRooms();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   if (loading) return <div>Loading rooms...</div>
   if (!rooms.length) return <div>No rooms found</div>

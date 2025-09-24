@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "../login/AuthContext"
 import type { RoomTypeDto } from "@/types/RoomTypesDTO"
+import { ApiService } from "@/services/ApiService"
 
 export function RoomTypesList() {
   const { token } = useAuth()
@@ -24,16 +25,22 @@ export function RoomTypesList() {
     price: "",
   })
 
-  useEffect(() => {
-    if (!token) return
-    fetch(`${import.meta.env.VITE_API_URL}/api/RoomTypes`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data: RoomTypeDto[]) => setRoomTypes(data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [token])
+   useEffect(() => {
+    const fetchRoomTypes = async () => {
+      setLoading(true);
+      const typesData = await ApiService.getAllRoomTypes();
+      if (typesData) {
+        setRoomTypes(typesData);
+      }
+      setLoading(false);
+    };
+
+    if (token) {
+      fetchRoomTypes();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   if (loading) return <div>Loading room types...</div>
   if (!roomTypes.length) return <div>No room types found</div>
@@ -52,34 +59,29 @@ export function RoomTypesList() {
   }
 
   const saveEdit = async (id: number) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/RoomTypes/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          description: editValues.description,
-          price: editValues.price ? parseFloat(editValues.price) : null,
-        }),
-      })
+  const updatedData = {
+    description: editValues.description,
+    price: editValues.price ? parseFloat(editValues.price) : null,
+  };
 
-      if (!response.ok) throw new Error("Failed to update room type")
+  try {
+    const isSuccess = await ApiService.updateRoomType(id, updatedData);
 
-      // update the local state after a successful update.
-      setRoomTypes((prev) =>
-        prev.map((rt) =>
-          rt.id === id
-            ? { ...rt, description: editValues.description, pricePerNight: parseFloat(editValues.price) }
-            : rt
-        )
-      )
-      cancelEdit()
-    } catch (error) {
-      console.error(error)
+    if (isSuccess) {
+      console.log("Room type updated successfully!");
+      
+      const roomsData = await ApiService.getAllRoomTypes();
+      if (roomsData) {
+        setRoomTypes(roomsData);
+        setEditingId(null);
+      }
+    } else {
+      console.error("Failed to save changes.");
     }
+  } catch (error) {
+    console.error("An unexpected error occurred:", error);
   }
+};
 
   return (
     <Table>
