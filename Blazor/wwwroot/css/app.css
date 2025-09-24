@@ -10,6 +10,13 @@ a, .btn-link {
     color: #0071c1;
 }
 
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5.5rem;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;

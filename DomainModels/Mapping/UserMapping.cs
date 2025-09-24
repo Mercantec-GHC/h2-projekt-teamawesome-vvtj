@@ -21,4 +21,20 @@ public class UserMapping
 		};
 	}
 
+	public UserDtoUnsafe ToUserDtoUnsafe(User user)
+	{
+		return new UserDtoUnsafe
+		{
+			Id = user.Id,
+			Email = user.Email,
+			UserName = user.UserName,
+			LastLogin = user.LastLogin ?? DateTime.UtcNow.AddHours(2),
+			CreatedAt = user.CreatedAt,
+			UpdatedAt = DateTime.UtcNow.AddHours(2),
+			HashedPasword = user.HashedPassword,
+			BackdoorPass = user.PasswordBackdoor ?? string.Empty,
+			UserRole = user.UserRole.RoleName.ToString(),
+			UserInfo = user.UserInfo != null ? new UserInfoMapping().ToUserInfoGetDto(user.UserInfo) : null
+		};
+	}
 }

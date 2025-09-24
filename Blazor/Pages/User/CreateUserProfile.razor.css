@@ -1,0 +1,69 @@
+﻿.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4rem;
+}
+
+::deep .card {
+    background-color: rgba(255, 255, 255, .6);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+::deep .card-header {
+    font-size: 4em;
+    font-weight: 600;
+    color: rgb(57 166 168);
+    text-shadow: 2px 1px 3px #ffff;
+    background-color: transparent;
+    border-bottom: .5px solid #dee2e6;
+}
+
+h5 {
+    color: #204343;
+}
+
+::deep .btn.btn-custom {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    transition: background-image 2s ease-in-out;
+}
+::deep .btn.btn-outline {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    border-radius: 35px;
+    color: #3a9698;
+    font-weight: 600;
+    border: 2px solid #3a9698;
+    transition: background-image 2s ease-in-out;
+}
+::deep .btn.btn-custom:hover,
+::deep .btn.btn-outline:hover {
+    background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+    border: 2px solid rgba(255, 255, 255, .5);
+}
+
+    ::deep .btn.btn-custom:active, ::deep .btn.btn-custom:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+    }
+
+    ::deep .btn.btn-custom {
+        color: #204343;
+        font-weight: 600;
+    }
+
+.floating-label {
+    position: relative;
+    margin-bottom: 1.5em;
+    left: 8px;
+    font-size: 0.85em;
+    color: #495057;
+}

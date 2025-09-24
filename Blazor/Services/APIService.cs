@@ -26,7 +26,18 @@ namespace Blazor.Services
 				throw;
 			}
 		}
-
+		public async Task<HttpResponseMessage> PutAsJsonAsync<T>(string url, T body)
+		{
+			try
+			{
+				return await _httpClient.PutAsJsonAsync(url, body);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "PUT request failed: {Url}", url);
+				throw;
+			}
+		}
 		public async Task<HttpResponseMessage> GetAsync(string url)
 		{
 			try

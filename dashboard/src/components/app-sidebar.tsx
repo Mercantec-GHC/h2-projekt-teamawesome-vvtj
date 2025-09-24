@@ -2,15 +2,11 @@
 
 import * as React from "react"
 import {
-  Frame,
   Hotel,
   House,
   IdCardLanyard,
   Kanban,
-  Map,
   NotebookPen,
-  PieChart,
-  User,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -60,25 +56,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "#",
         icon: NotebookPen,
         items: [
-          {
-            title: "New Bookings",
-            url: "#",
-          },
           { 
             title: "All Bookings",
              url: "/bookings" 
-          },
-          { title: "Calendar", url: "#" },
-        ],
-      },
-      {
-        title: "Guests",
-        url: "#",
-        icon: User,
-        items: [
-          {
-            title: "List of Guests",
-            url: "#",
           },
         ],
       },
@@ -93,7 +73,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
           {
             title: "Room types",
-            url: "#",
+            url: "/room-types",
           },
         ],
       },
@@ -104,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "All Hotels",
-            url: "#",
+            url: "/hotels",
           },
         ],
       },
@@ -115,30 +95,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: [
           {
             title: "Cleaning",
-            url: "#",
+            url: "/cleaning",
           },
           {
-            title: "Team",
-            url: "#",
+            title: "Users",
+            url: "/users",
           },
         ],
-      },
-    ],
-    projects: [
-      {
-        name: "Design Engineering",
-        url: "#",
-        icon: Frame,
-      },
-      {
-        name: "Sales & Marketing",
-        url: "#",
-        icon: PieChart,
-      },
-      {
-        name: "Travel",
-        url: "#",
-        icon: Map,
       },
     ],
   }
