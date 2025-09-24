@@ -1,6 +1,11 @@
 ﻿using System.Net;
 using System.DirectoryServices.Protocols;
 using API.Interfaces;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
+using API.Data;
+using Microsoft.EntityFrameworkCore;
+using DomainModels.Models;
+using DomainModels.Dto.UserDto;
 
 namespace API.Services
 {
@@ -9,6 +14,7 @@ namespace API.Services
 		private readonly ILogger<ActiveDirectoryService> _logger;
 		private readonly IConfiguration _configuration;
 		private readonly IJWTService _jwtService;
+		private readonly AppDBContext _context;
 
 		// AD configuration from appsettings.json
 		private readonly string _server;
@@ -22,11 +28,12 @@ namespace API.Services
 		/// </summary>
 		/// <param name="logger">Logger used for error reporting</param>
 		/// <param name="configuration">Configuration for AD settings</param>
-		public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, IConfiguration configuration, IJWTService jwtService)
+		public ActiveDirectoryService(ILogger<ActiveDirectoryService> logger, IConfiguration configuration, IJWTService jwtService, AppDBContext context)
 		{
 			_logger = logger;
 			_configuration = configuration;
 			_jwtService = jwtService;
+			_context = context;
 
 			// Reads AD configuration from appsettings.json
 			_server = _configuration["ActiveDirectory:Server"]!;
@@ -53,14 +60,31 @@ namespace API.Services
 				if (adUser == null)
 					return null;
 
+				 var adUserToDb = await _context.Users
+				 .Include(u => u.UserRole)
+				 .FirstOrDefaultAsync(u => u.UserName == adUser.SamAccountName);
+				 if (adUserToDb == null)
+				 {
+				 	adUserToDb = new User
+				 	{
+				 		UserName = adUser.SamAccountName,
+				 		Email = adUser.Email,
+				 		HashedPassword = "EXTERNALLY_MANAGED"
+				 	};
+				 	_context.Users.Add(adUserToDb);
+				 	await _context.SaveChangesAsync();
+				 }
+
 				// Generate a JWT token for the authenticated AD user
 				var token = _jwtService.CreateToken(adUser);
+
 				return token;
 			}
 			catch (Exception)
 			{
 				throw;
 			}
+			
 		}
 
 		/// <summary>
