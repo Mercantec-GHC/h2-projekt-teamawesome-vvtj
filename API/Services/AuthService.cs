@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Interfaces;
+using DomainModels.Dto;
 using DomainModels.Dto.UserDto;
 using DomainModels.Enums;
 using DomainModels.Mapping;
@@ -19,13 +20,15 @@ public class AuthService : IAuthService
 	private readonly UserMapping _userMapping = new();
 	private readonly ILogger<AuthService> _logger;
 	private readonly IJWTService _jwtService;
+	private readonly IEmailService _emailService ;
 
-	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService)
+	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService, IEmailService emailService)
 	{
 		_configuration = configuration;
 		_context = context;
 		_logger = logger;
 		_jwtService = jwtService;
+		_emailService = emailService;
 	}
 
 	/// <summary>
@@ -46,7 +49,7 @@ public class AuthService : IAuthService
 				_logger.LogWarning("Registration failed: Email, Username, or Password is empty.");
 				return null;
 			}
-
+			
 			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
 			{
 				_logger.LogWarning("Registration failed: User with email {Email} already exists.", request.Email);
@@ -72,6 +75,9 @@ public class AuthService : IAuthService
 
 			_context.Users.Add(user);
 			await _context.SaveChangesAsync();
+
+			//send welcome email
+			await _emailService.SendWelcomeEmailAsync(new EmailFormDto { Email = user.Email, Name = user.UserName });
 
 			_logger.LogInformation("Registered new user with email: {Email}", request.Email);
 
