@@ -3,6 +3,7 @@ using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using DomainModels.Dto.AuthDto;
 using DomainModels.Dto.UserDto;
 
 namespace Blazor.Services;
