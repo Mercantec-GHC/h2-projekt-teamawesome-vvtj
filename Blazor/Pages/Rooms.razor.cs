@@ -1,22 +1,15 @@
+using Blazor.Models;
+using Blazor.Models.ViewModels;
+using DomainModels.Dto;
 using Microsoft.AspNetCore.Components;
+using DomainModels.Models;
 using Blazor.Services;
-
-
+using System.Threading.Tasks;
 
 namespace Blazor
 {
-    
-
-    public class Rooms
+    public partial class Rooms
     {
-        public override async Task OnInitializedAsync()
-        {
-
-        }
-
-        private async Task ShowRoomTypes()
-        {
-            var roomTypes = (await ApiService.())?.ToList();
-        }
+        
     }
 }

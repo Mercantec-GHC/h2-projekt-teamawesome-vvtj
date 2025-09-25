@@ -1,4 +1,6 @@
 @using BootstrapBlazor.Components
+@using DomainModels.Enums
+
 @page "/rooms"
 
 <PageTitle>Rooms</PageTitle>
@@ -6,78 +8,50 @@
 <div class="page-wrapper">
     <div class="container mt-4">
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 ">
-        
-            <div class="col">
-                <div class="card h-100 ">
-                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Standard room</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                            content.
-                        </p>
-                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+
+            @foreach (var room in roomTypes)
+            {
+                var roomtype = room.TypeofRoom;
+
+                var imagePath = roomtype switch
+                {
+                    RoomTypeEnum.Standard => "/wwwroot/images/CopilotBedroom.png",
+                    RoomTypeEnum.Family => "/wwwroot/images/CopilotBedroom.png",
+                    RoomTypeEnum.Single => "/wwwroot/images/CopilotBedroom.png",
+                    RoomTypeEnum.Royal => "/wwwroot/images/CopilotBedroom.png",
+                    RoomTypeEnum.Penthouse => "/wwwroot/images/CopilotBedroom.png",
+                    _ => "/wwwroot/images/Placeholder.png"
+                };
+
+                var displayName = roomtype switch
+                {
+                    RoomTypeEnum.Standard => "Standard room",
+                    RoomTypeEnum.Family => "Family room",
+                    RoomTypeEnum.Single => "Single room",
+                    RoomTypeEnum.Royal => "Royal suite",
+                    RoomTypeEnum.Penthouse => "Penthouse",
+                    _ => "Unknown"
+                };
+
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="@imagePath" class="card-img-top" alt="@displayName" />
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@displayName</h5>
+                            <p class="card-text">@room.Description</p>
+                            <p class="card-text text-muted">Max Capacity: @room.MaxCapacity</p>
+                            <p class="card-text text-muted mt-auto">Price per night: @room.PricePerNight?.ToString("C")</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col">
-                <div class="card h-100">
-                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Single room</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                            content.
-                        </p>
-                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Family room</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                            content.
-                        </p>
-                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Royal Room</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                            content.
-                        </p>
-                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col">
-                <div class="card h-100">
-                    <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Penthouse</h5>
-                        <p class="card-text">This card has supporting text below as a natural lead-in to additional
-                            content.
-                        </p>
-                        <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
+            }
         </div>
     </div>
 </div>
 
 @code {
-    private BlazorBootstrap.Modal modal = default!;
+    @* private BlazorBootstrap.Modal modal = default!;
 
     private async Task OnShowModalClick()
     {
@@ -87,5 +61,69 @@
     private async Task OnHideModalClick()
     {
         await modal.HideAsync();
-    }
+    } *@
+
+    public APIService _aPIService { get; set; }
+        public IEnumerable<RoomTypeDto> roomTypes { get; set; } = new List<RoomTypeDto>();
+
+        protected async Task OnInitializedAsync()
+        {
+            var result = await _aPIService.GetRoomTypeAsync()
+            ?? throw new ArgumentException("Error: No Room types were found");
+            roomTypes = result?.Where(r => r != null)!;
+
+        }
+
 }
+
+@* 
+ <div class="col">
+                    <div class="card h-100">
+                        <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Single room</h5>
+                            <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                                content.
+                            </p>
+                            <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+                        </div>
+                    </div>
+                </div>
+<div class="col">
+    <div class="card h-100">
+        <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Family room</h5>
+            <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                content.
+            </p>
+            <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+        </div>
+    </div>
+</div>
+
+<div class="col">
+    <div class="card h-100">
+        <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Royal Room</h5>
+            <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                content.
+            </p>
+            <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+        </div>
+    </div>
+</div>
+
+<div class="col">
+    <div class="card h-100">
+        <img src="/wwwroot/images/CopilotBedroom.png" class="card-img-top" alt="placeholder" />
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title">Penthouse</h5>
+            <p class="card-text">This card has supporting text below as a natural lead-in to additional
+                content.
+            </p>
+            <p class="card-text text-muted mt-auto">Last updated 3 mins ago</p>
+        </div>
+    </div>
+</div> *@
