@@ -1,40 +1,34 @@
-﻿using API.Data;
+﻿using System.Linq;
+using System.Security.Cryptography;
+using API.Data;
 using API.Interfaces;
+using DomainModels.Dto.AuthDto;
 using DomainModels.Dto.UserDto;
 using DomainModels.Enums;
 using DomainModels.Mapping;
 using DomainModels.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
-/// <summary>
-/// Provides authentication and registration services for users, including JWT token generation and password management.
-/// </summary>
 public class AuthService : IAuthService
 {
-	private readonly IConfiguration _configuration;
 	private readonly AppDBContext _context;
 	private readonly UserMapping _userMapping = new();
 	private readonly ILogger<AuthService> _logger;
 	private readonly IJWTService _jwtService;
+	private readonly IHttpContextAccessor _httpContextAccessor;
 
-	public AuthService(IConfiguration configuration, AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService)
+	public AuthService(AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService, IHttpContextAccessor httpContextAccessor)
 	{
-		_configuration = configuration;
 		_context = context;
 		_logger = logger;
 		_jwtService = jwtService;
+		_httpContextAccessor = httpContextAccessor;
 	}
 
-	/// <summary>
-	/// Registers a new user in the system.
-	/// </summary>
-	/// <param name="request">Registration data including email, username, and password.</param>
-	/// <returns>
-	/// A <see cref="UserDto"/> containing user details if registration is successful; otherwise, <c>null</c>.
-	/// </returns>
 	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
 	{
 		try
@@ -84,18 +78,18 @@ public class AuthService : IAuthService
 		}
 	}
 
-	/// <summary>
-	/// Authenticates a user and returns a JWT token if successful.
-	/// </summary>
-	/// <param name="request">Login credentials containing email and password.</param>
-	/// <returns>
-	/// A JWT token string if login is successful; otherwise, <c>null</c>.
-	/// </returns>
-	public async Task<string?> LoginUserAsync(LoginDto request)
+	public async Task<TokenResponseDto?> LoginUserAsync(LoginDto request)
 	{
+		var httpContext = _httpContextAccessor.HttpContext;
+		var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+		var device = httpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty;
+
+		var normalizedEmail = request.Email.ToLowerInvariant();
+
 		var user = await _context.Users
 		.Include(u => u.UserRole)
-		.FirstOrDefaultAsync(u => u.Email == request.Email.ToLower());
+		.Include(u => u.RefreshTokens)
+		.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
 		if (user == null)
 		{
@@ -109,19 +103,79 @@ public class AuthService : IAuthService
 		}
 
 		user.LastLogin = DateTime.UtcNow.AddHours(2);
+
+		string accessToken = _jwtService.CreateToken(user);
+		var refreshToken = await CreateRefreshTokenAsync(ipAddress, device);
+
+		// Finds all valid (not expired, not revoked) refresh tokens for this user.
+		var existingTokens = await _context.RefreshTokens
+		.Where(rt => rt.UserId == user.Id && rt.Expires > DateTime.UtcNow.AddHours(2) && rt.Revoked == null)
+		.ToListAsync();
+
+		// Revokes all existing valid tokens, linking them to the new token.
+		// This prevents reuse of multiple active refresh tokens, reducing risk if a token is leaked.
+		foreach (var token in existingTokens)
+		{
+			token.Revoked = DateTime.UtcNow.AddHours(2);
+			token.ReplacedByToken = refreshToken.Token;
+		}
+		// Ensures the user’s refresh token collection is initialized.
+		// Adds the new refresh token to the user and saves all changes in the database.
+		user.RefreshTokens ??= new List<RefreshToken>();
+		user.RefreshTokens.Add(refreshToken);
 		await _context.SaveChangesAsync();
 
-		string token = _jwtService.CreateToken(user);
-		return token;
+		return new TokenResponseDto
+		{
+			AccessToken = accessToken,
+			RefreshToken = refreshToken.Token,
+		};
 	}
-	/// <summary>
-	/// Changes the password for a user.
-	/// </summary>
-	/// <param name="userEmail">The email of the user whose password is to be changed.</param>
-	/// <param name="newPassword">The new password to set.</param>
-	/// <returns>
-	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
-	/// </returns>
+
+	public async Task<RefreshToken?> CreateRefreshTokenAsync(string ipAddress, string device)
+	{
+		return new RefreshToken
+		{
+			Token = GenerateRefreshToken(),
+			CreatedByIp = ipAddress,
+			Device = device,
+			Created = DateTime.UtcNow.AddHours(2),
+			Expires = DateTime.UtcNow.AddDays(7)
+		};
+	}
+
+	public string GenerateRefreshToken()
+	{
+		var randomNumber = new byte[64];
+		using var rng = RandomNumberGenerator.Create();
+		rng.GetBytes(randomNumber);
+		return Convert.ToBase64String(randomNumber);
+	}
+
+	public async Task<TokenResponseDto?> RefreshTokenAsync(string token)
+	{
+		var existingToken = await _context.RefreshTokens
+			.Include(rt => rt.User)
+			.ThenInclude(rt => rt.UserRole)
+			.FirstOrDefaultAsync(rt => rt.Token == token);
+
+		if (existingToken == null || existingToken.Expires <= DateTime.UtcNow.AddHours(2)
+			|| existingToken.Revoked != null)
+			return null;
+
+		existingToken.Revoked = DateTime.UtcNow.AddHours(2);
+
+		var accessToken = _jwtService.CreateToken(existingToken.User);
+
+		await _context.SaveChangesAsync();
+
+		return new TokenResponseDto
+		{
+			AccessToken = accessToken,
+			RefreshToken = existingToken.Token
+		};
+	}
+
 	public async Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword)
 	{
 		try
@@ -146,15 +200,6 @@ public class AuthService : IAuthService
 		}
 	}
 
-	/// <summary>
-	/// Changes the password for the currently authenticated user.
-	/// </summary>
-	/// <param name="userId">The ID of the user whose password is to be changed.</param>
-	/// <param name="newPassword">The new password to set.</param>
-	/// <param name="confirmNewPassword">The confirmation of the new password.</param>
-	/// <returns>
-	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
-	/// </returns>
 	public async Task<bool> ChangeOwnPasswordAsync(string userId, string newPassword, string confirmNewPassword)
 	{
 		try
