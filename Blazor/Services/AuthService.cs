@@ -43,7 +43,7 @@ public class AuthService : IAuthService
 
 		// Read the token from the response
 		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
-		var token = result?.Token;
+		var token = result?.AccessToken;
 
 		if (string.IsNullOrWhiteSpace(token))
 			return false;
