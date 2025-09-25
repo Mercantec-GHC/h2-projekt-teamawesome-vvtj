@@ -4,6 +4,7 @@ namespace API.Interfaces
 {
     public interface IEmailService
     {
-        Task<bool> SendEmailAsync(EmailFormDto dto);
-    }
+        Task<bool> SendEmailNotificationAsync(EmailFormDto dto);
+        Task<bool> SendWelcomeEmailAsync(EmailFormDto dto);
+	}
 }

@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using API.Data;
 using API.Interfaces;
+using DomainModels.Dto;
 using DomainModels.Dto.AuthDto;
 using DomainModels.Dto.UserDto;
 using DomainModels.Enums;
@@ -20,13 +21,15 @@ public class AuthService : IAuthService
 	private readonly ILogger<AuthService> _logger;
 	private readonly IJWTService _jwtService;
 	private readonly IHttpContextAccessor _httpContextAccessor;
+	private readonly IEmailService _emailService;
 
-	public AuthService(AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService, IHttpContextAccessor httpContextAccessor)
+	public AuthService(AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService)
 	{
 		_context = context;
 		_logger = logger;
 		_jwtService = jwtService;
 		_httpContextAccessor = httpContextAccessor;
+		_emailService = emailService;
 	}
 
 	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
@@ -40,7 +43,7 @@ public class AuthService : IAuthService
 				_logger.LogWarning("Registration failed: Email, Username, or Password is empty.");
 				return null;
 			}
-
+			
 			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
 			{
 				_logger.LogWarning("Registration failed: User with email {Email} already exists.", request.Email);
@@ -66,6 +69,9 @@ public class AuthService : IAuthService
 
 			_context.Users.Add(user);
 			await _context.SaveChangesAsync();
+
+			//send welcome email
+			await _emailService.SendWelcomeEmailAsync(new EmailFormDto { Email = user.Email, Name = user.UserName });
 
 			_logger.LogInformation("Registered new user with email: {Email}", request.Email);
 
