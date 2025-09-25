@@ -50,11 +50,7 @@ public class AuthService : IAuthService
 
 		var cleanToken = token.Trim('"');
 
-		Console.WriteLine($"Token is: {token}, clean token is {cleanToken}");
 		await _authStateProvider.SaveTokenAsync(cleanToken, remember);
-		_authStateProvider.NotifyUserAuthentication(cleanToken);
-
-		// Notify Blazor that the user is authenticated
 		_authStateProvider.NotifyUserAuthentication(cleanToken);
 
 		// Set the token in the HttpClient for future requests
@@ -94,8 +90,8 @@ public class AuthService : IAuthService
 
 	public async Task LogoutAsync()
 	{
-		await _localStorage.RemoveItemAsync(_tokenKey);
-		await _sessionStorage.RemoveItemAsync(_tokenKey);
+		await _localStorage.RemoveItemAsync("authToken");
+		await _sessionStorage.RemoveItemAsync("authToken");
 		_apiService.RemoveBearerToken();
 		_authStateProvider.NotifyUserLogout();
 	}

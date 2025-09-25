@@ -15,6 +15,7 @@ public static class JWTHelper
 
 		var jwtToken = jwtHandler.ReadJwtToken(token);
 		var expiration = jwtToken.ValidTo.AddHours(2);
+
 		var dif = DateTime.UtcNow.AddHours(2) - expiration;
 		var expired = expiration < DateTime.UtcNow.AddHours(2);
 

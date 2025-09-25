@@ -54,8 +54,8 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 			}
 			else
 			{
-				await _localStorage.RemoveItemAsync(_tokenKey);
-				await _sessionStorage.RemoveItemAsync(_tokenKey);
+				await _localStorage.RemoveItemAsync("authToken");
+				await _sessionStorage.RemoveItemAsync("authToken");
 				return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 			}
 		}
@@ -72,7 +72,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
 		if (!string.IsNullOrWhiteSpace(newToken))
 		{
-			var remember = await _localStorage.ContainKeyAsync(_tokenKey);
+			var remember = await _localStorage.ContainKeyAsync("authToken");
 			await SaveTokenAsync(newToken, remember);
 
 			_apiService.SetBearerToken(newToken);
@@ -86,6 +86,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		// The backend should read the refresh token from the cookie
 		var response = await _apiService.PostAsJsonAsync<object>("api/Auth/refresh-token", null);
 
+		Console.WriteLine($"Refresh token response status: {response.StatusCode}");
 		if (!response.IsSuccessStatusCode)
 			return null;
 
