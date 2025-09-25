@@ -43,24 +43,16 @@ public class AuthService : IAuthService
 
 		// Read the token from the response
 		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
-		var token = result?.Token;
+		var token = result?.AccessToken;
 
 		if (string.IsNullOrWhiteSpace(token))
 			return false;
+
 		var cleanToken = token.Trim('"');
 
-		// Store the token in local storage if remember me is checked, otherwise in session storage
-		if (remember)
-		{
-			await _localStorage.SetItemAsync(_tokenKey, cleanToken);
-			await _sessionStorage.RemoveItemAsync(_tokenKey);
-		}
-
-		else
-		{
-			await _sessionStorage.SetItemAsync(_tokenKey, cleanToken);
-			await _localStorage.RemoveItemAsync(_tokenKey);
-		}
+		Console.WriteLine($"Token is: {token}, clean token is {cleanToken}");
+		await _authStateProvider.SaveTokenAsync(cleanToken, remember);
+		_authStateProvider.NotifyUserAuthentication(cleanToken);
 
 		// Notify Blazor that the user is authenticated
 		_authStateProvider.NotifyUserAuthentication(cleanToken);
@@ -69,8 +61,8 @@ public class AuthService : IAuthService
 		_apiService.SetBearerToken(cleanToken);
 
 		// Send a message to admin dashboard to about the login event
-		var message = $"User {loginDto.Email} has just logged in";
-		await _apiService.SendNotificationAsync(message);
+		//var message = $"User {loginDto.Email} has just logged in";
+		//await _apiService.SendNotificationAsync(message);
 
 		return true;
 	}

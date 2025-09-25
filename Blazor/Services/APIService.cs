@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using DomainModels.Dto.AuthDto;
 
 namespace Blazor.Services
 {
@@ -54,8 +55,9 @@ namespace Blazor.Services
 		//Helper methods to manage the Bearer token in the HttpClient by using the APIService
 		public void SetBearerToken(string token)
 		{
+			var cleanToken = token.Trim('"');
 			_httpClient.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("Bearer", token);
+				new AuthenticationHeaderValue("Bearer", cleanToken);
 		}
 
 		public void RemoveBearerToken()
