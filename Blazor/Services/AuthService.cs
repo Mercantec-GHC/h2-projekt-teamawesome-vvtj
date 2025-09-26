@@ -27,7 +27,6 @@ public class AuthService : IAuthService
 
 	public async Task<bool> LoginAsync(string email, string password, bool remember)
 	{
-		// Create the login DTO with data for a login
 		var loginDto = new UserLoginDto
 		{
 			Email = email,
@@ -35,31 +34,23 @@ public class AuthService : IAuthService
 			RememberMe = remember
 		};
 
-		// Send the login request to the API
 		var response = await _apiService.PostAsJsonAsync("api/Auth/login", loginDto);
-
 		if (!response.IsSuccessStatusCode)
 			return false;
 
-		// Read the token from the response
 		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
-		var token = result?.AccessToken;
-
-		if (string.IsNullOrWhiteSpace(token))
+		if (result == null || string.IsNullOrWhiteSpace(result.AccessToken))
 			return false;
 
-		var cleanToken = token.Trim('"');
+		var token = result.AccessToken;
 
-		await _authStateProvider.SaveTokenAsync(cleanToken, remember);
-		_authStateProvider.NotifyUserAuthentication(cleanToken);
+		await _authStateProvider.SaveTokenAsync(token, remember);
+		_authStateProvider.NotifyUserAuthentication(token);
+		_apiService.SetBearerToken(token);
 
-
-		// Set the token in the HttpClient for future requests
-		_apiService.SetBearerToken(cleanToken);
-
-		// Send a message to admin dashboard to about the login event
-		//var message = $"User {loginDto.Email} has just logged in";
-		//await _apiService.SendNotificationAsync(message);
+		// Send a message to admin dashboard about the login event
+		var message = $"User {loginDto.Email} has just logged in";
+		await _apiService.SendNotificationAsync(message);
 
 		return true;
 	}

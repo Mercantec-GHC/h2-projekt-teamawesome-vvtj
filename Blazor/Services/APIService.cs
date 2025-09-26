@@ -23,7 +23,6 @@ public partial class APIService
 	{
 		try
 		{
-			// Important: include cookies for login too
 			var request = new HttpRequestMessage(HttpMethod.Post, url)
 			{
 				Content = JsonContent.Create(body)

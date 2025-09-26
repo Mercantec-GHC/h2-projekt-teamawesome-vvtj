@@ -40,17 +40,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 			return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 		}
 
-		// Remove any surrounding quotes from the token
-		var cleanToken = savedToken.Trim('"');
-
 		// Check if the token is expired
-		if (JWTHelper.IsTokenExpired(cleanToken))
+		if (JWTHelper.IsTokenExpired(savedToken))
 		{
 			// Try to refresh the token
 			var newToken = await RefreshAccessTokenAsync();
 			if (!string.IsNullOrWhiteSpace(newToken) && !JWTHelper.IsTokenExpired(newToken))
 			{
-				cleanToken = newToken;
+				savedToken = newToken;
 			}
 			else
 			{
@@ -60,10 +57,10 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 			}
 		}
 		//Set the token in the HttpClient for future requests, so that it is available after a page refresh
-		_apiService.SetBearerToken(cleanToken);
+		_apiService.SetBearerToken(savedToken);
 
 		//Notify the application about the authentication state change
-		return GetAuthenticatedState(cleanToken);
+		return GetAuthenticatedState(savedToken);
 	}
 
 	public async Task<string?> RefreshAccessTokenAsync()
@@ -124,8 +121,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	// It notifies Blazor that the authentication state has changed.
 	public void NotifyUserAuthentication(string token)
 	{
-		var cleanToken = token.Trim('"');
-		NotifyAuthenticationStateChanged(Task.FromResult(GetAuthenticatedState(cleanToken)));
+		NotifyAuthenticationStateChanged(Task.FromResult(GetAuthenticatedState(token)));
 	}
 
 	// Call this method when a user logs out.
