@@ -40,11 +40,11 @@ namespace API.Services
             // If hotel not found, aborts and returns null.
             if (hotel == null)
                 return null;
-
+           
             var roomsQuery = await _dbContext.Rooms
                 .Include(r => r.RoomType)
                 .Where(r => r.HotelId == hotel.Id &&
-                r.RoomType.TypeofRoom == dto.TypeOfRoom && r.IsAvailable == true)
+                 r.TypeId == dto.RoomTypeId && r.IsAvailable == true)
                 .Select(r => new { r.Id, r.RoomType })
                  .ToListAsync();
 
@@ -89,7 +89,7 @@ namespace API.Services
 
             var nights = Math.Max((dto.CheckOut.DayNumber - dto.CheckIn.DayNumber), 1);
 
-            if (dto.isBreakfast == true)
+            if (dto.IsBreakfast == true)
                 roomType.PricePerNight += 200 * guests;
 
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
@@ -108,7 +108,7 @@ namespace API.Services
                 NightsCount = nights,
                 TotalPrice = total,
                 CreatedAt = DateTime.UtcNow,
-                IsBreakfast = dto.isBreakfast,
+                IsBreakfast = dto.IsBreakfast,
             };
 
             _dbContext.Bookings.Add(booking);
@@ -119,7 +119,7 @@ namespace API.Services
             {
                 UserName = dto.UserName,
                 HotelName = hotel.HotelName,
-                RoomType = roomType.TypeofRoom,
+                TypeOfRoom = roomType.TypeofRoom,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = guests,
@@ -244,7 +244,7 @@ namespace API.Services
                 UpdatedAt = booking.UpdatedAt,
                 UserName = booking.User.UserName,
                 HotelName = booking.Room.Hotel.HotelName,
-                RoomType = booking.Room.RoomType.TypeofRoom,
+                TypeOfRoom = booking.Room.RoomType.TypeofRoom,
                 CheckIn = booking.CheckIn,
                 CheckOut = booking.CheckOut,
                 GuestsCount = booking.GuestsCount,

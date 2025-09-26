@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace API;
 
@@ -39,6 +41,8 @@ public class Program
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
         builder.Services.AddScoped<SeasonalPricingService>();
+        builder.Services.AddControllers();
+      
         // Add MemoryCache
         builder.Services.AddMemoryCache();
 

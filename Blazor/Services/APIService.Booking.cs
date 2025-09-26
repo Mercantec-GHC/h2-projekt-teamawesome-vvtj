@@ -7,7 +7,7 @@ namespace Blazor.Services
 {
     public partial class APIService
     {
-        public async Task<BookingResponseDto?> CreateBookingAsync(CreateBookingDto dto)
+        public async Task<BookingResponseDto?> CreateBooking(CreateBookingDto dto)
         {
             try
             {
@@ -39,5 +39,18 @@ namespace Blazor.Services
                 throw;
             }
         }
+
+        public async Task<List<RoomTypeDto>> GetAllRoomTypesAsync()
+        {
+            var response = await GetAsync("api/roomtypes");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<List<RoomTypeDto>>();
+                return result ?? new List<RoomTypeDto>();
+            }
+            return new List<RoomTypeDto>();
+        }
     }
+
+
 }

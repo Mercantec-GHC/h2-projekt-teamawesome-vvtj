@@ -12,7 +12,7 @@ namespace API.Controllers;
 /// <summary>
 /// Controller for handling booking-related operations.
 /// </summary>
-[Route("api/[controller]")]
+[Route("api/bookings")]
 [ApiController]
 
 public class BookingController : ControllerBase
