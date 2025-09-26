@@ -53,6 +53,7 @@ public class AuthService : IAuthService
 		await _authStateProvider.SaveTokenAsync(cleanToken, remember);
 		_authStateProvider.NotifyUserAuthentication(cleanToken);
 
+
 		// Set the token in the HttpClient for future requests
 		_apiService.SetBearerToken(cleanToken);
 

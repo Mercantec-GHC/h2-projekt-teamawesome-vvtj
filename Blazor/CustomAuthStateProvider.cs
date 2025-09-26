@@ -1,11 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using Blazor.Helpers;
 using Blazor.Services;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using DomainModels.Dto.AuthDto;
-using DomainModels.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor;
@@ -83,16 +83,13 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 
 	public async Task<string?> TryRefreshAccessTokenAsync()
 	{
-		// The backend should read the refresh token from the cookie
-		var response = await _apiService.PostAsJsonAsync<object>("api/Auth/refresh-token", null);
+		// Backend reads refresh token from HttpOnly cookie
+		var response = await _apiService.PostWithCredentialsAsync("api/Auth/refresh-token");
 
-		Console.WriteLine($"Refresh token response status: {response.StatusCode}");
 		if (!response.IsSuccessStatusCode)
 			return null;
 
-		var json = await response.Content.ReadAsStringAsync();
-		var result = System.Text.Json.JsonSerializer.Deserialize<TokenResponseDto>(json);
-
+		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
 		return result?.AccessToken;
 	}
 
