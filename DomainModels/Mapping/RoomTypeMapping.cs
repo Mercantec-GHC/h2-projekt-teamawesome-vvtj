@@ -12,7 +12,7 @@ namespace DomainModels.Mapping
             return new RoomTypeDto
             {
                 Id = roomType.Id,
-                TypeofRoom = roomType.TypeofRoom,
+                TypeofRoom = roomType.TypeofRoom.ToString(),
                 MaxCapacity = roomType.MaxCapacity,
                 Description = roomType.Description,
                 HasBalcony = roomType.HasBalcony,

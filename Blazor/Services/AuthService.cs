@@ -3,6 +3,7 @@ using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using DomainModels.Dto.AuthDto;
 using DomainModels.Dto.UserDto;
 
 namespace Blazor.Services;
@@ -26,7 +27,6 @@ public class AuthService : IAuthService
 
 	public async Task<bool> LoginAsync(string email, string password, bool remember)
 	{
-		// Create the login DTO with data for a login
 		var loginDto = new UserLoginDto
 		{
 			Email = email,
@@ -34,41 +34,22 @@ public class AuthService : IAuthService
 			RememberMe = remember
 		};
 
-		// Send the login request to the API
 		var response = await _apiService.PostAsJsonAsync("api/Auth/login", loginDto);
-
 		if (!response.IsSuccessStatusCode)
 			return false;
 
-		// Read the token from the response
 		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
-		var token = result?.Token;
-
-		if (string.IsNullOrWhiteSpace(token))
+		if (result == null || string.IsNullOrWhiteSpace(result.AccessToken))
 			return false;
-		var cleanToken = token.Trim('"');
 
-		// Store the token in local storage if remember me is checked, otherwise in session storage
-		if (remember)
-		{
-			await _localStorage.SetItemAsync(_tokenKey, cleanToken);
-			await _sessionStorage.RemoveItemAsync(_tokenKey);
-		}
+		var token = result.AccessToken;
 
-		else
-		{
-			await _sessionStorage.SetItemAsync(_tokenKey, cleanToken);
-			await _localStorage.RemoveItemAsync(_tokenKey);
-		}
+		await _authStateProvider.SaveTokenAsync(token, remember);
+		_authStateProvider.NotifyUserAuthentication(token);
+		_apiService.SetBearerToken(token);
 
-		// Notify Blazor that the user is authenticated
-		_authStateProvider.NotifyUserAuthentication(cleanToken);
-
-		// Set the token in the HttpClient for future requests
-		_apiService.SetBearerToken(cleanToken);
-
-		// Send a message to all administrators about admin login
-		var message = $"Admin {loginDto.Email} has just logged in. Welcome at working!";
+		// Send a message to admin dashboard about the login event
+		var message = $"User {loginDto.Email} has just logged in";
 		await _apiService.SendNotificationAsync(message);
 
 		return true;
@@ -101,10 +82,25 @@ public class AuthService : IAuthService
 
 	public async Task LogoutAsync()
 	{
-		await _localStorage.RemoveItemAsync(_tokenKey);
-		await _sessionStorage.RemoveItemAsync(_tokenKey);
+		await _localStorage.RemoveItemAsync("authToken");
+		await _sessionStorage.RemoveItemAsync("authToken");
 		_apiService.RemoveBearerToken();
 		_authStateProvider.NotifyUserLogout();
+	}
+
+	public async Task <bool> ChangePasswordAsync(string newPassword, string confirmNewPassword)
+	{
+		if (newPassword != confirmNewPassword)
+			return false;
+
+		var changePasswordDto = new ChangePasswordDto
+		{
+			NewPassword = newPassword,
+			ConfirmPassword = confirmNewPassword
+		};
+
+		var response = await _apiService.PostAsJsonAsync("api/Auth/change-own-password", changePasswordDto);
+		return response.IsSuccessStatusCode;
 	}
 
 }

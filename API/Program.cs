@@ -22,7 +22,7 @@ public class Program
 {
 	public static void Main(string[] args)
 	{
-        var builder = WebApplication.CreateBuilder(args);
+		var builder = WebApplication.CreateBuilder(args);
 		builder.Services.AddControllers();
 		builder.Services.AddOpenApi();
 
@@ -35,16 +35,17 @@ public class Program
 		builder.Services.AddScoped<IAuthService, AuthService>();
 		builder.Services.AddScoped<HotelService>();
 		builder.Services.AddScoped<IBookingService, BookingService>();
-        builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
+		builder.Services.AddScoped<ILoginAttemptService, LoginAttemptService>();
 		builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
-        builder.Services.AddScoped<SeasonalPricingService>();
-        builder.Services.AddControllers();
-      
-        // Add MemoryCache
-        builder.Services.AddMemoryCache();
+		builder.Services.AddScoped<SeasonalPricingService>();
+		builder.Services.AddScoped<IJWTService, JWTService>();
+		builder.Services.AddHttpContextAccessor();
+		// Add MemoryCache
+		builder.Services.AddMemoryCache();
+
 
 
 		// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -86,27 +87,28 @@ public class Program
 			});
 		});
 
-        var allowSpecificOrigins = "AllowSpecificOrigins";
+		var allowSpecificOrigins = "AllowSpecificOrigins";
 
-        builder.Services.AddHealthChecks();
+		builder.Services.AddHealthChecks();
 
 		if (builder.Environment.IsDevelopment())
 		{
-            // Tilføj CORS for specifikke Blazor WASM domæner fo Development, for all localhosts
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(allowSpecificOrigins,
-                    policy =>
-                    {
-                        policy
-                            .SetIsOriginAllowed(_ => true)
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-                    });
-            });
+			// Tilføj CORS for specifikke Blazor WASM domæner fo Development, for all localhosts
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy(allowSpecificOrigins,
+					policy =>
+					{
+						policy
+							.SetIsOriginAllowed(_ => true)
+							.WithOrigins("https://localhost:5085")
+							.AllowAnyMethod()
+							.AllowAnyHeader()
+							.AllowCredentials();
+					});
+			});
 
-            IConfiguration Configuration = builder.Configuration;
+			IConfiguration Configuration = builder.Configuration;
 			string connectionString = Configuration.GetConnectionString("DefaultConnection")
 				?? Environment.GetEnvironmentVariable("DefaultConnection");
 
@@ -116,32 +118,33 @@ public class Program
 
 		if (builder.Environment.IsProduction())
 		{
-            // Tilføj CORS for specifikke Blazor WASM domæner for Production, only prod domain
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(allowSpecificOrigins,
-                    policy =>
-                    {
-                        policy
-                            .WithOrigins("https://prod-novahotels-blazor-mercantec-tech.azurewebsites.net")
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials();
-                    });
-            });
+			// Tilføj CORS for specifikke Blazor WASM domæner for Production, only prod domain
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy(allowSpecificOrigins,
+					policy =>
+					{
+						policy
+							.WithOrigins("https://prod-novahotels-blazor-mercantec-tech.azurewebsites.net",
+							"https://prod-novahotels-admin-dashboard.azurewebsites.net")
+							.AllowAnyMethod()
+							.AllowAnyHeader()
+							.AllowCredentials();
+					});
+			});
 
-            var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
+			var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL");
 			var KeyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
-				builder.Configuration.AddAzureKeyVault(
-				keyVaultURL.Value!.ToString(),
-				new DefaultKeyVaultSecretManager()
-			); 
+			builder.Configuration.AddAzureKeyVault(
+			keyVaultURL.Value!.ToString(),
+			new DefaultKeyVaultSecretManager()
+		);
 
 			var client = new SecretClient(new Uri(keyVaultURL.Value!.ToString()), new DefaultAzureCredential());
 
-            builder.Services.AddDbContext<AppDBContext>(options =>
-                    options.UseNpgsql(client.GetSecret("dbconnection").Value.Value.ToString()));
-        }
+			builder.Services.AddDbContext<AppDBContext>(options =>
+					options.UseNpgsql(client.GetSecret("dbconnection").Value.Value.ToString()));
+		}
 
 		builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 			.AddJwtBearer(options =>
@@ -169,27 +172,27 @@ public class Program
 			app.MapScalarApiReference();
 		}
 
-        // Map the Swagger UI
-        app.UseSwagger();
+		// Map the Swagger UI
+		app.UseSwagger();
 		app.UseSwaggerUI(options =>
 		{
 			options.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
 		});
 
-        app.UseRouting();
+		app.UseRouting();
 
-        // Brug CORS - skal være før anden middleware
-        app.UseCors(allowSpecificOrigins);
+		// Brug CORS - skal være før anden middleware
+		app.UseCors(allowSpecificOrigins);
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+		app.UseAuthentication();
+		app.UseAuthorization();
 
-        app.MapControllers().RequireCors(allowSpecificOrigins);
+		app.MapControllers().RequireCors(allowSpecificOrigins);
 
 
-        app.MapDefaultEndpoints();
+		app.MapDefaultEndpoints();
 
-       
-        app.Run();
-    }
+
+		app.Run();
+	}
 }

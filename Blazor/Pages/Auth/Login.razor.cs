@@ -32,45 +32,11 @@ public partial class Login
 		{
 			_navigation.NavigateTo("/user/account");
 
-			// If the user is an admin, request notification subscription
-			var authState = await _customAuthStateProvider.GetAuthenticationStateAsync();
-			var user = authState.User;
-			if (user.IsInRole("Admin"))
-			{
-				await RequestNotificationSubscriptionAsync();
-			}
 		}
 		else
 		{
 			_errorMessage = "Invalid email or password.";
 		}
 		PreloadService.Hide();
-	}
-
-	private async Task RequestNotificationSubscriptionAsync()
-	{
-		// Get the current permission status
-		var permission = await JSRuntime.InvokeAsync<string>("blazorPushNotifications.getNotificationPermission");
-
-		// If permission has not yet been requested, ask
-		if (permission == "default")
-		{
-			permission = await JSRuntime.InvokeAsync<string>("blazorPushNotifications.requestPermission");
-		}
-
-		// If the user refused, do not continue
-		if (permission == "denied")
-		{
-			return;
-		}
-
-		// If permission is granted, create a subscription
-		var subscription = await JSRuntime.InvokeAsync<NotificationSubscriptionDto>(
-			"blazorPushNotifications.requestSubscription");
-
-		if (subscription != null)
-		{
-			var result = await ApiService.SubscribeToPushNotificationsAsync(subscription);
-		}
 	}
 }
