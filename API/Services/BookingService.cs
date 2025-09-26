@@ -118,7 +118,7 @@ namespace API.Services
             {
 				UserName = dto.UserName,
 				HotelName = hotel.HotelName,
-				RoomType = roomType.TypeofRoom,
+				TypeOfRoom = roomType.TypeofRoom,
 				CheckIn = booking.CheckIn,
 				CheckOut = booking.CheckOut,
 				GuestsCount = guests,
