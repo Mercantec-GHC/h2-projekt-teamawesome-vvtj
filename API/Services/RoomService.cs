@@ -23,7 +23,10 @@ namespace API.Services
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
+                RoomNumber = r.RoomNumber,
                 RoomType = r.RoomType,
+                RoomTypeName = r.RoomType.TypeofRoom.ToString(),
+                HotelName = r.Hotel.HotelName,
                 HotelId = r.Hotel.Id,
 
             });
@@ -44,7 +47,6 @@ namespace API.Services
             return new RoomsDto
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
@@ -101,6 +103,7 @@ namespace API.Services
                 Id = r.Id,
                 RoomNumber = r.RoomNumber,
                 RoomType = r.RoomType,
+                RoomTypeName = r.RoomType.TypeofRoom.ToString(),
                 HotelName = r.Hotel.HotelName,
                 HotelId = r.HotelId
 
