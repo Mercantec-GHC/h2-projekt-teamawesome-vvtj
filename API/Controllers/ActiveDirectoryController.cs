@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
-using DomainModels.Dto.UserDto;
+using DomainModels.Dto.AuthDto;
 
 namespace API.Controllers;
 /// <summary>
@@ -47,7 +47,7 @@ public class ActiveDirectoryController : ControllerBase
 
 			return Ok(new TokenResponseDto
 			{
-				Token = token
+				AccessToken = token
 			});
 		}
 		catch (Exception ex)
