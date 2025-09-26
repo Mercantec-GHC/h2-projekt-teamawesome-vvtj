@@ -6,12 +6,13 @@ namespace DomainModels.Dto
     public class CreateBookingDto
     {
         public string UserName { get; set; } = null!;
-        public RoomTypeEnum TypeOfRoom { get; set; }
+        public int RoomTypeId { get; set; }
+      // public RoomTypeEnum TypeOfRoom { get; set; }
         public string HotelName { get; set; }
         public DateOnly CheckIn { get; set; }
         public DateOnly CheckOut { get; set; }
         public int GuestsCount { get; set; }
-        public bool isBreakfast { get; set; } = false;
+        public bool IsBreakfast { get; set; } = false;
 
 
 
@@ -22,7 +23,7 @@ namespace DomainModels.Dto
         public DateTime? UpdatedAt { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string HotelName { get; set; }
-        public RoomTypeEnum RoomType { get; set; }
+        public RoomTypeEnum TypeOfRoom { get; set; }
         public DateOnly CheckIn { get; set; }
         public DateOnly CheckOut { get; set; }
         public int GuestsCount { get; set; }

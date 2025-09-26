@@ -18,7 +18,7 @@ namespace API.Services
             return rooms.Select(r => new RoomsDto
             {
                 Id = r.Id,
-                //GuestCount = r.GuestCount,
+              
                 IsAvailable = r.IsAvailable,
                 IsBreakfast = r.IsBreakfast,
                 AvailableFrom = r.AvailableFrom,
@@ -40,7 +40,6 @@ namespace API.Services
             RoomsDto getRoom = new RoomsDto
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 AvailableFrom = room.AvailableFrom,
@@ -69,7 +68,6 @@ namespace API.Services
             var newRoom = new Room
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 RoomNumber = room.RoomNumber,

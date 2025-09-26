@@ -25,7 +25,7 @@ public class Program
 
 		builder.Services.AddAuthorizationCore();
 		builder.Services.AddBlazoredLocalStorage();
-        builder.Services.AddBlazoredSessionStorage();
+       builder.Services.AddBlazoredSessionStorage();
 		builder.Services.AddCascadingAuthenticationState();
 
 		// Læs API endpoint fra miljøvariabler eller brug default

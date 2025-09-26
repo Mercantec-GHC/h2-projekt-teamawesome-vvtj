@@ -6,8 +6,8 @@ namespace DomainModels.Models
     public class Room : Common
     {
         public int RoomNumber { get; set; }
-        //public required int GuestCount { get; set; }
-        public bool IsAvailable { get; set; }
+      
+        public bool IsAvailable { get; set; } 
         public bool IsBreakfast { get; set; }
         public DateTime AvailableFrom { get; set; }
 
