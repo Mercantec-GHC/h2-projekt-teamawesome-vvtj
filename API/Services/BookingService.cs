@@ -2,10 +2,7 @@
 using API.Interfaces;
 using DomainModels.Dto;
 using DomainModels.Enums;
-using DomainModels.Mapping;
 using DomainModels.Models;
-using Humanizer;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -16,14 +13,17 @@ namespace API.Services
     {
         private readonly AppDBContext _dbContext;
         private readonly SeasonalPricingService? _seasonalPricing;
-        public BookingService(AppDBContext context, SeasonalPricingService seasonalPricing)
-        {
-            _dbContext = context;
-            _seasonalPricing = seasonalPricing;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<BookingService> _logger;
+		public BookingService(AppDBContext context, SeasonalPricingService seasonalPricing, IEmailService emailService, ILogger<BookingService> logger)
+		{
+			_dbContext = context;
+			_seasonalPricing = seasonalPricing;
+			_emailService = emailService;
+			_logger = logger;
+		}
 
-        }
-
-        public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
+		public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
         {
             var userId = await _dbContext.Users
                 .Where(u => u.UserName == dto.UserName)
@@ -114,23 +114,51 @@ namespace API.Services
             _dbContext.Bookings.Add(booking);
             await _dbContext.SaveChangesAsync();
 
-
-            return new BookingResponseDto
+            var responseDto = new BookingResponseDto
             {
-                UserName = dto.UserName,
-                HotelName = hotel.HotelName,
-                RoomType = roomType.TypeofRoom,
-                CheckIn = booking.CheckIn,
-                CheckOut = booking.CheckOut,
-                GuestsCount = guests,
-                IsBreakfast = booking.IsBreakfast,
-                NightsCount = nights,
-                TotalPrice = total,
-            };
-        }
+				UserName = dto.UserName,
+				HotelName = hotel.HotelName,
+				RoomType = roomType.TypeofRoom,
+				CheckIn = booking.CheckIn,
+				CheckOut = booking.CheckOut,
+				GuestsCount = guests,
+				IsBreakfast = booking.IsBreakfast,
+				NightsCount = nights,
+				TotalPrice = total,
+			};
 
+			// Send booking confirmation email
+			await SendBookingConfirmationNotification(userId, responseDto);
 
-        public async Task<IEnumerable<GetBookingsDto>> GetAllBookings()
+			return responseDto;
+
+		}
+
+		private async Task SendBookingConfirmationNotification(int userId, BookingResponseDto responseDto)
+		{
+			var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+
+			if (user == null)
+			{
+				_logger.LogWarning($"Booking confirmation email skipped: User with ID {userId} not found.");
+				return;
+			}
+
+			try
+			{
+				await _emailService.SendBookingConfirmationEmailAsync(new EmailFormDto
+				{
+					Name = user.UserName,
+					Email = user.Email
+				}, responseDto);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Failed to send booking confirmation email to {user.Email} (ID: {userId}).");
+			}
+		}
+
+		public async Task<IEnumerable<GetBookingsDto>> GetAllBookings()
         {
 
             var bookings = await _dbContext.Bookings
