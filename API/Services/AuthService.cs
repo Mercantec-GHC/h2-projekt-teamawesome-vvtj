@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using API.Data;
 using API.Interfaces;
 using DomainModels.Dto;
@@ -8,7 +7,6 @@ using DomainModels.Dto.UserDto;
 using DomainModels.Enums;
 using DomainModels.Mapping;
 using DomainModels.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -94,7 +92,6 @@ public class AuthService : IAuthService
 
 		var user = await _context.Users
 		.Include(u => u.UserRole)
-		.Include(u => u.RefreshTokens)
 		.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
 
 		if (user == null)
@@ -113,22 +110,26 @@ public class AuthService : IAuthService
 		string accessToken = _jwtService.CreateToken(user);
 		var refreshToken = await CreateRefreshTokenAsync(ipAddress, device);
 
-		// Finds all valid (not expired, not revoked) refresh tokens for this user.
+		// Only query tokens that are not revoked and not expired
+		var now = DateTime.UtcNow.AddHours(2);
 		var existingTokens = await _context.RefreshTokens
-		.Where(rt => rt.UserId == user.Id && rt.Expires > DateTime.UtcNow.AddHours(2) && rt.Revoked == null)
-		.ToListAsync();
+			.Where(rt => rt.UserId == user.Id && rt.Expires > now && rt.Revoked == null)
+			.ToListAsync();
 
-		// Revokes all existing valid tokens, linking them to the new token.
-		// This prevents reuse of multiple active refresh tokens, reducing risk if a token is leaked.
-		foreach (var token in existingTokens)
+		if (existingTokens.Count > 0)
 		{
-			token.Revoked = DateTime.UtcNow.AddHours(2);
-			token.ReplacedByToken = refreshToken.Token;
+			foreach (var token in existingTokens)
+			{
+				token.Revoked = now;
+				token.ReplacedByToken = refreshToken.Token;
+			}
 		}
-		// Ensures the user’s refresh token collection is initialized.
-		// Adds the new refresh token to the user and saves all changes in the database.
-		user.RefreshTokens ??= new List<RefreshToken>();
+
+		// Avoid unnecessary allocation
+		if (user.RefreshTokens == null)
+			user.RefreshTokens = new List<RefreshToken>(1);
 		user.RefreshTokens.Add(refreshToken);
+
 		await _context.SaveChangesAsync();
 
 		return new TokenResponseDto
@@ -158,27 +159,36 @@ public class AuthService : IAuthService
 		return Convert.ToBase64String(randomNumber);
 	}
 
-	public async Task<TokenResponseDto?> RefreshTokenAsync(string token)
+	public async Task<TokenResponseDto?> RefreshTokenAsync(string token, string ipAddress, string device)
 	{
+		// Find the existing refresh token
 		var existingToken = await _context.RefreshTokens
 			.Include(rt => rt.User)
 			.ThenInclude(rt => rt.UserRole)
 			.FirstOrDefaultAsync(rt => rt.Token == token);
 
+		// If invalid, expired, or revoked, reject
 		if (existingToken == null || existingToken.Expires <= DateTime.UtcNow.AddHours(2)
 			|| existingToken.Revoked != null)
 			return null;
 
+		// Revoke the old token
 		existingToken.Revoked = DateTime.UtcNow.AddHours(2);
 
-		var accessToken = _jwtService.CreateToken(existingToken.User);
+		// Create a new refresh token and save
+		var newRefreshToken = await CreateRefreshTokenAsync(ipAddress, device);
+		newRefreshToken.UserId = existingToken.UserId;
 
+		_context.RefreshTokens.Add(newRefreshToken);
+
+		// Generate a new JWT access token
+		var accessToken = _jwtService.CreateToken(existingToken.User);
 		await _context.SaveChangesAsync();
 
 		return new TokenResponseDto
 		{
 			AccessToken = accessToken,
-			RefreshToken = existingToken.Token
+			RefreshToken = newRefreshToken.Token
 		};
 	}
 

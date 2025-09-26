@@ -99,6 +99,7 @@ public class Program
 					{
 						policy
 							.SetIsOriginAllowed(_ => true)
+							.WithOrigins("https://localhost:5085")
 							.AllowAnyMethod()
 							.AllowAnyHeader()
 							.AllowCredentials();

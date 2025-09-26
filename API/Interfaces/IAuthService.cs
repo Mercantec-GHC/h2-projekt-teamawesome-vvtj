@@ -38,7 +38,7 @@ public interface IAuthService
 	/// </returns>
 	Task<RefreshToken?> CreateRefreshTokenAsync(string ipAddress, string device);
 
-	Task<TokenResponseDto?> RefreshTokenAsync(string token);
+	Task<TokenResponseDto?> RefreshTokenAsync(string token, string ipAddress, string device);
 	/// <summary>
 	/// Changes the password for a user identified by their email address.
 	/// Intended for administrative password resets or recovery scenarios.

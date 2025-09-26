@@ -97,20 +97,20 @@ public class AuthController : ControllerBase
 
 			_loginAttemptService.RecordSuccessfulLogin(request.Email);
 
-			Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+			var cookieOptions = new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = true,
-				SameSite = SameSiteMode.Strict,
+				SameSite = SameSiteMode.None,
 				Expires = DateTime.UtcNow.AddDays(7)
-			});
+			};
+			Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
 
 			return Ok(new
 			{
 				accessToken = result.AccessToken,
 				refreshToken = result.RefreshToken
-			}
-			);
+			});
 		}
 
 		catch (Exception ex)
@@ -131,24 +131,38 @@ public class AuthController : ControllerBase
 	/// <see cref="UnauthorizedObjectResult"/> if the refresh token is invalid;
 	/// <see cref="ObjectResult"/> with status code 500 if an internal error occurs.
 	/// </returns>
-	[Authorize]
 	[HttpPost("refresh-token")]
-	public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto request)
+	public async Task<ActionResult<TokenResponseDto>> RefreshToken()
 	{
 		try
 		{
 			var refreshToken = Request.Cookies["refreshToken"];
-			if (string.IsNullOrEmpty(refreshToken) || refreshToken != request.RefreshToken)
+			if (string.IsNullOrEmpty(refreshToken))
 				return BadRequest("Refresh token is missing or does not match.");
 
-			var result = await _authService.RefreshTokenAsync(request.RefreshToken);
-			if (result == null)
-				return Unauthorized("Invalid refresh token.");
+			// Use IP/device info for token rotation tracking
+			var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+			var device = Request.Headers["User-Agent"].ToString();
 
+			var result = await _authService.RefreshTokenAsync(refreshToken, ipAddress, device);
+
+			if (result == null)
+				return Unauthorized("Invalid or expired refresh token.");
+
+			// Overwrite cookie with new refresh token
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = DateTime.UtcNow.AddDays(7)
+			};
+			Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
+
+			// Only return the access token in JSON
 			return Ok(new TokenResponseDto
 			{
-				AccessToken = result.AccessToken,
-				RefreshToken = result.RefreshToken
+				AccessToken = result.AccessToken
 			});
 		}
 		catch (Exception ex)

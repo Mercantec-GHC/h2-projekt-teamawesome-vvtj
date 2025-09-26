@@ -1,8 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Json;
 using System.Security.Claims;
+using Blazor.Helpers;
 using Blazor.Services;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using DomainModels.Dto.AuthDto;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor;
@@ -29,8 +32,7 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 	public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
 		// Try to get the token from session storage; if not found, check local storage.
-		var savedToken = await _sessionStorage.GetItemAsStringAsync(_tokenKey)
-			?? await _localStorage.GetItemAsStringAsync(_tokenKey);
+		var savedToken = await GetTokenAsync();
 
 		//If no token, return anonymous (unauthenticated) user
 		if (string.IsNullOrWhiteSpace(savedToken))
@@ -41,12 +43,56 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		// Remove any surrounding quotes from the token
 		var cleanToken = savedToken.Trim('"');
 
+		// Check if the token is expired
+		if (JWTHelper.IsTokenExpired(cleanToken))
+		{
+			// Try to refresh the token
+			var newToken = await RefreshAccessTokenAsync();
+			if (!string.IsNullOrWhiteSpace(newToken) && !JWTHelper.IsTokenExpired(newToken))
+			{
+				cleanToken = newToken;
+			}
+			else
+			{
+				await _localStorage.RemoveItemAsync("authToken");
+				await _sessionStorage.RemoveItemAsync("authToken");
+				return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+			}
+		}
 		//Set the token in the HttpClient for future requests, so that it is available after a page refresh
 		_apiService.SetBearerToken(cleanToken);
 
 		//Notify the application about the authentication state change
 		return GetAuthenticatedState(cleanToken);
 	}
+
+	public async Task<string?> RefreshAccessTokenAsync()
+	{
+		var newToken = await TryRefreshAccessTokenAsync();
+
+		if (!string.IsNullOrWhiteSpace(newToken))
+		{
+			var remember = await _localStorage.ContainKeyAsync("authToken");
+			await SaveTokenAsync(newToken, remember);
+
+			_apiService.SetBearerToken(newToken);
+			NotifyUserAuthentication(newToken);
+		}
+		return newToken;
+	}
+
+	public async Task<string?> TryRefreshAccessTokenAsync()
+	{
+		// Backend reads refresh token from HttpOnly cookie
+		var response = await _apiService.PostWithCredentialsAsync("api/Auth/refresh-token");
+
+		if (!response.IsSuccessStatusCode)
+			return null;
+
+		var result = await response.Content.ReadFromJsonAsync<TokenResponseDto>();
+		return result?.AccessToken;
+	}
+
 
 	// This helper method creates an AuthenticationState from a JWT token.
 	// It parses the token, extracts claims, and builds a ClaimsPrincipal.
@@ -92,5 +138,25 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		var authState = Task.FromResult(new AuthenticationState(anonymousUser));
 		// Notify Blazor that the authentication state has changed
 		NotifyAuthenticationStateChanged(authState);
+	}
+	public async Task SaveTokenAsync(string token, bool rememberMe)
+	{
+
+		if (rememberMe)
+		{
+			await _localStorage.SetItemAsync("authToken", token);
+			await _sessionStorage.RemoveItemAsync("authToken");
+		}
+		else
+		{
+			await _sessionStorage.SetItemAsync("authToken", token);
+			await _localStorage.RemoveItemAsync("authToken");
+		}
+	}
+
+	public async Task<string?> GetTokenAsync()
+	{
+		return await _sessionStorage.GetItemAsync<string>("authToken")
+			?? await _localStorage.GetItemAsync<string>("authToken");
 	}
 }
