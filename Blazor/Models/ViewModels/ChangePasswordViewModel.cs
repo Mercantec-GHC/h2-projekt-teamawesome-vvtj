@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DomainModels.Dto.UserDto;
+using DomainModels.Dto.AuthDto;
 
 namespace Blazor.Models.ViewModels;
 
