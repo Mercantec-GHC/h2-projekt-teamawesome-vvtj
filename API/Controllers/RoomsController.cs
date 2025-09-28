@@ -31,14 +31,14 @@ public class RoomsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomsDto>>> GetRooms()
     {
-        var rooms = await _roomService.GetRooms();
-
-        if (rooms == null)
+        try
         {
-            return NotFound();
+            return Ok(await _roomService.GetRooms());
         }
-
-        return Ok(rooms);
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     //Everybody -> Guests shouldn't be able to see rooms, so not everybody
@@ -61,7 +61,6 @@ public class RoomsController : ControllerBase
         {
             return BadRequest(ex);
         }
-
     }
     /// <summary>
     /// Creates a new room
@@ -73,13 +72,15 @@ public class RoomsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateRoom(RoomCreateDto createRoom)
     {
-        var newRoom = await _roomService.PostRoom(createRoom);
-        if (newRoom == null)
+        try
         {
-            return BadRequest();
+            await _roomService.PostRoom(createRoom);
+            return NoContent();
         }
-
-        return Ok(newRoom);
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
@@ -93,9 +94,6 @@ public class RoomsController : ControllerBase
     public async Task<ActionResult<RoomType>> GetRoomsByRoomType(int roomTypeId)
     {
         var rooms = await _roomService.GetRoomsByRoomType(roomTypeId);
-
         return Ok(rooms);
     }
-        
-
 }

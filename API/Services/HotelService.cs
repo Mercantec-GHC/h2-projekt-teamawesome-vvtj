@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using DomainModels.Models;
 using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
+using DomainModels.Mapping;
 
 namespace API.Services
 {
     public class HotelService
     {
         private readonly AppDBContext _context;
+        private readonly HotelMapping _hotelMapping = new();
         public HotelService(AppDBContext context)
         {
             _context = context;
@@ -18,63 +20,25 @@ namespace API.Services
         //GET
         public async Task<IEnumerable<HotelDto>> GetHotel()
         {
+            var hotels = await _context.Hotels.ToListAsync()
+            ?? throw new ArgumentException("No hotels found");
 
-            var hotels = await _context.Hotels.ToListAsync();
-
-            if (hotels == null)
-            {
-                return null;
-            }
-
-            var getHotels = hotels.Select(h => new HotelDto
-            {
-                Id = h.Id,
-                HotelName = h.HotelName,
-                CityName = h.CityName,
-                Address = h.Address,
-                Description = h.Description,
-                Phone = h.Phone,
-                Email = h.Email,
-                WeekdayTime = h.WeekdayTime,
-                SaturdayTime = h.SaturdayTime,
-                HolidaysTime = h.HolidaysTime
-            }).ToList();
-
-            return getHotels;
-
+            return hotels
+            .Select(h => _hotelMapping.ToHotelGETdto(h))
+            .ToList();
         }
         
        
         //GET {Id}
         public async Task<HotelDto> GetHotelById(int id)
         {
-            if (id == null)
-            {
-                return null;
-            }
+            if (id == 0)
+                throw new ArgumentException("Id can't be 0");
 
-            var hotel = await _context.Hotels.FindAsync(id);
+            var hotel = await _context.Hotels.FindAsync(id)
+                ?? throw new ArgumentException($"Couldn't find hotel with ID: {id}");
 
-            if (hotel == null)
-            {
-                return null;
-            }
-
-            HotelDto getHotel = new HotelDto
-            {
-                Id = hotel.Id,
-                HotelName = hotel.HotelName,
-                CityName = hotel.CityName,
-                Address = hotel.Address,
-                Description = hotel.Description,
-                Email = hotel.Email,
-                Phone = hotel.Phone,
-                WeekdayTime = hotel.WeekdayTime,
-                SaturdayTime = hotel.SaturdayTime,
-                HolidaysTime = hotel.HolidaysTime
-            };
-
-            return getHotel;
+            return _hotelMapping.ToHotelGETdto(hotel);
         }
 
         //Use type Hotel instead of HotelDto, as we want the new hotel into the DB
@@ -82,9 +46,8 @@ namespace API.Services
         {
             //Check if hotel.name already exists in our database
             if (await _context.Hotels.AnyAsync(h => h.HotelName == hotelCreateDto.HotelName))
-            {
-                return null;
-            }
+                throw new ArgumentException($"Hotel already exist: {hotelCreateDto.HotelName}");
+            
             var newHotel = new Hotel
             {
                 HotelName = hotelCreateDto.HotelName,
@@ -103,8 +66,11 @@ namespace API.Services
 
             await _context.SaveChangesAsync();
 
+            var createdHotel = _context.Hotels.FirstOrDefault(h => h.HotelName == newHotel.HotelName)
+                ?? throw new Exception("Something went wrong saving the hotel to the database!");
+
             //Return new Hotel into db
-            return newHotel;
+            return createdHotel;
         }
         
         /// <summary>
@@ -112,26 +78,14 @@ namespace API.Services
         /// </summary>
         public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)
         {
-            var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id);
-            if (currentHotel == null)
-            {
-                return null;
-            }
+            var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id)
+                ?? throw new ArgumentException($"Couldn't not find hotel by ID:{updatedHotel.Id}");
 
-            currentHotel.Id = updatedHotel.Id;
-            currentHotel.HotelName = updatedHotel.HotelName;
-            currentHotel.CityName = updatedHotel.CityName;
-            currentHotel.Address = updatedHotel.Address;
-            currentHotel.Description = updatedHotel.Description;
-            currentHotel.UpdatedAt = DateTime.UtcNow.AddHours(2);
-            currentHotel.Email = updatedHotel.Email;
-            currentHotel.Phone = updatedHotel.Phone;
-            currentHotel.WeekdayTime = updatedHotel.WeekdayTime;
-            currentHotel.SaturdayTime = updatedHotel.SaturdayTime;
-            currentHotel.HolidaysTime = updatedHotel.HolidaysTime;
 
+            _hotelMapping.TohotelPUTDto(currentHotel, updatedHotel);
             await _context.SaveChangesAsync();
 
+            //??
             return new HotelDto
             {
                 Id = currentHotel.Id,
