@@ -42,17 +42,34 @@ namespace DomainModels.Mapping
         // }
         public void TohotelPUTDto(Hotel currentHotel, HotelDto updatedHotel)
         {
-            currentHotel.HotelName = updatedHotel.HotelName;
-            currentHotel.CityName = updatedHotel.CityName;
-            currentHotel.Address = updatedHotel.Address;
-            currentHotel.Description = updatedHotel.Description;
+            if (!string.IsNullOrWhiteSpace(updatedHotel.HotelName)  && updatedHotel.HotelName != "string")
+                currentHotel.HotelName = updatedHotel.HotelName;
+
+            if (!string.IsNullOrWhiteSpace(updatedHotel.CityName) &&updatedHotel.CityName != "string")
+                currentHotel.CityName = updatedHotel.CityName;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.Address) && updatedHotel.Address != "string")
+                currentHotel.Address = updatedHotel.Address;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.Description)&& updatedHotel.Description != "string")
+                currentHotel.Description = updatedHotel.Description;
+            
             currentHotel.UpdatedAt = DateTime.UtcNow.AddHours(2);
-            currentHotel.Email = updatedHotel.Email;
-            currentHotel.Phone = updatedHotel.Phone;
-            currentHotel.WeekdayTime = updatedHotel.WeekdayTime;
-            currentHotel.SaturdayTime = updatedHotel.SaturdayTime;
-            currentHotel.HolidaysTime = updatedHotel.HolidaysTime;
+
+            if (!string.IsNullOrWhiteSpace(updatedHotel.Email) && updatedHotel.Email != "string")
+                currentHotel.Email = updatedHotel.Email;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.Phone) && updatedHotel.Phone != "string")
+                currentHotel.Phone = updatedHotel.Phone;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.WeekdayTime) && updatedHotel.WeekdayTime != "string")
+                currentHotel.WeekdayTime = updatedHotel.WeekdayTime;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.SaturdayTime) && updatedHotel.SaturdayTime != "string")
+                currentHotel.SaturdayTime = updatedHotel.SaturdayTime;
+            
+            if (!string.IsNullOrWhiteSpace(updatedHotel.HolidaysTime) && updatedHotel.HolidaysTime != "string")
+                currentHotel.HolidaysTime = updatedHotel.HolidaysTime;
         }
-        
     }
 }

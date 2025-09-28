@@ -72,20 +72,20 @@ namespace API.Services
             //Return new Hotel into db
             return createdHotel;
         }
-        
+
         /// <summary>
         /// Returns HotelDto, as we want the "tailored" version
         /// </summary>
         public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)
         {
             var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id)
-                ?? throw new ArgumentException($"Couldn't not find hotel by ID:{updatedHotel.Id}");
-
+                ?? throw new ArgumentException($"Couldn't find hotel by ID: {updatedHotel.Id}");
 
             _hotelMapping.TohotelPUTDto(currentHotel, updatedHotel);
+
             await _context.SaveChangesAsync();
 
-            //??
+            // Return the updated hotel as DTO
             return new HotelDto
             {
                 Id = currentHotel.Id,
