@@ -101,7 +101,7 @@ public class HotelController : ControllerBase
     {
         try
         {
-            return Ok(updateHotel);
+            return Ok(await _hotelService.PutHotel(updateHotel));
         }
         catch (ArgumentException ex)
         {

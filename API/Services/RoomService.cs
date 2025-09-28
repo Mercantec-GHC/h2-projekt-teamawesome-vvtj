@@ -35,7 +35,7 @@ namespace API.Services
             .Include(r => r.RoomType)
             .Include(r => r.Hotel)
             .FirstOrDefaultAsync(r => r.Id == id)
-                ?? throw new ArgumentException($"Couldnt find room with id; {id}");
+                ?? throw new ArgumentException($"Couldnt find room with id: {id}");
 
             return _roomMapping.ToRoomGETdto(room);
         }

@@ -59,7 +59,7 @@ public class RoomsController : ControllerBase
         }
         catch (ArgumentException ex)
         {
-            return BadRequest(ex);
+            return BadRequest(ex.Message);
         }
     }
     /// <summary>
