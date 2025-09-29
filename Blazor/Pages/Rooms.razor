@@ -12,33 +12,12 @@
 
             @foreach (var room in roomTypes)
             {
-                var roomtype = room.TypeofRoom;
-
-                var imagePath = roomtype switch
-                {
-                    "1" => "/wwwroot/images/CopilotBedroom.png",
-                    "2" => "/wwwroot/images/CopilotBedroom.png",
-                    "3" => "/wwwroot/images/CopilotBedroom.png",
-                    "4" => "/wwwroot/images/CopilotBedroom.png",
-                    "5" => "/wwwroot/images/CopilotBedroom.png",
-                    _ => "/wwwroot/images/Placeholder.png"
-                };
-
-                var displayName = roomtype switch
-                {
-                    "1"=> "Standard room",
-                    "2" => "Family room",
-                    "3" => "Single room",
-                    "4" => "Royal suite",
-                    "5" => "Penthouse",
-                    _ => "Unknown"
-                };
-
+                
                 <div class="col">
                     <div class="card h-100">
-                        <img src="@imagePath" class="card-img-top" alt="@displayName" />
+                        <img src="/images/CopilotBedroom.png" class="card-img-top" />
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">@displayName</h5>
+                            <h5 class="card-title">@room.TypeofRoom.</h5>
                             <p class="card-text">@room.Description</p>
                             <p class="card-text text-muted">Max Capacity: @room.MaxCapacity</p>
                             <p class="card-text text-muted mt-auto">Price per night: @room.PricePerNight?.ToString("C")</p>
