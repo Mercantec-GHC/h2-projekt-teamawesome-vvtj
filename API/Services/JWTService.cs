@@ -70,7 +70,7 @@ public class JWTService : IJWTService
 			Subject = claimsIdentity,
 			Issuer = _configuration.GetValue<string>("AppSettings:Issuer"),
 			Audience = _configuration.GetValue<string>("AppSettings:Audience"),
-			Expires = DateTime.UtcNow.AddHours(1),
+			Expires = DateTime.UtcNow.AddMinutes(5),
 			SigningCredentials = creds
 		};
 		var token = tokenHandler.CreateToken(tokenDescriptor);

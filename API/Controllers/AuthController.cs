@@ -1,6 +1,7 @@
-﻿using API.Data;
+﻿using System.Security.Claims;
+using API.Data;
 using API.Interfaces;
-using DomainModels.Dto.UserDto;
+using DomainModels.Dto.AuthDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ public class AuthController : ControllerBase
 	/// <summary>
 	/// Initializes a new instance of the <see cref="AuthController"/> class.
 	/// </summary>
-	/// <param name="authService">Service for authentication logic.</param>
+	/// <param name="authService">Service for authentication and user management logic.</param>
 	/// <param name="loginAttemptService">Service for tracking login attempts and lockouts.</param>
 	/// <param name="logger">Logger for authentication events.</param>
 	/// <param name="context">Database context for user data.</param>
@@ -37,11 +38,12 @@ public class AuthController : ControllerBase
 
 	/// <summary>
 	/// Registers a new user account.
+	/// Validates input and returns user data if successful, or a bad request if the user already exists.
 	/// </summary>
 	/// <param name="request">The registration details including email, username, password, and role.</param>
 	/// <returns>
-	/// <see cref="RegisterDto"/> with registered user data if successful;
-	/// otherwise, a <see cref="BadRequestObjectResult"/> if the user already exists.
+	/// <see cref="OkObjectResult"/> with registered user data if successful;
+	/// <see cref="BadRequestObjectResult"/> if the user already exists.
 	/// </returns>
 	[HttpPost("register")]
 	public async Task<ActionResult<RegisterDto>> Register(RegisterDto request)
@@ -56,11 +58,12 @@ public class AuthController : ControllerBase
 	}
 
 	/// <summary>
-	/// Authenticates a user and returns a JWT token if credentials are valid.
+	/// Authenticates a user and returns JWT access and refresh tokens if credentials are valid.
+	/// Handles lockout for repeated failed attempts and logs authentication events.
 	/// </summary>
 	/// <param name="request">The login details including email and password.</param>
 	/// <returns>
-	/// JWT token as a string if login is successful;
+	/// <see cref="OkObjectResult"/> with JWT tokens if login is successful;
 	/// <see cref="UnauthorizedObjectResult"/> if credentials are invalid;
 	/// <see cref="ObjectResult"/> with status code 429 if account is locked out;
 	/// <see cref="ObjectResult"/> with status code 500 if an internal error occurs.
@@ -80,8 +83,8 @@ public class AuthController : ControllerBase
 				});
 			}
 
-			var token = await _authService.LoginUserAsync(request);
-			if (token == null)
+			var result = await _authService.LoginUserAsync(request);
+			if (result == null)
 			{
 				var attemptsLeft = _loginAttemptService.RecordFailedAttempt(request.Email);
 
@@ -93,15 +96,78 @@ public class AuthController : ControllerBase
 			}
 
 			_loginAttemptService.RecordSuccessfulLogin(request.Email);
-			return Ok(new TokenResponseDto
+
+			var cookieOptions = new CookieOptions
 			{
-				Token = token
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = DateTime.UtcNow.AddDays(7)
+			};
+			Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
+
+			return Ok(new
+			{
+				accessToken = result.AccessToken,
+				refreshToken = result.RefreshToken
 			});
 		}
 
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Login failed for email {Email}", request.Email);
+			return StatusCode(500, "An internal error occurred. Please try again later.");
+		}
+	}
+
+	/// <summary>
+	/// Refreshes the JWT access token using a valid refresh token.
+	/// Validates the refresh token from the request and the cookie, then issues new tokens if valid.
+	/// </summary>
+	/// <param name="request">The refresh token request containing the refresh token string.</param>
+	/// <returns>
+	/// <see cref="OkObjectResult"/> with new access and refresh tokens if successful;
+	/// <see cref="BadRequestObjectResult"/> if the refresh token is missing or does not match the cookie;
+	/// <see cref="UnauthorizedObjectResult"/> if the refresh token is invalid;
+	/// <see cref="ObjectResult"/> with status code 500 if an internal error occurs.
+	/// </returns>
+	[HttpPost("refresh-token")]
+	public async Task<ActionResult<TokenResponseDto>> RefreshToken()
+	{
+		try
+		{
+			var refreshToken = Request.Cookies["refreshToken"];
+			if (string.IsNullOrEmpty(refreshToken))
+				return BadRequest("Refresh token is missing or does not match.");
+
+			// Use IP/device info for token rotation tracking
+			var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+			var device = Request.Headers["User-Agent"].ToString();
+
+			var result = await _authService.RefreshTokenAsync(refreshToken, ipAddress, device);
+
+			if (result == null)
+				return Unauthorized("Invalid or expired refresh token.");
+
+			// Overwrite cookie with new refresh token
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = DateTime.UtcNow.AddDays(7)
+			};
+			Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
+
+			// Only return the access token in JSON
+			return Ok(new TokenResponseDto
+			{
+				AccessToken = result.AccessToken
+			});
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Error refreshing token");
 			return StatusCode(500, "An internal error occurred. Please try again later.");
 		}
 	}
@@ -130,7 +196,7 @@ public class AuthController : ControllerBase
 				return BadRequest("New password cannot be empty.");
 
 			var result = await _authService.ChangeUserPasswordAsync(email, request.NewPassword);
-			
+
 			if (!result)
 				return NotFound("User not found or failed to update password.");
 
@@ -143,6 +209,44 @@ public class AuthController : ControllerBase
 		{
 			_logger.LogError(ex, "Error changing password for user with email {Email}", email);
 			return StatusCode(500, "An error occurred while retrieving the user.");
-		}	
+		}
+	}
+
+	/// <summary>
+	/// Allows the currently authenticated user to change their own password.
+	/// Validates input and ensures the new password and confirmation match.
+	/// </summary>
+	/// <param name="changePassword">The new password and confirmation details.</param>
+	/// <returns>
+	/// <see cref="OkObjectResult"/> if the password was changed successfully;
+	/// <see cref="BadRequestObjectResult"/> if input is invalid or password change fails;
+	/// <see cref="UnauthorizedObjectResult"/> if the user is not authenticated;
+	/// <see cref="ObjectResult"/> with status code 500 if an error occurs.
+	/// </returns>
+	[Authorize]
+	[HttpPost("change-own-password")]
+	public async Task<IActionResult> ChangeOwnPassword([FromBody] ChangePasswordDto changePassword)
+	{
+		try
+		{
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			if (userId == null)
+				return Unauthorized("User ID claim not found.");
+
+			if (string.IsNullOrWhiteSpace(changePassword.NewPassword)
+				|| string.IsNullOrWhiteSpace(changePassword.ConfirmPassword))
+				return BadRequest("New password and confirmation cannot be empty.");
+
+			var result = await _authService.ChangeOwnPasswordAsync(userId, changePassword.NewPassword, changePassword.ConfirmPassword);
+
+			if (!result)
+				return BadRequest("Failed to change password. Please ensure your current password is correct.");
+			return Ok("Password changed successfully.");
+		}
+		catch
+		{
+			return StatusCode(500, "An error occurred while changing the password.");
+		}
 	}
 }
