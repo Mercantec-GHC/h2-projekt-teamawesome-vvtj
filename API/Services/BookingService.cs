@@ -1,9 +1,8 @@
 ﻿using API.Data;
 using API.Interfaces;
 using DomainModels.Dto;
-using DomainModels.Mapping;
+using DomainModels.Enums;
 using DomainModels.Models;
-using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,12 +12,18 @@ namespace API.Services
     public class BookingService : IBookingService
     {
         private readonly AppDBContext _dbContext;
-        public BookingService(AppDBContext context)
-        {
-            _dbContext = context;
-        }
+        private readonly SeasonalPricingService? _seasonalPricing;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<BookingService> _logger;
+		public BookingService(AppDBContext context, SeasonalPricingService seasonalPricing, IEmailService emailService, ILogger<BookingService> logger)
+		{
+			_dbContext = context;
+			_seasonalPricing = seasonalPricing;
+			_emailService = emailService;
+			_logger = logger;
+		}
 
-        public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
+		public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
         {
             var userId = await _dbContext.Users
                 .Where(u => u.UserName == dto.UserName)
@@ -42,9 +47,9 @@ namespace API.Services
                 r.RoomType.TypeofRoom == dto.TypeOfRoom && r.IsAvailable == true)
                 .Select(r => new { r.Id, r.RoomType })
                  .ToListAsync();
-          
+
             //if there are no rooms with chosen type in the hotel
-            if (roomsQuery.Count == 0) 
+            if (roomsQuery.Count == 0)
                 return null;
 
             var roomIds = roomsQuery.Select(r => r.Id).ToList();
@@ -67,9 +72,8 @@ namespace API.Services
             if (availableRoomId == 0)
                 return null; // No available rooms found
 
-           var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
-            
-            
+            var availableRoom = roomsQuery.FirstOrDefault(r => r.Id == availableRoomId);
+
             // If no available room is found, return null
             if (availableRoom == null || availableRoom.RoomType == null)
                 return null;
@@ -89,7 +93,8 @@ namespace API.Services
                 roomType.PricePerNight += 200 * guests;
 
             var pricePerNight = roomType.PricePerNight.GetValueOrDefault(0m);
-            var total = pricePerNight * nights;
+            decimal finalPrice = await _seasonalPricing.GetSeasonalPrice(pricePerNight, dto.CheckIn.ToDateTime(TimeOnly.MinValue));
+            var total = finalPrice * nights;
 
 
             var booking = new Booking
@@ -109,23 +114,51 @@ namespace API.Services
             _dbContext.Bookings.Add(booking);
             await _dbContext.SaveChangesAsync();
 
-
-            return new BookingResponseDto
+            var responseDto = new BookingResponseDto
             {
-                UserName = dto.UserName,
-                HotelName = hotel.HotelName,
-                RoomType = roomType.TypeofRoom,
-                CheckIn = booking.CheckIn,
-                CheckOut = booking.CheckOut,
-                GuestsCount = guests,
-                IsBreakfast = booking.IsBreakfast,
-                NightsCount = nights,
-                TotalPrice = total,
-            };
-        }
+				UserName = dto.UserName,
+				HotelName = hotel.HotelName,
+				RoomType = roomType.TypeofRoom,
+				CheckIn = booking.CheckIn,
+				CheckOut = booking.CheckOut,
+				GuestsCount = guests,
+				IsBreakfast = booking.IsBreakfast,
+				NightsCount = nights,
+				TotalPrice = total,
+			};
 
+			// Send booking confirmation email
+			await SendBookingConfirmationNotification(userId, responseDto);
 
-        public async Task<IEnumerable<GetBookingsDto>> GetAllBookings()
+			return responseDto;
+
+		}
+
+		private async Task SendBookingConfirmationNotification(int userId, BookingResponseDto responseDto)
+		{
+			var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+
+			if (user == null)
+			{
+				_logger.LogWarning($"Booking confirmation email skipped: User with ID {userId} not found.");
+				return;
+			}
+
+			try
+			{
+				await _emailService.SendBookingConfirmationEmailAsync(new EmailFormDto
+				{
+					Name = user.UserName,
+					Email = user.Email
+				}, responseDto);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, $"Failed to send booking confirmation email to {user.Email} (ID: {userId}).");
+			}
+		}
+
+		public async Task<IEnumerable<GetBookingsDto>> GetAllBookings()
         {
 
             var bookings = await _dbContext.Bookings
@@ -144,6 +177,37 @@ namespace API.Services
 
             return bookings;
         }
+
+        public async Task<IEnumerable<GetAvaliableRoomsDto>> GetAvaliableRoomsAsync(string hotelName, DateOnly from, DateOnly to)
+        {
+            if (to <= from)
+                return Enumerable.Empty<GetAvaliableRoomsDto>();
+
+            var hotel = await _dbContext.Hotels
+                .AsNoTracking()
+                .FirstOrDefaultAsync(h => h.HotelName == hotelName);
+            if (hotel == null)
+                return Enumerable.Empty<GetAvaliableRoomsDto>();
+
+            var available = await _dbContext.Rooms
+              .AsNoTracking()
+              .Where(r => r.HotelId == hotel.Id)
+              .Where(r => !_dbContext.Bookings.Any(b =>
+            b.RoomId == r.Id &&
+            b.CheckIn < to && b.CheckOut > from))
+                .OrderBy(r => r.RoomNumber)
+                .Select(r => new GetAvaliableRoomsDto
+                {
+                    RoomId = r.Id,
+                    RoomNumber = r.RoomNumber,
+                    HotelName = r.Hotel.HotelName,
+                    RoomTypeName = ((RoomTypeEnum)r.TypeId).ToString()
+                })
+                .ToListAsync();
+            return available;
+
+
+       }
 
         public async Task<IEnumerable<BookingByUserDto>> GetBookingByUser(int userId)
         {
@@ -167,7 +231,7 @@ namespace API.Services
             return userBookings;
         }
 
-     
+
 
         public async Task<BookingResponseDto?> UpdateBookingDatesAsync(int bookingId, DateOnly newCheckIn, DateOnly newCheckOut)
         {
@@ -180,7 +244,7 @@ namespace API.Services
 
 
 
-            if (booking == null || !booking.Room.IsAvailable)
+            if (booking == null)
                 return null;
 
             booking.CheckIn = newCheckIn;
@@ -196,14 +260,16 @@ namespace API.Services
                 pricePerNight += 200 * booking.GuestsCount;
             }
 
-
-            var total = pricePerNight * nights;
+            decimal finalPrice = await _seasonalPricing.GetSeasonalPrice(pricePerNight, booking.CheckIn.ToDateTime(TimeOnly.MinValue));
+            var total = finalPrice * nights;
             booking.TotalPrice = total;
+            booking.UpdatedAt = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();
 
             return new BookingResponseDto
             {
+                UpdatedAt = booking.UpdatedAt,
                 UserName = booking.User.UserName,
                 HotelName = booking.Room.Hotel.HotelName,
                 RoomType = booking.Room.RoomType.TypeofRoom,

@@ -33,8 +33,8 @@ public static class CurrentUserViewModelExtensions
 			PhoneNumber = dto.PhoneNumber,
 			DateOfBirth = dto.DateOfBirth,
 			SpecialRequests = dto.SpecialRequests,
-			LastUpdated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm"),
-			UpdatedAt = dto.UpdatedAt
+			LastUpdatedFormated = dto.UpdatedAt?.ToString("dd-MM-yyyy HH:mm"),
+			LastUpdated = dto.UpdatedAt
 		};
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 
 namespace Blazor.Pages.Auth;
@@ -7,9 +8,11 @@ namespace Blazor.Pages.Auth;
 public partial class Register
 {
 	[Inject]
-	private IAuthService _authService { get; set; } = null!;
+	private IAuthService _authService { get; set; } = default!;
 	[Inject]
-	private NavigationManager _navigation { get; set; } = null!;
+	private NavigationManager _navigation { get; set; } = default!;
+	[Inject]
+	private PreloadService _preloadService { get; set; } = default!;
 	private string _errorMessage = string.Empty;
 	private UserRegisterDto _registerModel = new();
 
@@ -25,6 +28,7 @@ public partial class Register
 
 		try
 		{
+			_preloadService.Show();
 			var emailExists = await _authService.RegisterAsync(
 				_registerModel.Email,
 				_registerModel.Username,
@@ -47,6 +51,10 @@ public partial class Register
 		{
 			_errorMessage = $"An error occurred: {ex.Message}";
 			return;
+		}
+		finally
+		{
+			_preloadService?.Hide();
 		}
 	}
 }
