@@ -11,6 +11,8 @@ namespace Blazor.Services
             try
             {
                 //Gets endpoint
+                Console.WriteLine($"room type link: {_httpClient.BaseAddress}api/RoomTypes");
+
                 var response = await GetAsync("api/RoomTypes");
                 response.EnsureSuccessStatusCode();
 
