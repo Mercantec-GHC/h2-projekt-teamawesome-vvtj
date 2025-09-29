@@ -1,4 +1,5 @@
 ﻿using Blazor.Pages.Booking;
+using DomainModels.Dto;
 using DomainModels.Enums;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,5 +22,20 @@ namespace Blazor.Models.ViewModels
         public decimal? TotalPrice { get; set; }
 
     }
-
+    public static class BookingMapping
+    {
+        public static CreateBookingDto ToCreateBookingDto(this CreateBookingViewModel vm)
+        {
+            return new CreateBookingDto
+            {
+                UserName = vm.UserName,
+                HotelName = vm.HotelName,
+                RoomTypeId = vm.RoomTypeId,
+                CheckIn = DateOnly.FromDateTime(vm.CheckIn),
+                CheckOut = DateOnly.FromDateTime(vm.CheckOut),
+                GuestsCount = vm.GuestsCount,
+                IsBreakfast = vm.IsBreakfast
+            };
+        }
+    }
 }

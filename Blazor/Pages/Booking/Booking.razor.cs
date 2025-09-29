@@ -7,7 +7,6 @@ using Blazor.Models.ViewModels;
 
 namespace Blazor.Pages.Booking;
 
-[Authorize]
 public partial class Booking : ComponentBase
 {
     [Inject] private Services.APIService Api { get; set; } = default!;
@@ -15,7 +14,7 @@ public partial class Booking : ComponentBase
 
     protected bool IsSubmitting { get; set; }
     protected string? FormError { get; set; }
-    protected CreateBookingViewModel? Vm { get; set; }
+    protected CreateBookingViewModel Vm { get; set; } = new();
     protected BookingResponseDto? Quote { get; set; }
 
     protected List<string> Hotels { get; set; } = new();
@@ -35,7 +34,7 @@ public partial class Booking : ComponentBase
         var user = await Api.GetCurrentUserAsync();
         if (user is null)
         {
-            Nav.NavigateTo("authentication/login");
+            Nav.NavigateTo("/login");
             return;
         }
 
@@ -118,7 +117,7 @@ public partial class Booking : ComponentBase
         IsSubmitting = true;
         FormError = null;
 
-        var dto = ToCreateBookingDto(Vm);
+        var dto = Vm.ToCreateBookingDto();
         var result = await Api.CreateBooking(dto);
 
         IsSubmitting = false;
@@ -135,15 +134,4 @@ public partial class Booking : ComponentBase
         Nav.NavigateTo("/booking/success");
     }
 
-    private static CreateBookingDto ToCreateBookingDto(CreateBookingViewModel vm) => new()
-    {
-        UserName = vm.UserName,
-        HotelName = vm.HotelName,
-        RoomTypeId = vm.RoomTypeId,
-        // TypeOfRoom = (RoomTypeEnum)vm.RoomTypeId!.Value,
-        CheckIn = DateOnly.FromDateTime(vm.CheckIn),
-        CheckOut = DateOnly.FromDateTime(vm.CheckOut),
-        GuestsCount = vm.GuestsCount,
-        IsBreakfast = vm.IsBreakfast
-    };
 }
