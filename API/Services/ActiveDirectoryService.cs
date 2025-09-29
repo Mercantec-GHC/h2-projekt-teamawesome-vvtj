@@ -61,6 +61,10 @@ namespace API.Services
 				if (adUser == null)
 					return null;
 
+				var roleEntity = await _context.Roles
+				.FirstOrDefaultAsync(r => r.RoleName == adUser.Role)
+					?? throw new ArgumentException($"Role '{adUser.Role}' was not found in the database");
+
 				 var adUserToDb = await _context.Users
 				 .Include(u => u.UserRole)
 				 .FirstOrDefaultAsync(u => u.UserName == adUser.SamAccountName);
@@ -70,7 +74,8 @@ namespace API.Services
 				 	{
 				 		UserName = adUser.SamAccountName,
 				 		Email = adUser.Email,
-				 		HashedPassword = "EXTERNALLY_MANAGED"
+				 		HashedPassword = "EXTERNALLY_MANAGED",
+						UserRole = roleEntity,
 				 	};
 				 	_context.Users.Add(adUserToDb);
 				 	await _context.SaveChangesAsync();
