@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Blazor.Models.ViewModels;
+using Blazor.Pages.User;
+using BlazorBootstrap;
 using DomainModels.Dto;
-using DomainModels.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Blazor.Models.ViewModels;
+
 
 namespace Blazor.Pages.Booking;
 
@@ -11,12 +11,14 @@ public partial class Booking : ComponentBase
 {
     [Inject] private Services.APIService Api { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
+    [Inject] private PreloadService preloadService { get; set; } = default!;
 
     protected bool IsSubmitting { get; set; }
     protected string? FormError { get; set; }
     protected CreateBookingViewModel Vm { get; set; } = new();
     protected BookingResponseDto? Quote { get; set; }
 
+    protected CurrentUserProfileViewModel? User { get; set; }
     protected List<string> Hotels { get; set; } = new();
     protected List<RoomTypeDto> AllowedRoomTypes { get; set; } = new();
 
@@ -27,15 +29,27 @@ public partial class Booking : ComponentBase
         !string.IsNullOrWhiteSpace(Vm.HotelName) &&
        // Vm.RoomTypeId is not null &&
         Vm.GuestsCount >= 1 &&
-        Vm.NightsCount > 0;
+         Vm.GuestsCount <= 6 &&
+        Vm.NightsCount > 0 &&
+        Vm.CheckIn >= DateTime.Today;
 
     protected override async Task OnInitializedAsync()
     {
+
         var user = await Api.GetCurrentUserAsync();
         if (user is null)
         {
             Nav.NavigateTo("/login");
             return;
+        }
+        var userInfo = await Api.GetCurrentUserInfoAsync();
+        if (userInfo != null)
+        {
+            User = new CurrentUserProfileViewModel
+            {
+                FirstName = userInfo.FirstName ?? string.Empty,
+                LastName = userInfo.LastName ?? string.Empty
+            };
         }
 
         Hotels = (await Api.GetAllHotelsAsync())?.Select(h => h.HotelName).ToList()
@@ -86,13 +100,39 @@ public partial class Booking : ComponentBase
 
         RecalcNights();
     }
+    private void CancelCreate()
+    {
+        Nav.NavigateTo("/");
+    }
 
     protected void OnHotelChanged(ChangeEventArgs _) => ClearError();
     protected void OnRoomTypeChanged(ChangeEventArgs _) => ClearError();
-    protected void OnGuestsChanged(ChangeEventArgs _) => ClearError();
+    protected void OnGuestsChanged(ChangeEventArgs _)
+    {
+        if (Vm.GuestsCount > 6)
+        {
+            Vm.GuestsCount = 6;
+            FormError = "Maximum 6 guests in one room";
+        }
+        else if (Vm.GuestsCount < 1)
+        {
+            Vm.GuestsCount = 1;
+            FormError = "At least 1 guest is required.";
+        }
+        else
+        {
+            ClearError();
+        }
+    }
 
     protected void OnDatesChanged(ChangeEventArgs _)
     {
+        if (Vm.CheckIn < DateTime.Today)
+        {
+            Vm.CheckIn = DateTime.Today;
+            FormError = "Check-in date cannot be earlier than today.";
+        }
+
         RecalcNights();
         ClearError();
     }
