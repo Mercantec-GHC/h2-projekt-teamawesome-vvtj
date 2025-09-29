@@ -15,21 +15,21 @@
 
                 var imagePath = roomtype switch
                 {
-                    RoomTypeEnum.Standard => "/wwwroot/images/CopilotBedroom.png",
-                    RoomTypeEnum.Family => "/wwwroot/images/CopilotBedroom.png",
-                    RoomTypeEnum.Single => "/wwwroot/images/CopilotBedroom.png",
-                    RoomTypeEnum.Royal => "/wwwroot/images/CopilotBedroom.png",
-                    RoomTypeEnum.Penthouse => "/wwwroot/images/CopilotBedroom.png",
+                    "1" => "/wwwroot/images/CopilotBedroom.png",
+                    "2" => "/wwwroot/images/CopilotBedroom.png",
+                    "3" => "/wwwroot/images/CopilotBedroom.png",
+                    "4" => "/wwwroot/images/CopilotBedroom.png",
+                    "5" => "/wwwroot/images/CopilotBedroom.png",
                     _ => "/wwwroot/images/Placeholder.png"
                 };
 
                 var displayName = roomtype switch
                 {
-                    RoomTypeEnum.Standard => "Standard room",
-                    RoomTypeEnum.Family => "Family room",
-                    RoomTypeEnum.Single => "Single room",
-                    RoomTypeEnum.Royal => "Royal suite",
-                    RoomTypeEnum.Penthouse => "Penthouse",
+                    "1"=> "Standard room",
+                    "2" => "Family room",
+                    "3" => "Single room",
+                    "4" => "Royal suite",
+                    "5" => "Penthouse",
                     _ => "Unknown"
                 };
 
