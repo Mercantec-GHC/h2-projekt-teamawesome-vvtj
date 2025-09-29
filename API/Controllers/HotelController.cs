@@ -6,8 +6,10 @@ using API.Services;
 using DomainModels.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
-
-
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using Azure;
+using DomainModels.Mapping;
 
 
 [ApiController]
@@ -16,6 +18,7 @@ public class HotelController : ControllerBase
 {
     private readonly AppDBContext _context;
     private readonly HotelService _hotelService;
+    private readonly HotelMapping _hotelMapping;
 
     public HotelController(AppDBContext context, HotelService hotelService)
     {
@@ -35,20 +38,12 @@ public class HotelController : ControllerBase
     {
         try
         {
-            var hotels = await _hotelService.GetHotel();
-
-            if (hotels == null)
-            {
-                return BadRequest("Cannot find hotel");
-            }
-
-            return Ok(hotels);
+            return Ok(await _hotelService.GetHotel());
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error {ex.Message}");
+            return NotFound(ex.Message);
         }
-        
     }
 
     /// <summary>
@@ -60,13 +55,14 @@ public class HotelController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<HotelDto>> GetSpecificHotel(int id)
     {
-        if (id == null)
+        try
         {
-            return NotFound();
+            return await _hotelService.GetHotelById(id);
         }
-
-        var hotel = await _hotelService.GetHotelById(id);
-        return Ok(hotel);
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     //Only Admin
@@ -82,24 +78,15 @@ public class HotelController : ControllerBase
 	[HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
-        
         try
         {
-            var newHotel = await _hotelService.PostHotel(hotelcreateDto);
-            
-
-            if (newHotel == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(newHotel);
+            await _hotelService.PostHotel(hotelcreateDto);
+            return NoContent();
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return BadRequest(ex.Message);
         }
-
     }
 
 	//Only Admin
@@ -122,23 +109,55 @@ public class HotelController : ControllerBase
 
             return Ok(_updatedHotel);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return BadRequest(ex.Message);
         }
         
     }
+    
+    [HttpPatch("{hotelId}")]
+    public async Task<IActionResult> PatchHotel(int hotelId, [FromBody]HotelPutDto updateDto)
+    {
+        var hotel = await _context.Hotels.FindAsync(hotelId);
+        if (hotel == null) return NotFound();
 
-	//Only Admin
-	//DELETE: api/Hotels
-	/// <summary>
-	/// Deletes a hotel
-	/// </summary>
-	/// <param name="Id">Unique identifier</param>
-	/// <returns>true if deletion succeed</returns>
-	/// <response code="404">Could not delete hotel!</response>
-	/// 
-	[Authorize(Roles = "Admin")]
+        if (updateDto.HotelName != null) hotel.HotelName = updateDto.HotelName;
+        if (updateDto.CityName != null) hotel.CityName = updateDto.CityName;
+        if (updateDto.Address != null) hotel.Address = updateDto.Address;
+        if (updateDto.Description != null) hotel.Description = updateDto.Description;
+
+        hotel.UpdatedAt = DateTime.UtcNow.AddHours(2);
+        await _context.SaveChangesAsync();
+
+        return Ok(hotel);
+        // var exitingHotel = await _context.Hotels.FindAsync(hotelId);
+
+        // var updatedHotel = new HotelPutDto
+        // {
+        //     HotelName = exitingHotel.HotelName,
+        //     CityName = exitingHotel.CityName,
+        //     Address = exitingHotel.Address,
+        //     Description = exitingHotel.Description,
+        // };
+        // patchDocumentHotel.ApplyTo(updatedHotel, ModelState);
+
+        // _hotelMapping.ToHotelPatchDto(exitingHotel, updatedHotel);
+
+        // await _context.SaveChangesAsync();
+        // return Ok(exitingHotel);
+    }
+
+    //Only Admin
+    //DELETE: api/Hotels
+    /// <summary>
+    /// Deletes a hotel
+    /// </summary>
+    /// <param name="Id">Unique identifier</param>
+    /// <returns>true if deletion succeed</returns>
+    /// <response code="404">Could not delete hotel!</response>
+    /// 
+    [Authorize(Roles = "Admin")]
 	[HttpDelete]
     public async Task<IActionResult> DeleteHotel(int Id)
     {

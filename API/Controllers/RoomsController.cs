@@ -59,6 +59,10 @@ public class RoomsController : ControllerBase
         }
 
         var room = await _roomService.GetRoomByID(id);
+        if (room == null)
+        {
+            return NotFound($"Room with ID {id} not found.");
+        }
         return Ok(room);
     }
     /// <summary>

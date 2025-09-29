@@ -6,6 +6,7 @@ using API.Data;
 using Microsoft.EntityFrameworkCore;
 using DomainModels.Models;
 using DomainModels.Dto.UserDto;
+using DomainModels.Enums;
 
 namespace API.Services
 {
@@ -145,7 +146,7 @@ namespace API.Services
 				$"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}", // Constructs base DN - Tells LDAP where to search
 				searchFilter,                                             // Filter for user
 				SearchScope.Subtree,                                      // Searches the entire directory tree with the given attributes
-				"sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName"
+				"sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName", "distinguishedName"
 			);
 
 			//Executes the search asynchronously
@@ -173,9 +174,13 @@ namespace API.Services
 				Email = GetAttributeValue(entry, "mail"),
 				FirstName = GetAttributeValue(entry, "givenName"),
 				LastName = GetAttributeValue(entry, "sn"),
+				DistinguishedName = GetAttributeValue(entry, "distinguishedName")
 			};
 
-			_logger.LogInformation("Bruger fundet i AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
+			userInfo.Groups = GetGroupsByUser(connection, userInfo.DistinguishedName);
+			userInfo.Role = MapADGroupToRole(userInfo.Groups);
+
+			_logger.LogInformation("User found in AD: {SamAccountName}, Email: {Email}, Groups: {GroupCount}",
 				userInfo.SamAccountName, userInfo.Email, userInfo.Groups.Count);
 
 			return userInfo;
@@ -192,6 +197,56 @@ namespace API.Services
 			return string.Empty;
 		}
 
+		private List<string> GetGroupsByUser(LdapConnection connection, string? userDN)
+        {
+            List<string> groups = new List<string>();
+            var groupSearch = new SearchRequest(
+                    $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
+                    $"(member={userDN})",
+                    SearchScope.Subtree,
+                    "cn", "description"
+                );
+			try
+			{
+				var groupResponse = (SearchResponse)connection.SendRequest(groupSearch);
+				if (groupResponse.Entries.Count == 0)
+					return groups;
+				foreach (SearchResultEntry entry in groupResponse.Entries)
+				{
+					var name = entry.Attributes["cn"]?[0]?.ToString() ?? string.Empty;
+					var desc = entry.Attributes["description"]?[0]?.ToString() ?? string.Empty;
+					if (!string.IsNullOrEmpty(name))
+					{
+						groups.Add(name);
+						groups.Add(desc);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Could not find groups for {userDN}: {ex.Message}");
+			}
+			return groups;
+		}
+
+		private RoleEnum MapADGroupToRole(List<string> adGroups)
+		{
+			//Map AD groups to our RoleEnum
+			Dictionary<string, RoleEnum> GroupToRoleMap = new(StringComparer.OrdinalIgnoreCase) //Case sensitive
+            {
+				{"Admin", RoleEnum.Admin},
+				{"Reception", RoleEnum.Reception},
+				{"CleaningStaff", RoleEnum.CleaningStaff}
+			};
+
+			foreach (var description in adGroups)
+			{
+				if (GroupToRoleMap.TryGetValue(description, out var role))
+					return role;
+			}
+
+			return RoleEnum.Unknown;
+		}
 
 		//-----------------------------------------------------------------------------//
 		// Models for AD objects
@@ -235,6 +290,8 @@ namespace API.Services
 			public string FirstName { get; set; } = string.Empty;
 			public string LastName { get; set; } = string.Empty;
 			public string Department { get; set; } = string.Empty;
+			public string DistinguishedName { get; set; } = string.Empty;
+			public RoleEnum Role { get; set; } = RoleEnum.Unknown;
 			//List of AD groups the user belongs to
 			public List<string> Groups { get; set; } = new List<string>();
 		}
