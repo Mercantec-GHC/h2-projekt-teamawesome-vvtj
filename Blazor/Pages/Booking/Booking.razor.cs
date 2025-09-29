@@ -1,33 +1,34 @@
-﻿using System.ComponentModel.DataAnnotations;
-using DomainModels.Dto;
-using DomainModels.Enums;
-using Microsoft.AspNetCore.Authorization;
+﻿using DomainModels.Dto;
 using Microsoft.AspNetCore.Components;
 using Blazor.Models.ViewModels;
+using BlazorBootstrap;
 
 namespace Blazor.Pages.Booking;
-
 public partial class Booking : ComponentBase
 {
-    [Inject] private Services.APIService Api { get; set; } = default!;
-    [Inject] private NavigationManager Nav { get; set; } = default!;
+	[Inject] private Services.APIService Api { get; set; } = default!;
+	[Inject] private NavigationManager Nav { get; set; } = default!;
 
     protected bool IsSubmitting { get; set; }
     protected string? FormError { get; set; }
     protected CreateBookingViewModel Vm { get; set; } = new();
     protected BookingResponseDto? Quote { get; set; }
+	[Inject] private PreloadService preloadService { get; set; } = default!;
+	protected CurrentUserProfileViewModel User { get; set; } = new();
 
-    protected List<string> Hotels { get; set; } = new();
-    protected List<RoomTypeDto> AllowedRoomTypes { get; set; } = new();
+	protected List<string> Hotels { get; set; } = new();
+	protected List<RoomTypeDto> AllowedRoomTypes { get; set; } = new();
+	private bool isLoading = false;
+	private string? errorMessage;
+	private string? successMessage;
+	protected bool IsRoomTypeEnabled => Vm is not null && Vm.GuestsCount >= 1;
 
-    protected bool IsRoomTypeEnabled => Vm is not null && Vm.GuestsCount >= 1;
-
-    protected bool CanProceed =>
-        Vm is not null &&
-        !string.IsNullOrWhiteSpace(Vm.HotelName) &&
-       // Vm.RoomTypeId is not null &&
-        Vm.GuestsCount >= 1 &&
-        Vm.NightsCount > 0;
+	protected bool CanProceed =>
+		Vm is not null &&
+		!string.IsNullOrWhiteSpace(Vm.HotelName) &&
+		// Vm.RoomTypeId is not null &&
+		Vm.GuestsCount >= 1 &&
+		Vm.NightsCount > 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -37,101 +38,95 @@ public partial class Booking : ComponentBase
             Nav.NavigateTo("/login");
             return;
         }
+		var userInfo = await Api.GetCurrentUserInfoAsync();
+		if (userInfo != null)
+		{
+			User = new CurrentUserProfileViewModel
+			{
+				FirstName = userInfo.FirstName ?? string.Empty,
+				LastName = userInfo.LastName ?? string.Empty,
+			};
+		}
+		Hotels = (await Api.GetAllHotelsAsync())?.Select(h => h.HotelName).ToList()
+?? new List<string>();
 
-        Hotels = (await Api.GetAllHotelsAsync())?.Select(h => h.HotelName).ToList()
-                 ?? new List<string>();
+		AllowedRoomTypes = await Api.GetAllRoomTypesAsync();
+		preloadService.Hide();
+		RecalcNights();
+		PrefillFromQuery();
+	}
 
-        AllowedRoomTypes = await Api.GetAllRoomTypesAsync();
+	public void PrefillFromQuery()
+	{
+		if (Vm is null) return;
 
-        Vm = new CreateBookingViewModel
-        {
-            UserName = user.UserName,
-            HotelName = string.Empty,
-            RoomTypeId = 0,
-            GuestsCount = 1,
-            CheckIn = DateTime.Today.AddDays(1),
-            CheckOut = DateTime.Today.AddDays(2),
-            IsBreakfast = false,
-            NightsCount = 1
-        };
+		var uri = Nav.ToAbsoluteUri(Nav.Uri);
+		var q = System.Web.HttpUtility.ParseQueryString(uri.Query);
 
-        RecalcNights();
-        PrefillFromQuery();
-    }
+		if (int.TryParse(q.Get("guests"), out var guests) && guests > 0)
+			Vm.GuestsCount = guests;
 
-    public void PrefillFromQuery()
-    {
-        if (Vm is null) return;
+		//if (Enum.TryParse<RoomTypeEnum>(q.Get("roomType"), true, out var rt))
+		//    Vm.RoomTypeId = (int)rt;
+		if (int.TryParse(q.Get("roomType"), out var rtId))
+			Vm.RoomTypeId = rtId;
 
-        var uri = Nav.ToAbsoluteUri(Nav.Uri);
-        var q = System.Web.HttpUtility.ParseQueryString(uri.Query);
+		var hotel = q.Get("hotel");
+		if (!string.IsNullOrWhiteSpace(hotel))
+			Vm.HotelName = hotel;
 
-        if (int.TryParse(q.Get("guests"), out var guests) && guests > 0)
-            Vm.GuestsCount = guests;
+		if (DateTime.TryParse(q.Get("checkIn"), out var ci))
+			Vm.CheckIn = ci.Date;
 
-        //if (Enum.TryParse<RoomTypeEnum>(q.Get("roomType"), true, out var rt))
-        //    Vm.RoomTypeId = (int)rt;
-        if (int.TryParse(q.Get("roomType"), out var rtId))
-            Vm.RoomTypeId = rtId;
+		if (DateTime.TryParse(q.Get("checkOut"), out var co))
+			Vm.CheckOut = co.Date;
 
-        var hotel = q.Get("hotel");
-        if (!string.IsNullOrWhiteSpace(hotel))
-            Vm.HotelName = hotel;
+		RecalcNights();
+	}
+	private void CancelCreate()
+	{
+		Nav.NavigateTo("/");
+	}
+	protected void OnHotelChanged(ChangeEventArgs _) => ClearError();
+	protected void OnRoomTypeChanged(ChangeEventArgs _) => ClearError();
+	protected void OnGuestsChanged(ChangeEventArgs _) => ClearError();
 
-        if (DateTime.TryParse(q.Get("checkIn"), out var ci))
-            Vm.CheckIn = ci.Date;
+	protected void OnDatesChanged(ChangeEventArgs _)
+	{
+		RecalcNights();
+		ClearError();
+	}
 
-        if (DateTime.TryParse(q.Get("checkOut"), out var co))
-            Vm.CheckOut = co.Date;
+	private void RecalcNights()
+	{
+		if (Vm is null) return;
+		var nights = (Vm.CheckOut.Date - Vm.CheckIn.Date).Days;
+		Vm.NightsCount = Math.Max(0, nights);
 
-        RecalcNights();
-    }
+		FormError = Vm.NightsCount <= 0
+			? "Check-out must be after check-in."
+			: null;
+	}
 
-    protected void OnHotelChanged(ChangeEventArgs _) => ClearError();
-    protected void OnRoomTypeChanged(ChangeEventArgs _) => ClearError();
-    protected void OnGuestsChanged(ChangeEventArgs _) => ClearError();
+	private void ClearError() => FormError = null;
 
-    protected void OnDatesChanged(ChangeEventArgs _)
-    {
-        RecalcNights();
-        ClearError();
-    }
+	protected async Task OnCreateClicked()
+	{
+		if (!CanProceed || Vm is null) return;
+		IsSubmitting = true;
+		FormError = null;
 
-    private void RecalcNights()
-    {
-        if (Vm is null) return;
-        var nights = (Vm.CheckOut.Date - Vm.CheckIn.Date).Days;
-        Vm.NightsCount = Math.Max(0, nights);
+		var dto = Vm.ToCreateBookingDto();
+		var result = await Api.CreateBooking(dto);
 
-        FormError = Vm.NightsCount <= 0
-            ? "Check-out must be after check-in."
-            : null;
-    }
-
-    private void ClearError() => FormError = null;
-
-    protected async Task OnCreateClicked()
-    {
-        if (!CanProceed || Vm is null) return;
-
-        IsSubmitting = true;
-        FormError = null;
-
-        var dto = Vm.ToCreateBookingDto();
-        var result = await Api.CreateBooking(dto);
-
-        IsSubmitting = false;
-
-        if (result is null)
-        {
-            FormError = "No rooms of this type are available for the selected dates, or the data is invalid.";
-            return;
-        }
-
-        Vm.TotalPrice = result.TotalPrice;
-        Quote = result;
-
-        Nav.NavigateTo("/booking/success");
-    }
-
+		IsSubmitting = false;
+		if (result is null)
+		{
+			FormError = "No rooms of this type are available for the selected dates, or the data is invalid.";
+			return;
+		}
+		Vm.TotalPrice = result.TotalPrice;
+		Quote = result;
+		Nav.NavigateTo("/booking/success");
+	}
 }

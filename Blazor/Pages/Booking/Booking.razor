@@ -5,7 +5,7 @@
 @using DomainModels.Enums
 @using Microsoft.AspNetCore.Components.Forms
 
-<div class="container">
+@* <div class="container">
     <div class="card">
         <div class="card-header">
             <h3 class="title">Create a Booking</h3>
@@ -52,6 +52,7 @@
                             <option value="@rt.Id">@rt.TypeofRoom</option>
                         }
                     </InputSelect>
+                    *@
                     @* <label>Room type</label>
                     <InputSelect class="input"
                                  TValue="int?"
@@ -63,7 +64,7 @@
                         {
                             <option value="@rt.Id">@rt.TypeofRoom</option>
                         }                     </InputSelect>*@
-
+@*
                 </div>
 
                 <div>
@@ -97,4 +98,112 @@
             </div>
         </EditForm>
     </div>
-</div>
+</div> *@
+
+
+@*Victoria's improvemet suggestions*@
+<PageTitle>Create Booking</PageTitle>
+
+@if (isLoading)
+{
+	<Preload LoadingText="Loading..." />
+}
+
+else
+{
+	<div class="container">
+		<div class="col-md-8">
+			<Card>
+				<CardHeader Class="py-3 text-center">Create New Booking,  <div>@User?.FirstName @User?.LastName</div></CardHeader>
+				<CardBody>
+					<CardTitle Class="text-center mt-3">
+						<h5>Please fill out the form below and we will find a perfect stay for you.</h5>
+					</CardTitle>
+					<hr />
+					@if (!string.IsNullOrEmpty(errorMessage))
+					{
+						<div class="alert alert-danger">@errorMessage</div>
+					}
+					@if (!string.IsNullOrEmpty(successMessage))
+					{
+						<div class="alert alert-success">@successMessage</div>
+					}
+
+					<EditForm Model="@Vm" OnValidSubmit="@OnCreateClicked">
+						<DataAnnotationsValidator />
+						<ValidationSummary />
+
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<div class="floating-label d-flex flex-column gap-3">
+									<div>
+										<label for="input-field-select-hotel">Select Hotel</label>
+										<InputSelect @bind-Value="Vm.HotelName"
+													 @onchange="OnHotelChanged"
+													 class="form-control"
+													 id="input-field-select-hotel">
+											<option value="">-- Select hotel --</option>
+											@foreach (var h in Hotels)
+											{
+												<option value="@h">@h</option>
+											}
+										</InputSelect>
+									</div>
+									<div>
+										<label for="input-field-guests">Amount of Guests</label>
+										<InputNumber @bind-Value="Vm.GuestsCount"
+													 @onchange="OnGuestsChanged"
+													 placeholder="Amount of Guests"
+													 class="form-control"
+													 id="input-field-guests" />
+									</div>
+									<div>
+										<label for="input-field-nights">Nights</label>
+										<InputNumber @bind-Value="Vm.NightsCount"
+													 placeholder="Nights"
+													 class="form-control"
+													 id="input-field-nights" Disabled="true" />
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6 mb-3">
+								<div class="floating-label d-flex flex-column gap-3">
+									<div>
+										<label for="input-field-checkin-date">Check In</label>
+										<InputDate @bind-Value="Vm.CheckIn"
+												   placeholder="Check In"
+												   class="form-control"
+												   id="input-field-checkin-date" />
+									</div>
+									<div>
+										<label for="input-field-checkout-date">Check Out</label>
+										<InputDate @bind-Value="Vm.CheckOut"
+												   placeholder="Check Out"
+												   class="form-control"
+												   id="input-field-checkout-date" />
+									</div>
+									<div class="form-check mt-4">
+										<input type="checkbox" @bind-value="Vm.IsBreakfast"
+											   class="form-check-input"
+											   id="input-field-include-breakfasts" />
+										<label class="form-check-label ms-2" for="input-field-include-breakfasts">
+											Include breakfasts
+										</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-2 gap-md-5">
+							<Button Type="ButtonType.Submit" Class="btn btn-custom">
+								Save Changes
+							</Button>
+							<Button Type="ButtonType.Button" Class="btn btn-outline" @onclick="CancelCreate">
+								Cancel
+							</Button>
+						</div>
+					</EditForm>
+				</CardBody>
+			</Card>
+		</div>
+	</div>
+}
