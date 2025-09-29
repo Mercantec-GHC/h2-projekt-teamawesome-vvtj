@@ -25,7 +25,7 @@ public class EmailController : ControllerBase
                 return BadRequest("Email form can not be null or empty.");
             }
 
-            var result = await _emailService.SendEmailAsync(dto);
+            var result = await _emailService.SendEmailNotificationAsync(dto);
             return Ok();
         }
         catch (Exception ex)
