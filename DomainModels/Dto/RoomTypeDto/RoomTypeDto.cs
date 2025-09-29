@@ -21,6 +21,7 @@ public class RoomTypeDto
     public bool? HasMiniFridge { get; set; }
     public int? Area { get; set; }
     public bool? HasVault { get; set; }
+    public string? ImagePath{ get; set; }
 }
 
 public class ToRoomTypeGETdto

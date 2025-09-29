@@ -28,6 +28,7 @@ namespace DomainModels.Mapping
                 HasVault = roomType.HasVault,
                 Area = roomType.Area,
                 PricePerNight = roomType.PricePerNight,
+                ImagePath = roomType.ImagePath,
             };
         }
     }
