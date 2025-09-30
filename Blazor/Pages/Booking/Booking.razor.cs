@@ -149,7 +149,29 @@ public partial class Booking : ComponentBase
     }
 
     private void ClearError() => FormError = null;
+    protected async Task OnPreviewClicked()
+    {
+        if (!CanProceed || Vm is null) return;
 
+        IsSubmitting = true;
+        FormError = null;
+
+        var dto = Vm.ToCreateBookingDto();
+        
+        var result = await Api.CreateBooking(dto, preview: true);
+
+        IsSubmitting = false;
+
+        if (result is null)
+        {
+            FormError = "No rooms of this type are available for the selected dates.";
+            Quote = null;
+            return;
+        }
+
+        Quote = result;
+        Vm.TotalPrice = result.TotalPrice;
+    }
     protected async Task OnCreateClicked()
     {
         if (!CanProceed || Vm is null) return;
@@ -158,7 +180,7 @@ public partial class Booking : ComponentBase
         FormError = null;
 
         var dto = Vm.ToCreateBookingDto();
-        var result = await Api.CreateBooking(dto);
+        var result = await Api.CreateBooking(dto, preview: false);
 
         IsSubmitting = false;
 

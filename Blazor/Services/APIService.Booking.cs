@@ -7,11 +7,12 @@ namespace Blazor.Services
 {
     public partial class APIService
     {
-        public async Task<BookingResponseDto?> CreateBooking(CreateBookingDto dto)
+        public async Task<BookingResponseDto?> CreateBooking(CreateBookingDto dto, bool preview = false)
         {
             try
             {
-                var response = await PostAsJsonAsync("api/bookings", dto);
+                var url = $"api/bookings?preview={(preview ? "true" : "false")}";
+                var response = await PostAsJsonAsync(url, dto);
 
                 if (response.IsSuccessStatusCode)
                 {

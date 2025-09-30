@@ -28,6 +28,11 @@ public class BookingController : ControllerBase
     /// Creates a new booking in the system.
     /// </summary>
     /// <param name="CreateBookingDto">The booking data from the client.</param>
+    /// <param name="preview">
+    /// If true, only returns a booking preview (price, dates, etc.)
+    /// without saving it to the database or sending confirmation.
+    /// If false, creates the booking in the database and sends confirmation.
+    /// </param>
     /// <returns>Returns a success message or an error if the booking cannot be completed.</returns>
     /// <response code="200">OK with <see cref="BookingResponseDto"/>.</response>
     /// <response code="400">Bad Request if the input is invalid or required entities/room are not found.</response>
@@ -36,7 +41,7 @@ public class BookingController : ControllerBase
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> CreateBooking(CreateBookingDto dto)
+    public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto, [FromQuery] bool preview = false)
     {
 
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -55,7 +60,7 @@ public class BookingController : ControllerBase
 
         try
         {
-            var result = await _bookingService.CreateBooking(dto);
+            var result = await _bookingService.CreateBooking(dto, preview);
 
             if (result == null)
             {

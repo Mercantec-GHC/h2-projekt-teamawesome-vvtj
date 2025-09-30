@@ -23,7 +23,7 @@ namespace API.Services
 			_logger = logger;
 		}
 
-		public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto)
+		public async Task<BookingResponseDto> CreateBooking(CreateBookingDto dto, bool preview = false)
         {
             var userId = await _dbContext.Users
                 .Where(u => u.UserName == dto.UserName)
@@ -96,39 +96,43 @@ namespace API.Services
             decimal finalPrice = await _seasonalPricing.GetSeasonalPrice(pricePerNight, dto.CheckIn.ToDateTime(TimeOnly.MinValue));
             var total = finalPrice * nights;
 
-
-            var booking = new Booking
-            {
-                UserId = userId,
-              
-                RoomId = availableRoom.Id,
-                CheckIn = dto.CheckIn,
-                CheckOut = dto.CheckOut,
-                GuestsCount = guests,
-                NightsCount = nights,
-                TotalPrice = total,
-                CreatedAt = DateTime.UtcNow,
-                IsBreakfast = dto.IsBreakfast,
-            };
-
-            _dbContext.Bookings.Add(booking);
-            await _dbContext.SaveChangesAsync();
-
-            var responseDto = new BookingResponseDto
+ var responseDto = new BookingResponseDto
             {
 				UserName = dto.UserName,
 				HotelName = hotel.HotelName,
 				TypeOfRoom = roomType.TypeofRoom,
-				CheckIn = booking.CheckIn,
-				CheckOut = booking.CheckOut,
+				CheckIn = dto.CheckIn,
+				CheckOut = dto.CheckOut,
 				GuestsCount = guests,
-				IsBreakfast = booking.IsBreakfast,
+				IsBreakfast = dto.IsBreakfast,
 				NightsCount = nights,
 				TotalPrice = total,
 			};
 
-			// Send booking confirmation email
-			await SendBookingConfirmationNotification(userId, responseDto);
+            if (!preview)
+            {
+                var booking = new Booking
+                {
+                    UserId = userId,
+
+                    RoomId = availableRoom.Id,
+                    CheckIn = dto.CheckIn,
+                    CheckOut = dto.CheckOut,
+                    GuestsCount = guests,
+                    NightsCount = nights,
+                    TotalPrice = total,
+                    CreatedAt = DateTime.UtcNow,
+                    IsBreakfast = dto.IsBreakfast,
+                };
+
+                _dbContext.Bookings.Add(booking);
+                await _dbContext.SaveChangesAsync();
+
+
+
+                // Send booking confirmation email
+                await SendBookingConfirmationNotification(userId, responseDto);
+            }
 
 			return responseDto;
 

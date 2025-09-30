@@ -58,7 +58,7 @@
                                          @bind-Value="Vm.RoomTypeId"
                                          disabled="@(!IsRoomTypeEnabled)"
                                          @onchange="OnRoomTypeChanged">
-                                <option value="0">-- Select room type --</option>
+                                <option value="0"> Select room type </option>
                                 @foreach (var rt in AllowedRoomTypes.Where(rt => rt.MaxCapacity >= Vm.GuestsCount))
                                 {
                                     <option value="@rt.Id">@rt.TypeofRoom</option>
@@ -90,13 +90,43 @@
                     </div>
 
                     <div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-2 gap-md-5 mt-3">
-                        <Button Type="ButtonType.Submit" Class="btn btn-custom" Disabled="@(!CanProceed || IsSubmitting)">
-                            Create
+                       
+                        <Button Type="ButtonType.Button"
+                                Class="btn btn-custom"
+                                Disabled="@(!CanProceed || IsSubmitting)"
+                                @onclick="OnPreviewClicked">
+                            Preview
                         </Button>
+
+                        @if (Quote != null)
+                        {
+                            <Button Type="ButtonType.Button"
+                                    Class="btn btn-custom"
+                                    Disabled="@(!CanProceed || IsSubmitting)"
+                                    @onclick="OnCreateClicked">
+                                Create
+                            </Button>
+                        }
+
                         <Button Type="ButtonType.Button" Class="btn btn-outline" @onclick="CancelCreate">
                             Cancel
                         </Button>
                     </div>
+
+                    @* Preview result appears in new box *@
+                    @if (Quote != null)
+                    {
+                        <div class="preview-box mt-3">
+                            <h5>Booking Preview</h5>
+                            <p><b>Hotel:</b> @Quote.HotelName</p>
+                            <p><b>Room:</b> @Quote.TypeOfRoom</p>
+                            <p><b>Guests:</b> @Quote.GuestsCount</p>
+                            <p><b>Dates:</b> @Quote.CheckIn.ToShortDateString() - @Quote.CheckOut.ToShortDateString()</p>
+                            <p><b>Nights:</b> @Quote.NightsCount</p>
+                            <p><b>Breakfast:</b> @(Quote.IsBreakfast ? "Yes" : "No")</p>
+                            <p><b>Total Price:</b> @Quote.TotalPrice DKK</p>
+                        </div>
+                    }
                 </EditForm>
             </CardBody>
         </Card>
