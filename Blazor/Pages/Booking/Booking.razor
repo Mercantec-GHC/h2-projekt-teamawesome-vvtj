@@ -16,16 +16,19 @@
             </CardHeader>
 
             <CardBody>
-                <CardTitle Class="text-center mt-3">
-                    <h5>Please fill out the form below and we will find a perfect stay for you.</h5>
-                </CardTitle>
-                <hr />
-
+                @if (!IsSuccess)
+                {
+                    <CardTitle Class="text-center mt-3">
+                        <h5>Please fill out the form below and we will find a perfect stay for you.</h5>
+                    </CardTitle>
+                    <hr />
+                }
                 @if (!string.IsNullOrEmpty(FormError))
                 {
                     <div class="alert alert-danger">@FormError</div>
                 }
-
+                @if (!IsSuccess)
+{
                 <EditForm Model="@Vm" OnValidSubmit="@OnCreateClicked">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
@@ -127,7 +130,33 @@
                             <p><b>Total Price:</b> @Quote.TotalPrice DKK</p>
                         </div>
                     }
-                </EditForm>
+                    </EditForm>
+                    }
+                    @if (IsSuccess && Quote != null)
+
+{
+    <div class="alert alert-success mt-3">
+        <h5> Booking Successful!</h5>
+        <p><b>Hotel:</b> @Quote.HotelName</p>
+        <p><b>Room:</b> @Quote.TypeOfRoom</p>
+        <p><b>Guests:</b> @Quote.GuestsCount</p>
+        <p><b>Dates:</b> @Quote.CheckIn.ToShortDateString() - @Quote.CheckOut.ToShortDateString()</p>
+        <p><b>Nights:</b> @Quote.NightsCount</p>
+        <p><b>Breakfast:</b> @(Quote.IsBreakfast ? "Yes" : "No")</p>
+        <p><b>Total Price:</b> @Quote.TotalPrice DKK</p>
+</div>   
+      
+     <div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-2 gap-md-5 mt-3">
+
+                        <Button Type="ButtonType.Button"
+                                Class="btn btn-custom"
+                                @onclick="GoToMyBookings">
+                            Go to My Bookings
+                        </Button>
+</div>
+  
+}
+                
             </CardBody>
         </Card>
     </div>

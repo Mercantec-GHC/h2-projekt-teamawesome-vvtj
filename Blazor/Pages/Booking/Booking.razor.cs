@@ -23,7 +23,7 @@ public partial class Booking : ComponentBase
     protected List<RoomTypeDto> AllowedRoomTypes { get; set; } = new();
 
     protected bool IsRoomTypeEnabled => Vm is not null && Vm.GuestsCount >= 1;
-
+    protected bool IsSuccess { get; set; } = false;
     protected bool CanProceed =>
         Vm is not null &&
         !string.IsNullOrWhiteSpace(Vm.HotelName) &&
@@ -193,7 +193,12 @@ public partial class Booking : ComponentBase
         Vm.TotalPrice = result.TotalPrice;
         Quote = result;
 
-        Nav.NavigateTo("/booking/success");
-    }
+        IsSuccess = true;
 
+
+    }
+    private void GoToMyBookings()
+    {
+        Nav.NavigateTo("/user/bookings");
+    }
 }
