@@ -5,6 +5,7 @@ import type { RoomTypeDto } from "@/types/RoomTypesDTO";
 import type { RoomTypeUpdateDto } from "@/types/RoomTypeUpdateDTO";
 import type { UserDTO } from "@/types/UserDTO";
 import type { BookingDto } from "@/types/BookingDTO";
+import type { GetNotificationsDto } from "@/types/GetNotificationsDTO";
 
 export const ApiService = {
   getAllRoomsToClean: async (): Promise<RoomToCleanDto[] | null> => {
@@ -246,6 +247,56 @@ export const ApiService = {
     } catch (err) {
       console.error("Error fetching hotels:", err);
       return null;
+    }
+  },
+
+  getAllNotifications: async (): Promise<GetNotificationsDto[] | null> => {
+     try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Notifications/all-notifications`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return null;
+      return res.json();
+    } catch (err) {
+      console.error("Error fetching hotels:", err);
+      return null;
+    }
+  },
+
+  updateNotificationStatus: async (id: number, newStatus: string ): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return false;
+      }
+      const payload = {
+        Id: id,
+        Status: newStatus
+      };
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Notifications/update-notification-status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload), 
+      });
+
+      if (response.ok) {
+        return true;
+      } 
+      
+      const errorText = await response.text();
+      console.error(`API Error ${response.status}: Failed to update notification ${id}. Response: ${errorText}`);
+      return false;
+
+    } catch (error) {
+      console.error(`[Network Error]: Error updating notification ${id}:`, error);
+      return false;
     }
   },
 };
