@@ -25,14 +25,14 @@ public class RoomTypesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomTypeDto>>> GetRoomTypes()
     {
-        var rooms = await _roomtypeService.GetRoomTypes();
-
-        if (rooms == null)
+        try
         {
-            return NotFound();
+            return Ok(await _roomtypeService.GetRoomTypes());
         }
-
-        return Ok(rooms);
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     //Everybody
@@ -45,13 +45,14 @@ public class RoomTypesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<RoomTypeDto>> GetSpecificRoomtype(int id)
     {
-        if (id == null)
+        try
         {
-            return NotFound();
+            return Ok(await _roomtypeService.GetSpecificRoomType(id));
         }
-
-        var room = await _roomtypeService.GetSpecificRoomType(id);
-        return Ok(room);
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
@@ -66,11 +67,14 @@ public class RoomTypesController : ControllerBase
     [HttpPut("{id}")]
      public async Task<ActionResult> UpdateRoomType(int id, RoomTypePutDto roomTypePutDto)
     {
-        var updatedRoomType = await _roomtypeService.UpdateRoomType(id, roomTypePutDto);
-
-        await _context.SaveChangesAsync();
-
-        return Ok(updatedRoomType);
+        try
+        {
+            return Ok(await _roomtypeService.UpdateRoomType(id, roomTypePutDto));
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }
 

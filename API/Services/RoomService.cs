@@ -1,4 +1,5 @@
 using API.Data;
+using DomainModels.Mapping;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace API.Services
     public class RoomService
     {
         private readonly AppDBContext _context;
+        private readonly RoomMapping _roomMapping = new();
         public RoomService(AppDBContext context)
         {
             _context = context;
@@ -14,40 +16,28 @@ namespace API.Services
 
         public async Task<IEnumerable<RoomsDto>> GetRooms()
         {
-            var rooms = await _context.Rooms.Include(r => r.RoomType).Include(r => r.Hotel).ToListAsync();
-            return rooms.Select(r => new RoomsDto
-            {
-                Id = r.Id,
-                //GuestCount = r.GuestCount,
-                IsAvailable = r.IsAvailable,
-                IsBreakfast = r.IsBreakfast,
-                AvailableFrom = r.AvailableFrom,
-                RoomType = r.RoomType,
-                HotelId = r.Hotel.Id,
+            var rooms = await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.Hotel).ToListAsync();
 
-            });
+            return rooms
+            .Select(r => _roomMapping.ToRoomGETdto(r))
+            .ToList();
         }
 
         public async Task<RoomsDto> GetRoomByID(int id)
         {
-            if (id == null)
-            {
-                return null;
-            }
+            //if statement and ??
+            if (id == 0)
+                throw new ArgumentException("id cant be 0");
 
-            var room = await _context.Rooms.FindAsync(id);
+            var room = await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.Hotel)
+            .FirstOrDefaultAsync(r => r.Id == id)
+                ?? throw new ArgumentException($"Couldnt find room with id: {id}");
 
-            RoomsDto getRoom = new RoomsDto
-            {
-                Id = room.Id,
-                //GuestCount = room.GuestCount,
-                IsAvailable = room.IsAvailable,
-                IsBreakfast = room.IsBreakfast,
-                AvailableFrom = room.AvailableFrom,
-                RoomType = room.RoomType,
-            };
-
-            return getRoom;
+            return _roomMapping.ToRoomGETdto(room);
         }
 
         //Use type Room instead of RoomsDto, as we want the new room into the DB
@@ -69,7 +59,6 @@ namespace API.Services
             var newRoom = new Room
             {
                 Id = room.Id,
-                //GuestCount = room.GuestCount,
                 IsAvailable = room.IsAvailable,
                 IsBreakfast = room.IsBreakfast,
                 RoomNumber = room.RoomNumber,
@@ -90,19 +79,9 @@ namespace API.Services
             .Include(r => r.Hotel)
             .ToListAsync();
 
-            var roomsWithType = rooms.Select(r => new RoomsDto
-            {
-                Id = r.Id,
-                RoomNumber = r.RoomNumber,
-                RoomType = r.RoomType,
-                HotelName = r.Hotel.HotelName,
-                HotelId = r.HotelId
-
-            });
-
-            return roomsWithType;
-
+            return rooms
+            .Select(r => _roomMapping.ToRoomGETdto(r))
+            .ToList();
         }
-
     }
 }
