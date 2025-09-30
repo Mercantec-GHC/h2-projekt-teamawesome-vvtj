@@ -40,10 +40,10 @@ export function Login() {
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.token);
-      setToken(data.token);
+      localStorage.setItem("token", data.accessToken);
+      setToken(data.accessToken);
 
-      const decoded: { role?: string } = jwtDecode(data.token);
+      const decoded: { role?: string } = jwtDecode(data.accessToken);
 
       if (decoded.role === "Admin") {
         try {
@@ -80,7 +80,7 @@ export function Login() {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${data.token}`,
+                  Authorization: `Bearer ${data.accessToken}`,
                 },
                 body: JSON.stringify(subscription),
               });
