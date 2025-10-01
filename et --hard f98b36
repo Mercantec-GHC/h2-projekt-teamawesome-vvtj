@@ -1,0 +1,387 @@
+[33m2b15b60[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32m109-create-booking-page[m[33m, [m[1;31morigin/181-styling[m[33m, [m[1;32m181-styling[m[33m)[m Example of styling
+[33mf98b36c[m[33m ([m[1;31morigin/109-create-booking-page[m[33m)[m Fix:moved BookingMapping to the viewmodel (cleaner in razor.cs), added default initialization for Vm (not null), removed [Authotize] and test-hotels
+[33m9151dac[m Changed RoomType to TypeOfRoom
+[33ma3983b2[m Merge Dev into 109-create-booking-page
+[33m1a1776e[m Added booking page
+[33m95628f1[m[33m ([m[1;31morigin/177-clean-up[m[33m, [m[1;32mDev[m[33m)[m removed unused code
+[33m0152ddb[m Merge pull request #176 from Mercantec-GHC/173-refresh-token-frontend
+[33m4d43fb6[m[33m ([m[1;31morigin/173-refresh-token-frontend[m[33m)[m Merge branch 'Dev' into 173-refresh-token-frontend
+[33mdf5dc4e[m Refresh token saved in browser cookies
+[33mc71a1f7[m Merge pull request #174 from Mercantec-GHC/170-booking-confirmation-email
+[33mb4e9b68[m[33m ([m[1;31morigin/170-booking-confirmation-email[m[33m)[m Merge remote-tracking branch 'origin/Dev' into 170-booking-confirmation-email
+[33m1e261f0[m Merge pull request #167 from Mercantec-GHC/165-welcome-mail
+[33mc1c7a86[m[33m ([m[1;31morigin/165-welcome-mail[m[33m)[m small fix
+[33mfb6ced0[m booking confirmation email
+[33m2acce2a[m merge dev
+[33md5d3829[m .
+[33mad1f6e6[m RefreshToken for frontend: services + helper
+[33m79d6678[m Merge pull request #172 from Mercantec-GHC/171-refresh-token-backend
+[33m51eea46[m[33m ([m[1;31morigin/171-refresh-token-backend[m[33m)[m cleanup + implementing of RefreshToken in backend
+[33m02ad658[m welcome email
+[33m8730cc1[m in process
+[33ma9cdce5[m[33m ([m[1;33mtag: [m[1;33mRelease_0.6.0[m[33m)[m fix missing data
+[33mf7e27af[m Merge pull request #164 from Mercantec-GHC/Dev
+[33me32c587[m Delete old Dashboard directory
+[33m3f508de[m Merge pull request #163 from Mercantec-GHC/Dev
+[33mbd82b32[m fix buid dashboard
+[33m3802192[m Merge branch 'Dev' of https://github.com/bukh04/h2-projekt-teamawesome-vvtj-new into Dev
+[33m7fd907e[m merge
+[33m522363e[m merge conf
+[33mdf07cd6[m fix
+[33m76a6e80[m fix
+[33mbcd2718[m Merge pull request #7 from bukh04/bukh04-patch-1
+[33mb801e1d[m test admin workflow
+[33m72ebff2[m Delete Dashboard directory
+[33mcee83f5[m new test
+[33m6ca297c[m new test workflow
+[33m64ee243[m Create build-and-deploy-admin-dashboard.yml
+[33m4b18e0c[m Merge pull request #6 from bukh04/5-create-booking-edit-bookings-in-admin-dashboard
+[33ma16529c[m edit bookings
+[33m7e44b8e[m Merge pull request #4 from bukh04/3-add-list-of-hotels-teams-to-admin-dashboard
+[33m34afc3b[m hotels,users
+[33mb9296b5[m Merge pull request #2 from bukh04/Move-cleaning-page-to-admin-dashboard
+[33m9b2e349[m Merge pull request #1 from bukh04/test-branch
+[33mdc1e7e2[m test
+[33m2b9b9c2[m test new repo
+[33mddbbbcc[m Merge pull request #161 from Mercantec-GHC/Move-push-notification-to-admin-dashboard
+[33m35a1dba[m[33m ([m[1;31morigin/152-refresh-token[m[33m)[m Merge pull request #151 from Mercantec-GHC/150-add-a-create-profile-page
+[33mc23a112[m[33m ([m[1;31morigin/150-add-a-create-profile-page[m[33m)[m EditUser fixes
+[33m273011f[m Dev -> branch + merge conflicts resolve
+[33mbad4dee[m[33m ([m[1;31morigin/Move-cleaning-page-to-admin-dashboard[m[33m)[m move cleaning to admin dashboard
+[33m0bc70a1[m[33m ([m[1;31morigin/Move-push-notification-to-admin-dashboard[m[33m)[m Merge remote-tracking branch 'origin/Dev' into Move-push-notification-to-admin-dashboard
+[33m36080c9[m Merge pull request #157 from Mercantec-GHC/148-add-create-room-to-dashboard-get-room-type
+[33mec795b4[m Merge branch 'Dev' of https://github.com/Mercantec-GHC/h2-projekt-teamawesome-vvtj into Dev
+[33m42ae816[m move push notification to admin dashboard
+[33m8da29c8[m Merge pull request #159 from Mercantec-GHC/155-add-a-new-model-refreshtoken-for-migration
+[33mb629944[m[33m ([m[1;31morigin/155-add-a-new-model-refreshtoken-for-migration[m[33m)[m added table
+[33m1f3f131[m Merge pull request #156 from Mercantec-GHC/155-add-a-new-model-refreshtoken-for-migration
+[33m8245546[m[33m ([m[1;31morigin/148-add-create-room-to-dashboard-get-room-type[m[33m)[m added denied access for guest
+[33mbccaa39[m Merge pull request #154 from Mercantec-GHC/153-change-password
+[33m250cdcf[m[33m ([m[1;31morigin/153-change-password[m[33m)[m Merge branch 'Dev' into 153-change-password
+[33m804255d[m added room types  and edit, filter by hotels in rooms
+[33md410e80[m Added a new model RefreshToken.cs + updated User model + Fluent API configuration.
+[33m36aed3c[m Change password logic + UI
+[33m97c44df[m Added endpoint to change password for authenticated user + services + dto
+[33ma32f72b[m Merge remote-tracking branch 'origin/main' into Dev
+[33mcd7a71d[m new test workflow
+[33m63316a3[m Preload for register form
+[33m442160a[m new test workflow
+[33m4bf41fd[m test fix workflow
+[33mb4c5caf[m fix workflow
+[33m644d974[m Revert "creating new pages EditProfile + VM + extentions"
+[33me4f295d[m Revert "UserProfile refactoring"
+[33m3338aaf[m Revert "Update/edit profile"
+[33m26f0038[m Unified styling + responsiveness for all forms
+[33m81699bb[m CreateUserProfile form: fronend + code behind + styling.
+[33m7857c7e[m[33m ([m[1;31morigin/139-edit-forms-for-user-account-and-user-profile[m[33m)[m Merge branch '139-edit-forms-for-user-account-and-user-profile' into Dev
+[33m331b4ab[m Update/edit profile
+[33m3f00834[m UserProfile refactoring
+[33mbf52100[m remove from solution
+[33m10a1f93[m Merge pull request #149 from Mercantec-GHC/Dev
+[33me46508d[m creating new pages EditProfile + VM + extentions
+[33m9e28cd2[m Merge pull request #145 from Mercantec-GHC/120-uge-6---administrator-dashboard
+[33m58d61b7[m[33m ([m[1;31morigin/120-uge-6---administrator-dashboard[m[33m)[m .
+[33m0bc634d[m update sidebar
+[33m33cc052[m[33m ([m[1;31morigin/148-add-create-room-to-dashboard-get-room-types[m[33m)[m Merge pull request #143 from Mercantec-GHC/142-endpoint-for-the-available-rooms
+[33m2fe2e3f[m[33m ([m[1;31morigin/142-endpoint-for-the-available-rooms[m[33m)[m Merge branch 'Dev' into 142-endpoint-for-the-available-rooms
+[33mf1cd83e[m Merge pull request #147 from Mercantec-GHC/146-fix-in-jwt-service
+[33m15e25df[m[33m ([m[1;31morigin/146-fix-in-jwt-service[m[33m)[m added issuer and audience to GenerateToken method.
+[33m2fa1326[m Merge branch 'Dev' into 142-endpoint-for-the-available-rooms
+[33m07b6cd7[m Merge remote-tracking branch 'origin/142-endpoint-for-the-available-rooms' into 109-create-booking-page
+[33m47a3546[m[33m ([m[1;32m142-endpoint-for-the-available-rooms[m[33m)[m Fix: added searching period (from/to dates), added room type name to GetAvailableRooms response, deleted CleaningStaff from authorized in GetAllBookings, changed name of BookingViewModel
+[33m093191a[m Merge pull request #144 from Mercantec-GHC/141-refactoring-of-jwt-service
+[33m3d1eee5[m added admin dashboard v 0.1
+[33m20ed7df[m Merge remote-tracking branch 'origin/Dev' into 120-uge-6---administrator-dashboard
+[33m2f3ef90[m WIP: progress on booking page
+[33m30a7121[m Merge branch 142 into 109-create-booking-page
+[33m18ae6d3[m[33m ([m[1;31morigin/141-refactoring-of-jwt-service[m[33m)[m Merge branch 'Dev' into 141-refactoring-of-jwt-service
+[33m9fa856f[m Adding dedicated JWTService; Refactoring AuthService and ActiveDirectoryService + controllers.
+[33m5b9e811[m .
+[33m254d645[m added react admin dashboard
+[33mde9d845[m Merge branch 'dev'
+[33m21016d5[m Added GET /api/booking/available: new method in booking service, controller, interface, dto, xml Implemented seasonal prices in CreateBooking, UpdateBooking
+[33ma0f98e3[m Merge pull request #140 from Mercantec-GHC/137-bug-fix-error-push-notification
+[33md22064a[m Merge pull request #138 from Mercantec-GHC/135-small-improvements-for-ui
+[33m11ba492[m SeasonPrising
+[33m2c4ea19[m[33m ([m[1;31morigin/137-bug-fix-error-push-notification[m[33m)[m fix bug push notification
+[33mfeee4a4[m[33m ([m[1;31morigin/135-small-improvements-for-ui[m[33m)[m Merge branch 'Dev' into 135-small-improvements-for-ui
+[33m77a9058[m Refactoring
+[33me8a6da6[m Merge pull request #131 from Mercantec-GHC/130-active-directory-implementation
+[33m40a21e2[m[33m ([m[1;31morigin/130-active-directory-implementation[m[33m)[m removed config classes
+[33m0d248a8[m Merge branch 'Dev' into 130-active-directory-implementation
+[33m8d87004[m Added XMAL documentation for Active Directory service
+[33m9c747d7[m update service-worker
+[33m815061e[m new publish ui
+[33me7e9e5f[m refresh deploy
+[33m01b0fdc[m Merge pull request #134 from Mercantec-GHC/Dev
+[33m559264d[m Merge pull request #132 from Mercantec-GHC/84-convert-an-existing-blazor-webassembly-app-into-a-pwa
+[33m925f437[m[33m ([m[1;31morigin/84-convert-an-existing-blazor-webassembly-app-into-a-pwa[m[33m)[m small fix
+[33m1bcb556[m remove unused
+[33m8899c2d[m merge dev into
+[33m2e569a4[m Merge pull request #133 from Mercantec-GHC/128-roles-for-frontend
+[33m17b6b1c[m[33m ([m[1;31morigin/128-roles-for-frontend[m[33m)[m Merge branch 'Dev' into 128-roles-for-frontend
+[33m136c030[m Merge remote-tracking branch 'origin/Dev' into 84-convert-an-existing-blazor-webassembly-app-into-a-pwa
+[33m4809bbb[m Merge pull request #126 from Mercantec-GHC/125-user-profile-page
+[33me7d4149[m[33m ([m[1;31morigin/125-user-profile-page[m[33m)[m Merge branch 'Dev' into 125-user-profile-page
+[33me9632bc[m Authentication state for frontend
+[33m605c296[m check missing keys
+[33m313ee02[m notification about login Admins
+[33m719df72[m browser notificaiton for admin if a new email from contact form
+[33m0385444[m Merge pull request #127 from Mercantec-GHC/113-create-cleaning-page
+[33m312ee00[m[33m ([m[1;32m130-active-directory-implementation[m[33m)[m Move JWT initialization to ActiveDirectoryService constructor
+[33maef5086[m Add Active Directory authentication with JWT support
+[33m3792c50[m AD start
+[33m22ba888[m ApiService, razor page
+[33m4241470[m[33m ([m[1;31morigin/113-create-cleaning-page[m[33m)[m added cleaning staff page
+[33ma834e67[m Services + page + styling
+[33m0e338ae[m Adding new controller
+[33mf9b6ecf[m Merge pull request #115 from Mercantec-GHC/98-add-controller-getroomsbyroomtype
+[33m14555b2[m[33m ([m[1;31morigin/98-add-controller-getroomsbyroomtype[m[33m)[m Merge branch 'Dev' into 98-add-controller-getroomsbyroomtype
+[33m904dfde[m Added Hotel Name and Hotel Id
+[33m61001e0[m Merge pull request #124 from Mercantec-GHC/121-refactoring-of-me-endpoint
+[33m2634833[m[33m ([m[1;31morigin/121-refactoring-of-me-endpoint[m[33m)[m refactoring of User controller + service
+[33m129d9bd[m[33m ([m[1;31morigin/122-adauthcontroller-for-ad-testing[m[33m)[m Merge pull request #119 from Mercantec-GHC/102-create-a-user-profile-page
+[33m4803e8f[m Fixed
+[33mde88103[m[33m ([m[1;31morigin/102-create-a-user-profile-page[m[33m)[m Merge branch 'Dev' into 102-create-a-user-profile-page
+[33mbfde44f[m logger
+[33m1b03679[m Update RoomTypeEnum.cs
+[33mfab3309[m Merge branch 'Dev' into 98-add-controller-getroomsbyroomtype
+[33mb95a0e1[m cleanup
+[33m78a5f6d[m UserAccount page + service
+[33m4030f4e[m nav menu + dropdown
+[33meff4940[m FIx of the issue with response header
+[33m4c850ce[m wip
+[33m0f0dd4b[m Controllers refactoring
+[33m8b54a70[m Merge branch 'Dev' into 102-create-a-user-profile-page
+[33mf1cd7e7[m navmenu styling
+[33md5cc24b[m[33m ([m[1;33mtag: [m[1;33mpublish[m[33m, [m[1;33mtag: [m[1;33mRelease_v0.4.0[m[33m, [m[1;33mtag: [m[1;33mRelease_v.0.3.0[m[33m, [m[1;33mtag: [m[1;33mRelease_v.0.2.0[m[33m, [m[1;33mtag: [m[1;33mMain_v.0.5.0[m[33m)[m fix cors
+[33ma20b21e[m fix, new test action
+[33mce3d94b[m new fix action 2
+[33m9cc869a[m new fix action
+[33me0b4e0c[m fix action
+[33mfd92935[m Merge pull request #117 from Mercantec-GHC/Dev
+[33mec4490e[m[33m ([m[1;31morigin/118-user-profile-by-using-getuserbyid[m[33m)[m Merge pull request #116 from Mercantec-GHC/114-implement-roomtypename-in-the-booking-service-based-on-branch-85
+[33m1322ff8[m[33m ([m[1;31morigin/114-implement-roomtypename-in-the-booking-service-based-on-branch-85[m[33m, [m[1;32m114-implement-roomtypename-in-the-booking-service-based-on-branch-85[m[33m)[m RoomType description hided
+[33mac60ef1[m change in UpdatedAt in GetAllBookings
+[33m399a40f[m Merge Dev into 114
+[33m4434df4[m Add RoomEnum to dbContext and BookingService
+[33m1b326a7[m Merge pull request #110 from Mercantec-GHC/108-update-markroomascleaned-endpoint
+[33m9bf9042[m Merge pull request #112 from Mercantec-GHC/111-deploy-blazor-to-azure
+[33m1093fc5[m Implemented GetRoomsByRoomType
+[33mb5b9d04[m return roomsWithType bugged
+[33mefe03b2[m Merge branch 'Dev' into 98-add-controller-getroomsbyroomtype
+[33mb6d62da[m Refactor RoomType handling and mapping logic
+[33m451ecc6[m[33m ([m[1;31morigin/111-deploy-blazor-to-azure[m[33m)[m added link to blazor url in cors policy
+[33m509c85e[m git action&deploy for blazor
+[33m6a6600a[m[33m ([m[1;31morigin/108-update-markroomascleaned-endpoint[m[33m)[m update cleaning
+[33m29ba7e8[m Merge pull request #105 from Mercantec-GHC/101-register-page
+[33m5558366[m[33m ([m[1;31morigin/101-register-page[m[33m)[m Responsiveness
+[33m5414440[m Merge branch 'Dev' into 101-register-page
+[33mc43f6fe[m migration
+[33m060628e[m Merge pull request #104 from Mercantec-GHC/90-contact-page
+[33m3021748[m Refactor RoomType to use RoomTypeEnum type
+[33m9fbb24a[m[33m ([m[1;31morigin/85-fix-update-booking[m[33m, [m[1;31morigin/114-implement-roomtypeenam-in-the-booking-service-based-on-branch-85[m[33m, [m[1;32m85-fix-update-booking[m[33m)[m IsPaid = IsBreakfast in Booking (temp)
+[33mbaf4319[m Merge pull request #108 from Mercantec-GHC/106-fix-user-state
+[33md656244[m[33m ([m[1;31morigin/106-fix-user-state[m[33m)[m Fixed
+[33m93d9a19[m refactoring
+[33mb81d8d5[m token
+[33m9e09167[m Merge branch 'dev' into 85-fix-update-booking
+[33m3c66eb1[m Changes in CreateBooking, GetBookingByUser, added Authorization to BookingController
+[33m2cdc6fa[m Register
+[33m1fc1f19[m Merge branch 'Dev' into 101-register-page
+[33m30ea4b1[m[33m ([m[1;31morigin/90-contact-page[m[33m)[m added email form, email controller, fake smtp service, contact page
+[33m4bfc90f[m Merge pull request #100 from Mercantec-GHC/96-logout-implementation
+[33mc5558c7[m[33m ([m[1;31morigin/96-logout-implementation[m[33m)[m Merge branch 'Dev' into 96-logout-implementation
+[33med0dd86[m Merge remote-tracking branch 'origin/Dev' into 90-contact-page
+[33m00c59eb[m Merge pull request #103 from Mercantec-GHC/89-add-some-information-to-hotels-migration
+[33md7ab9bc[m[33m ([m[1;31morigin/89-add-some-information-to-hotels-migration[m[33m)[m add migration,  update hotels
+[33m3f62b3f[m css
+[33ma42b71f[m Register form
+[33mf27aace[m Remember me + session storage
+[33ma1db10f[m page title
+[33mec93c02[m wip
+[33mad97b0c[m Login form refactoring
+[33m488c929[m Logout logic
+[33m13235f3[m Merge pull request #97 from Mercantec-GHC/Dev
+[33mbbd0925[m Merge pull request #92 from Mercantec-GHC/79-refinement-for-roomtype-put
+[33m2695a9e[m[33m ([m[1;31morigin/79-refinement-for-roomtype-put[m[33m)[m Merge branch 'Dev' into 79-refinement-for-roomtype-put
+[33m3a61da6[m Allowed nullable
+[33me094cc7[m Merge pull request #94 from Mercantec-GHC/88-uge-4---loginsystem-med-api-blazor
+[33m5ea2bb3[m[33m ([m[1;31morigin/88-uge-4---loginsystem-med-api-blazor[m[33m)[m cleanup in Program.cs
+[33m947bb37[m Fix CreateBooking and UpdateBooking: room availability check, nights calculation
+[33ma043796[m css
+[33me2b7925[m float labels
+[33m752caab[m Login
+[33m6981998[m contact in process
+[33m393758b[m Refactor RoomType update and add admin authorization
+[33m21a0a7a[m Fix update booking logic, small changes in CreateBooking
+[33m1dfd6dd[m Auth using APIService instead of raw HTTPClient
+[33meef2578[m Login page
+[33m2d0e8b3[m dtos refactor
+[33m7ad339d[m wip
+[33mf6bdda0[m IAuthService + AuthService
+[33m82c8615[m Dtos
+[33m7bfa8a6[m Nuget packages
+[33ma0b926f[m CustomAuthStateProvider
+[33mfb1f5a1[m Created pages
+[33m1577fa7[m convert CheckIn to DateOnly(migrations)
+[33ma3e5f96[m Merge pull request #87 from Mercantec-GHC/86-new-migration-for-booking
+[33m16e0fd4[m[33m ([m[1;31morigin/86-new-migration-for-booking[m[33m, [m[1;32m86-new-migration-for-booking[m[33m)[m New db-migration booking
+[33m270725c[m Merge pull request #82 from Mercantec-GHC/81-main-page-with-components
+[33m7a00eeb[m[33m ([m[1;31morigin/81-main-page-with-components[m[33m)[m Dev -> branch: resolve merge conflicts
+[33m333c5c4[m Merge pull request #76 from Mercantec-GHC/76-add-repositories-for-all-api-services-in-blazor-testing-connection-and-respons
+[33mbd91c03[m[33m ([m[1;31morigin/76-add-repositories-for-all-api-services-in-blazor-testing-connection-and-respons[m[33m)[m remove home
+[33m52238e4[m Main page according to Figma design
+[33m66c8bb2[m[33m ([m[1;31morigin/78-add-react-component-to-display-bookings[m[33m, [m[1;32m78-add-react-component-to-display-bookings[m[33m)[m Merge pull request #72 from Mercantec-GHC/69-fix-bookingpost
+[33m63abee3[m[33m ([m[1;31morigin/69-fix-bookingpost[m[33m)[m Merge branch 'Dev' into 69-fix-bookingpost
+[33m81a8f34[m added repositories for services, testing connection
+[33m298ec2b[m Merge pull request #64 from Mercantec-GHC/53-post-for-room-and-roomtype
+[33m73b5ce6[m[33m ([m[1;31morigin/53-post-for-room-and-roomtype[m[33m)[m Change price fields to decimal and add logging
+[33mf324483[m Merge branch 'Dev' into 53-post-for-room-and-roomtype
+[33me74493f[m Merge pull request #71 from Mercantec-GHC/70-fix-status-controller-settings-for-cors
+[33m264c14c[m Merge pull request #74 from Mercantec-GHC/73-db-migration-for-room-and-roomtype-model
+[33md6958a4[m[33m ([m[1;31morigin/73-db-migration-for-room-and-roomtype-model[m[33m)[m update tables_sync_Snapshot
+[33m65625fa[m Merge pull request #66 from Mercantec-GHC/63-userinfo-implementation
+[33m081212f[m[33m ([m[1;31morigin/63-userinfo-implementation[m[33m)[m BlazorBootstrap package
+[33m18adeca[m Inheritance
+[33m18e0bc0[m Update roomtypeservice.cs
+[33mece3cdb[m Post+Put via claims
+[33m3426092[m[33m ([m[1;32m69-fix-bookingpost[m[33m)[m Fix booking post
+[33m0020f7e[m[33m ([m[1;31morigin/70-fix-status-controller-settings-for-cors[m[33m)[m remove comment
+[33mad1fe53[m added status controller, fix cors
+[33m8b52f19[m Dev -> branch (merge conflicts resolve)
+[33m0283cdc[m Merge branch 'Dev' into 53-post-for-room-and-roomtype
+[33m206669d[m Common inheritance
+[33m4ef063b[m Add PricePerNight to RoomType DTOs and update services
+[33mddc580f[m Merge pull request #68 from Mercantec-GHC/67-db-migration-for-userinfo
+[33m8f5a065[m[33m ([m[1;31morigin/67-db-migration-for-userinfo[m[33m)[m added migration
+[33m01d44b0[m Merge remote-tracking branch 'origin/Dev' into 67-db-migration-for-userinfo
+[33m2771ade[m fix bug
+[33m8304d98[m Merge pull request #61 from Mercantec-GHC/60-update-cleaning-service-using-entity-intead-of-dapper
+[33m6123118[m Merge pull request #47 from Mercantec-GHC/46-implement-aspire
+[33m29fa4b1[m UserInfo model + DBContext
+[33mb73d848[m[33m ([m[1;31morigin/46-implement-aspire[m[33m)[m Merge branch 'Dev' into 46-implement-aspire
+[33mb860bd1[m Merge pull request #62 from Mercantec-GHC/58-assignrole-and-removerole-implementation
+[33m266ae10[m[33m ([m[1;31morigin/58-assignrole-and-removerole-implementation[m[33m)[m Resolving comments on GitHub
+[33m672ef1f[m Deleted DataSeederService.cs
+[33m81452b7[m Service + controller
+[33m09a618a[m Area and HttpPut fixed
+[33me14ef14[m Refactoring of dto
+[33mc455a5b[m Refactor room and room type DTOs and services
+[33m9acb806[m Updated model + dto + mappings
+[33mca806e5[m cleanup
+[33m1ef06ae[m Dev-> branch(merge conflicts)
+[33mb27f608[m[33m ([m[1;31morigin/65-add-bogus-faker-guide[m[33m)[m Merge pull request #59 from Mercantec-GHC/57-refining-of-authservices
+[33ma63b0e9[m[33m ([m[1;31morigin/57-refining-of-authservices[m[33m)[m added ILogger + updated XML
+[33m8c3b9fd[m Roles logic in services and controllers
+[33m10f0304[m wip
+[33mcaf9205[m wip
+[33md50f530[m[33m ([m[1;31morigin/60-update-cleaning-service-using-entity-intead-of-dapper[m[33m)[m small fix
+[33mae7dc20[m update cleaning service
+[33md610379[m CleanUp
+[33mf6b99ac[m Refinement of services and dtos
+[33m47dd7ef[m Refinment in AuthService+Dtos+Users
+[33m05a893c[m[33m ([m[1;31morigin/85[m[33m)[m delete action test
+[33m005724c[m test gitAction => azure
+[33mad4178c[m Merge branch 'Dev' into 53-post-for-room-and-roomtype
+[33me7c6713[m small fix
+[33m7ec1c05[m fix actions
+[33md68e65e[m Merge branch 'main' of https://github.com/Mercantec-GHC/h2-projekt-teamawesome-vvtj
+[33m64666f0[m added ci pipeline
+[33mfa06580[m Merge pull request #56 from Mercantec-GHC/Dev
+[33mac92b5b[m Bugs
+[33m8cd3fbb[m Merge pull request #55 from Mercantec-GHC/49-xml-documentation-exceptions
+[33m69fc247[m[33m ([m[1;31morigin/49-xml-documentation-exceptions[m[33m)[m Merge branch 'Dev' into 49-xml-documentation-exceptions
+[33m58c2bc9[m XML + logger
+[33mcb21367[m update roomTypes
+[33m1f05bfb[m Merge branch 'Dev' into 53-post-for-room-and-roomtype
+[33mc2f2596[m Merge branch 'Dev' of https://github.com/Mercantec-GHC/h2-projekt-teamawesome-vvtj into Dev
+[33mfaf9786[m added key vault
+[33m0243cbd[m Merge branch 'Dev' into 53-post-for-room-and-roomtype
+[33mc71bf8f[m Merge pull request #51 from Mercantec-GHC/44-elev-xml-documentation-for-rooms
+[33m45bcbd1[m[33m ([m[1;31morigin/44-elev-xml-documentation-for-rooms[m[33m)[m Refactor room models and add RoomTypeEnum
+[33m81c1f60[m Added POST
+[33mf8a98db[m Fixed Room and RoomType GET functionality
+[33m82bf742[m[33m ([m[1;31morigin/48-fix-updatebooking[m[33m, [m[1;32m48-fix-updatebooking[m[33m)[m Merge pull request #43 from Mercantec-GHC/33-xml-documentation-for-hotel-and-room-endpoints
+[33mcab88e2[m[33m ([m[1;31morigin/33-xml-documentation-for-hotel-and-room-endpoints[m[33m)[m Merge branch '33-xml-documentation-for-hotel-and-room-endpoints' of https://github.com/Mercantec-GHC/h2-projekt-teamawesome-vvtj into 33-xml-documentation-for-hotel-and-room-endpoints
+[33mabcf58b[m Merge branch 'Dev' into 33-xml-documentation-for-hotel-and-room-endpoints
+[33maf3393a[m .
+[33m6530aaf[m Put and post fixed
+[33m13b9e82[m settings for aspire dashbord
+[33m5242908[m Merge pull request #42 from Mercantec-GHC/37-elev-implement-loginattemptservice
+[33m860c56b[m added scope for hotel n program.cs
+[33m5579cda[m[33m ([m[1;31morigin/37-elev-implement-loginattemptservice[m[33m)[m added attempt service into login endpoint
+[33mf1dd439[m merge with dev, fix conf
+[33mfee8ab9[m Merge branch 'Dev' into 33-xml-documentation-for-hotel-and-room-endpoints
+[33mcdeccb8[m Refactor hotel logic and unify HotelDto usage
+[33m18e3bea[m Merge pull request #38 from Mercantec-GHC/36-authentication-logic
+[33m2016297[m added attempts login service
+[33m165a89c[m[33m ([m[1;31morigin/36-authentication-logic[m[33m)[m Authorization
+[33mc9d13d3[m Merge pull request #30 from Mercantec-GHC/10-brugerhåndtering-registrering-login
+[33mc1f2d19[m[33m ([m[1;31morigin/10-brugerhåndtering-registrering-login[m[33m)[m PasswordBackdoor
+[33mc2c06d2[m Merge branch 'Dev' into 10-brugerhåndtering-registrering-login
+[33md6a5828[m UpdateUser method fixes
+[33m47966a5[m Controllers fix
+[33mf05b312[m Merge pull request #35 from Mercantec-GHC/34-uge-3---xml-dokumentation-af-api
+[33m2029f06[m[33m ([m[1;31morigin/34-uge-3---xml-dokumentation-af-api[m[33m)[m added doc for cleaning endpoints
+[33me362fe8[m Merge branch 'Dev' into 10-brugerhåndtering-registrering-login
+[33mcea7465[m .
+[33m8460d26[m update users
+[33m9bb2d59[m dev -> branch
+[33m6d86072[m update db
+[33m75a159c[m fixes
+[33mff335ca[m dev merged
+[33m84dc1bf[m Merge pull request #28 from Mercantec-GHC/27-role-fixing-bugs-in-controllers
+[33m883cc7b[m[33m ([m[1;31morigin/27-role-fixing-bugs-in-controllers[m[33m)[m .
+[33m5e2b7f0[m string -> enum
+[33m7181e74[m Small changes
+[33ma7db6c3[m Database connection
+[33mfbdf8b8[m AuthController+LoginDto+RegisterDto
+[33mbcae676[m Register and Login logic
+[33m68b1faa[m Cleanup in models, dtos, controllers; fix of Role
+[33m7920b8c[m Merge pull request #26 from Mercantec-GHC/Dev
+[33mf46f5d6[m Merge pull request #25 from Mercantec-GHC/bookingController
+[33mb6dda9c[m fixed conf
+[33m3636ac8[m Merge pull request #23 from Mercantec-GHC/21-room-implementation
+[33m773131e[m[33m ([m[1;31morigin/21-room-implementation[m[33m)[m Merge branch 'Dev' into 21-room-implementation
+[33m10cf7de[m Add BookingController, BookingService, BookingDto
+[33maf1361d[m Update HotelController.cs
+[33m3006ba2[m Merge branch 'Dev' into bookingController
+[33m54c1fe1[m Merge branch 'Dev' into 21-room-implementation
+[33mda3a543[m Merge pull request #24 from Mercantec-GHC/22-fixing-controllers
+[33m73563f3[m[33m ([m[1;31morigin/22-fixing-controllers[m[33m)[m Bug fixes on controllers
+[33mc107e6a[m Room and Roomtype fixed
+[33m0b829ee[m Merge branch 'Dev' into bookingController
+[33ma5b68a3[m Merge dev into my branch
+[33mfe86296[m added namespaces to fix bugs
+[33m36a1bf5[m Merge pull request #20 from Mercantec-GHC/Implement-Cleaning-Management-&-Daily-Cleanin
+[33m2ea369e[m[33m ([m[1;31morigin/Implement-Cleaning-Management-&-Daily-Cleanin[m[33m)[m merged dev into cleaning branch, fix conflicts
+[33m49c9712[m deleted  lastcleaned
+[33m13a2c79[m cleaning service v1
+[33mdce3063[m add mark like cleaned
+[33m5595141[m Add BookingController + service + DTO
+[33mbaca87d[m Merge pull request #19 from Mercantec-GHC/14-hotel-implementation
+[33m0a362f8[m[33m ([m[1;31morigin/14-hotel-implementation[m[33m)[m Merge branch 'Dev' into 14-hotel-implementation
+[33m0846921[m Hotel arv
+[33mc2917d8[m Merge pull request #17 from Mercantec-GHC/Refactoring-of-models-implement-controllers
+[33mf16751f[m[33m ([m[1;31morigin/Refactoring-of-models-implement-controllers[m[33m)[m Migrations
+[33mb61a71c[m Implemented Dto and controller
+[33mcaea53a[m Resolve comments from PR
+[33mfd590d5[m cleaning in process
+[33m5ce94c1[m RolesController + interface
+[33m587a112[m IUserService + UserController
+[33m68c0764[m Role dto + mapping
+[33m46e2961[m refactoring of the models + UserGetDto + UserPostDto
+[33m414e3c1[m[33m ([m[1;31morigin/6-implement-user-role-management-with-authentication[m[33m)[m update controller
+[33m62c7809[m added createUser controller
+[33m53b614e[m[33m ([m[1;32mTetiana[m[33m, [m[1;32m13-model[m[33m)[m Migrations
+[33m031d17b[m change user id to int
+[33m5d18e20[m Merge pull request #5 from Mercantec-GHC/3-elev-oprette-room-model
+[33mf26dbad[m[33m ([m[1;31morigin/3-elev-oprette-room-model[m[33m)[m Fixes
+[33ma5a275d[m removed question mark from required strings
+[33m1acf81b[m Fixes
+[33m4e7a683[m Created models
+[33mfdfba45[m Merge
+[33m4a176ea[m Added Booking model
+[33m712a9cf[m[33m ([m[1;31morigin/4-elev-oprette-en-booking-model[m[33m, [m[1;31morigin/1-uge-2---database-efcore[m[33m)[m added initial migration
+[33m3b22739[m[33m ([m[1;32mmain[m[33m)[m Initial commit

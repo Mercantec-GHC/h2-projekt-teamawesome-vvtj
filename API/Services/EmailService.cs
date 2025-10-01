@@ -204,7 +204,7 @@ namespace API.Services
 													<tr><th>Check-in Date:</th><td>{checkInDate}</td></tr>
 													<tr><th>Check-out Date:</th><td>{checkOutDate}</td></tr>
 													<tr><th>Nights:</th><td>{responseDto.NightsCount}</td></tr>
-													<tr><th>Room Type:</th><td>{responseDto.RoomType}</td></tr>
+													<tr><th>Room Type:</th><td>{responseDto.TypeOfRoom}</td></tr>
 													<tr><th>Guests:</th><td>{responseDto.GuestsCount}</td></tr>
 													<tr><th>Breakfast Included:</th><td>{isBreakfastText}</td></tr>
 													<tr class='final-price-row'>
