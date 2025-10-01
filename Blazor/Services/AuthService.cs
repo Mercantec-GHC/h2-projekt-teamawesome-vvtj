@@ -25,11 +25,11 @@ public class AuthService : IAuthService
 		_authStateProvider = authStateProvider;
 	}
 
-	public async Task<bool> LoginAsync(string email, string password, bool remember)
+	public async Task<bool> LoginAsync(string userName, string password, bool remember)
 	{
 		var loginDto = new UserLoginDto
 		{
-			Email = email,
+			Username = userName,
 			Password = password,
 			RememberMe = remember
 		};
@@ -49,7 +49,7 @@ public class AuthService : IAuthService
 		_apiService.SetBearerToken(token);
 
 		// Send a message to admin dashboard about the login event
-		var message = $"User {loginDto.Email} has just logged in";
+		var message = $"User {loginDto.Username} has just logged in";
 		await _apiService.SendNotificationAsync(message);
 
 		return true;

@@ -27,7 +27,7 @@ public partial class Login
 	{
 		PreloadService.Show();
 		_errorMessage = string.Empty;
-		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password, _loginModel.RememberMe);
+		var result = await _authService.LoginAsync(_loginModel.Username, _loginModel.Password, _loginModel.RememberMe);
 		if (result)
 		{
 			_navigation.NavigateTo("/user/account");
