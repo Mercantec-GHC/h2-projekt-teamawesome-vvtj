@@ -6,6 +6,15 @@
   min-height: 80vh;
 }
 
+.overlay {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.15);
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+
+}
+
 .container {
     margin-top: 2rem;
   }
