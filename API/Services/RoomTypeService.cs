@@ -21,36 +21,22 @@ namespace API.Services
         }
         public async Task<IEnumerable<RoomTypeDto?>> GetRoomTypes()
         {
-            var roomtypes = await _context.RoomTypes.ToListAsync();
+            var roomtypes = await _context.RoomTypes.ToListAsync()
+            ?? throw new ArgumentException("No roomtypes found");
 
-            if (roomtypes == null)
-            {
-                return null;
-            }
-
-            var newRoomTypesListDto = roomtypes
+            return roomtypes
               .Select(rt => _mapping.ToRoomTypeGETdto(rt));
-
-            // if (!RoomTypeEnumHelper.TryToConvert(rt.TypeofRoom, out var roomTypeEnum))
-            //     return null;
-            return newRoomTypesListDto;
         }
 
         public async Task<RoomTypeDto?> GetSpecificRoomType(int roomtypeId)
         {
-            var roomtype = await _context.RoomTypes.FindAsync(roomtypeId);
-            if (roomtype == null)
-            {
-                return null;
-            }
-            //  if (!RoomTypeEnumHelper.TryToConvert(, out var roomTypeEnum))
-            //  {
-            //      return null;
-            //  }
+            if (roomtypeId == 0)
+                throw new ArgumentException("ID cannot be 0");
 
-
-          var getRoomType = _mapping.ToRoomTypeGETdto(roomtype);
-            return getRoomType;
+            var roomtype = await _context.RoomTypes.FindAsync(roomtypeId)
+            ?? throw new ArgumentException($"No roomtype was found with the given ID: {roomtypeId}");
+            
+            return _mapping.ToRoomTypeGETdto(roomtype);
         }
         
         /// <summary>
@@ -59,11 +45,11 @@ namespace API.Services
         /// </summary>
         public async Task<RoomType?> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
         {
-            var existingRoomType = await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Id == roomtypeId);
-            if (existingRoomType == null)
-            {
-                return null;
-            }
+            if (roomtypeId == 0)
+                throw new ArgumentException("ID cannot be 0");
+
+            var existingRoomType = await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Id == roomtypeId)
+            ?? throw new ArgumentException($"Could not find room type with ID:{roomtypeId}");
 
             //Only update if there's a new value
             if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description) && roomTypePutDto.Description != "string")

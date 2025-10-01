@@ -1,4 +1,9 @@
-﻿namespace Blazor.Services
+﻿using DomainModels.Dto;
+using System.Net;
+using System.Net.Http.Json;
+
+
+namespace Blazor.Services
 {
     public partial class APIService
     {

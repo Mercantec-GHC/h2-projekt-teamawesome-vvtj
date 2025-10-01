@@ -1,8 +1,11 @@
 ﻿using System.Globalization;
+using API.Data;
 using API.Interfaces;
 using DomainModels.Dto;
+using DomainModels.Models;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using MimeKit.Text;
 
@@ -13,89 +16,13 @@ namespace API.Services
 		private readonly ILogger<CleaningService> _logger;
 		private readonly IConfiguration _config;
 
-		public EmailService(ILogger<CleaningService> logger, IConfiguration config)
+		private readonly AppDBContext _context;
+
+		public EmailService(ILogger<CleaningService> logger, IConfiguration config, AppDBContext context)
 		{
 			_logger = logger;
 			_config = config;
-		}
-
-		public async Task<bool> SendEmailNotificationAsync(EmailFormDto dto)
-		{
-			try
-			{
-				var username = _config["SmtpSettings:GmailUsername"];
-				var appPassword = _config["SmtpSettings:GmailAppPassword"];
-
-				if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(appPassword))
-				{
-					_logger.LogError("[Email Error]: SMTP credentials (GmailUsername or AppPassword) are missing or empty in configuration.");
-					return false;
-				}
-
-				var email = new MimeMessage();
-
-				email.From.Add(new MailboxAddress("NOVA Hotels Website", username));
-				email.To.Add(MailboxAddress.Parse(username));
-
-				email.Subject = $"NEW CONTACT: Message from {dto.Name}";
-
-				string htmlContent = $@"
-				<html>
-				<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
-					<div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;'>
-                    
-						<div style='background-color: #007bff; color: #ffffff; padding: 15px; text-align: center;'>
-							<h2 style='margin: 0;'>New Contact Form Submission</h2>
-						</div>
-                    
-						<div style='padding: 25px;'>
-							<p style='font-size: 16px; color: #333;'>
-								You have received a new contact message from a customer via the NOVA Hotels website.
-							</p>
-                        
-							<table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>
-								<tr>
-									<td style='padding: 10px; border: 1px solid #eee; background-color: #f9f9f9; width: 30%; font-weight: bold;'>Name:</td>
-									<td style='padding: 10px; border: 1px solid #eee;'>{dto.Name}</td>
-								</tr>
-								<tr>
-									<td style='padding: 10px; border: 1px solid #eee; background-color: #f9f9f9; width: 30%; font-weight: bold;'>Email:</td>
-									<td style='padding: 10px; border: 1px solid #eee;'><a href='mailto:{dto.Email}'>{dto.Email}</a></td>
-								</tr>
-							</table>
-
-							<h3 style='margin-top: 30px; border-bottom: 2px solid #eee; padding-bottom: 5px;'>Message:</h3>
-							<p style='padding: 15px; background-color: #fff8e1; border-left: 5px solid #ffc107; white-space: pre-wrap; color: #555;'>
-								{dto.Message}
-							</p>
-						</div>
-
-						<div style='background-color: #e9e9e9; color: #777; padding: 10px; font-size: 12px; text-align: center;'>
-							End of message.
-						</div>
-					</div>
-				</body>
-				</html>";
-
-				email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
-				{
-					Text = htmlContent
-				};
-
-				using var smtp = new SmtpClient();
-				await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
-				await smtp.AuthenticateAsync(username, appPassword);
-
-				await smtp.SendAsync(email);
-				await smtp.DisconnectAsync(true);
-
-				return true;
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError($"[Email Error]: {ex.Message}");
-				return false;
-			}
+			_context = context;
 		}
 
 		public async Task<bool> SendWelcomeEmailAsync(EmailFormDto dto)
@@ -277,7 +204,7 @@ namespace API.Services
 													<tr><th>Check-in Date:</th><td>{checkInDate}</td></tr>
 													<tr><th>Check-out Date:</th><td>{checkOutDate}</td></tr>
 													<tr><th>Nights:</th><td>{responseDto.NightsCount}</td></tr>
-													<tr><th>Room Type:</th><td>{responseDto.RoomType}</td></tr>
+													<tr><th>Room Type:</th><td>{responseDto.TypeOfRoom}</td></tr>
 													<tr><th>Guests:</th><td>{responseDto.GuestsCount}</td></tr>
 													<tr><th>Breakfast Included:</th><td>{isBreakfastText}</td></tr>
 													<tr class='final-price-row'>
@@ -331,6 +258,5 @@ namespace API.Services
 				return false;
 			}
 		}
-
 	}
 }
