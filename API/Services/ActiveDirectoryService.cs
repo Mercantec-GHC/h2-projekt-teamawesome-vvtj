@@ -81,6 +81,9 @@ namespace API.Services
 				 	await _context.SaveChangesAsync();
 				 }
 
+				adUser.Department = await MapADUserDepartmentToHotelName(adUser.Department)
+				?? throw new ArgumentException($"Department '{adUser.Department}' does not match any known hotel in the system.");
+
 				// Generate a JWT token for the authenticated AD user
 				var token = _jwtService.CreateToken(adUser);
 
@@ -151,7 +154,7 @@ namespace API.Services
 				$"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}", // Constructs base DN - Tells LDAP where to search
 				searchFilter,                                             // Filter for user
 				SearchScope.Subtree,                                      // Searches the entire directory tree with the given attributes
-				"sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName", "distinguishedName"
+				"sAMAccountName", "mail", "displayName", "givenName", "sn", "memberOf", "userPrincipalName", "distinguishedName", "department"
 			);
 
 			//Executes the search asynchronously
@@ -179,7 +182,8 @@ namespace API.Services
 				Email = GetAttributeValue(entry, "mail"),
 				FirstName = GetAttributeValue(entry, "givenName"),
 				LastName = GetAttributeValue(entry, "sn"),
-				DistinguishedName = GetAttributeValue(entry, "distinguishedName")
+				DistinguishedName = GetAttributeValue(entry, "distinguishedName"),
+				Department = GetAttributeValue(entry, "department")
 			};
 
 			userInfo.Groups = GetGroupsByUser(connection, userInfo.DistinguishedName);
@@ -251,6 +255,17 @@ namespace API.Services
 			}
 
 			return RoleEnum.Unknown;
+		}
+
+		private async Task<string?> MapADUserDepartmentToHotelName(string department)
+		{
+			if (string.IsNullOrWhiteSpace(department))
+				return null;
+
+			var hotel = await _context.Hotels
+				.FirstOrDefaultAsync(h => h.HotelName.Equals(department.ToLower()));
+
+			return hotel?.HotelName;
 		}
 
 		//-----------------------------------------------------------------------------//

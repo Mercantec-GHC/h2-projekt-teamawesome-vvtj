@@ -27,6 +27,7 @@ public class JWTService : IJWTService
 			new Claim(ClaimTypes.Email, user.Email),
 			new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString()),
 			new Claim(ClaimTypes.Name, user.UserName),
+
 		});
 		}
 		catch (Exception ex)
@@ -48,7 +49,8 @@ public class JWTService : IJWTService
 				new Claim("adUser", "true"), //Indicate that the user is AD-authenticated
                 new Claim("adGroups", string.Join(",", adUser.Groups)),
 				new Claim("adDistinguishedName", adUser.DistinguishedName),
-				new Claim("role", adUser.Role.ToString())
+				new Claim("role", adUser.Role.ToString()),
+				new Claim("department", adUser.Department)
 		});
 		}
 		catch (Exception ex)
