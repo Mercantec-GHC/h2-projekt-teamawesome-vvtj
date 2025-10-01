@@ -56,7 +56,7 @@ namespace Blazor.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync("user/bookings");
+                var response = await _httpClient.GetAsync("/api/bookings/bookings");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -78,6 +78,11 @@ namespace Blazor.Services
                 throw;
             }
 
+        }
+        public async Task<bool> DeleteMyBookingAsync(int Id)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/bookings/user/bookings/{Id}");
+            return response.IsSuccessStatusCode;
         }
     }
 }

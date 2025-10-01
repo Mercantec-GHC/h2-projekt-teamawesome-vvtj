@@ -18,6 +18,7 @@ namespace API.Interfaces
         Task<bool> DeleteBookingById(int id);
         Task<IEnumerable<BookingDto>> GetBookingByHotel(int hotelId);
 
+        Task<bool> DeleteMyBooking(int bookingId, int userId);
 
     }
 }

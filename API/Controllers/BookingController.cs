@@ -138,14 +138,14 @@ public class BookingController : ControllerBase
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [Authorize]
     [HttpGet("bookings")]
-    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
+    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser()
     {
         var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdStr == null)
+        if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
             return Unauthorized("UserId is not authorized.");
 
         var bookings = await _bookingService.GetBookingByUser(userId);
-        if (bookings == null || !bookings.Any())
+        if (bookings is null || !bookings.Any())
             return NotFound("No bookings found for this user.");
 
         return Ok(bookings);
@@ -216,5 +216,34 @@ public class BookingController : ControllerBase
     {
         var bookings = await _bookingService.GetBookingByHotel(hotelId);
         return Ok(bookings);
+    }
+
+    /// <summary>
+    /// Deletes a booking belonging to the current user.
+    /// </summary>
+    /// <param name="id">The ID of the booking to delete.</param>
+    /// <returns>
+    /// <response code="204"> No Content if the booking was deleted successfully.</response>
+    /// <response code="400"> Bad Request if the booking cannot be deleted (does not exist, does not belong to the user, or has already started).</returns>
+    ///<response code="401">Unauthorized – the user is not authenticated.</response>
+    ///  <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+    [Authorize]
+    [HttpDelete("user/bookings/{id}")]
+    public async Task<IActionResult> DeleteMyBooking(int id)
+    {
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized("User is not authorized.");
+        }
+
+        var success = await _bookingService.DeleteMyBooking(id, userId);
+
+        if (!success)
+        {
+            return BadRequest("Unable to delete booking. It may not exist, not belong to you, or has already started.");
+        }
+
+        return NoContent();
     }
 }
