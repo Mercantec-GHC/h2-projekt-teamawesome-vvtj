@@ -9,6 +9,7 @@ import { RoomTypesList } from './app/rooms/RoomTypesList'
 import CleaningPage from './app/operational activities/Cleaning'
 import { HotelList } from './app/hotels/HotelsList'
 import {UserList } from './app/operational activities/UserList'
+import  NotificationsTable  from './app/operational activities/NotificationsPage'
 
 function App() {
   return (
@@ -16,12 +17,13 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
-              <Route path="rooms"  element={<ProtectedRoute allowedRoles={["Admin", "Reception"]}><Rooms /></ProtectedRoute> } />
-              <Route path="bookings"  element={<ProtectedRoute allowedRoles={["Admin", "Reception"]}><Bookings /></ProtectedRoute> } />
-              <Route path='room-types'  element={<ProtectedRoute allowedRoles={["Admin", "Reception"]}><RoomTypesList /></ProtectedRoute> } />
-              <Route path="cleaning" element={<ProtectedRoute allowedRoles={["Admin", "Reception", "CleaningStaff"]}><CleaningPage /></ProtectedRoute> } />
-              <Route path="hotels"  element={<ProtectedRoute allowedRoles={["Admin"]}><HotelList /></ProtectedRoute> } />
-              <Route path='users'  element={<ProtectedRoute allowedRoles={["Admin", "Reception", "CleaningStaff"]}><UserList /></ProtectedRoute> } />
+              <Route path="rooms" element={<Rooms />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path='room-types' element={<RoomTypesList />} />
+              <Route path="cleaning" element={<CleaningPage />} />
+              <Route path="hotels" element={<HotelList />} />
+              <Route path='users' element={<UserList />} />
+             <Route path="notifications" element={<NotificationsTable />} />
           </Route>
           <Route path="/login" element={<Login />} />
         </Routes>

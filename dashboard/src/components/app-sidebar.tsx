@@ -101,6 +101,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: "Users",
             url: "/users",
           },
+           {
+            title: "All Notifications",
+            url: "/notifications",
+          },
         ],
       },
     ],

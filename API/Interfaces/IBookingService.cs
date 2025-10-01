@@ -7,7 +7,7 @@ namespace API.Interfaces
     public interface IBookingService
     {
 
-        Task<BookingResponseDto> CreateBooking(CreateBookingDto dto);
+        Task<BookingResponseDto> CreateBooking(CreateBookingDto dto, bool preview = false);
 
         Task<IEnumerable<GetBookingsDto>> GetAllBookings();
 

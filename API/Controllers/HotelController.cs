@@ -35,20 +35,12 @@ public class HotelController : ControllerBase
     {
         try
         {
-            var hotels = await _hotelService.GetHotel();
-
-            if (hotels == null)
-            {
-                return BadRequest("Cannot find hotel");
-            }
-
-            return Ok(hotels);
+            return Ok(await _hotelService.GetHotel());
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error {ex.Message}");
+            return NotFound(ex.Message);
         }
-        
     }
 
     /// <summary>
@@ -60,13 +52,14 @@ public class HotelController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<HotelDto>> GetSpecificHotel(int id)
     {
-        if (id == null)
+        try
         {
-            return NotFound();
+            return await _hotelService.GetHotelById(id);
         }
-
-        var hotel = await _hotelService.GetHotelById(id);
-        return Ok(hotel);
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     //Only Admin
@@ -79,66 +72,53 @@ public class HotelController : ControllerBase
     /// <response code="400">Could not create hotel!</response>
     /// 
     [Authorize(Roles = "Admin")]
-	[HttpPost]
+    [HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
-        
         try
         {
-            var newHotel = await _hotelService.PostHotel(hotelcreateDto);
-            
-
-            if (newHotel == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(newHotel);
+            await _hotelService.PostHotel(hotelcreateDto);
+            return NoContent();
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return BadRequest(ex.Message);
         }
-
     }
 
-	//Only Admin
-	//PUT: api/Hotels
-	/// <summary>
-	/// Updates a specific hotel
-	/// </summary>
-	/// <param name="updateHotel">Contains hotel details to be updated</param>
-	/// <returns>Updated hotel</returns>
-	/// <response code="400">Could not update hotel!</response>
-	/// 
-	[Authorize(Roles = "Admin")]
-	[HttpPut]
+    //Only Admin
+    //PUT: api/Hotels
+    /// <summary>
+    /// Updates a specific hotel
+    /// </summary>
+    /// <param name="updateHotel">Contains hotel details to be updated</param>
+    /// <returns>Updated hotel</returns>
+    /// <response code="400">Could not update hotel!</response>
+    /// 
+    [Authorize(Roles = "Admin")]
+    [HttpPut]
     public async Task<ActionResult> PutHotel(HotelDto updateHotel)
     {
         try
         {
-            var _updatedHotel = await _hotelService.PutHotel(updateHotel);
-            await _context.SaveChangesAsync();
-
-            return Ok(_updatedHotel);
+            return Ok(await _hotelService.PutHotel(updateHotel));
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return BadRequest(ex.Message);
         }
-        
     }
 
-	//Only Admin
-	//DELETE: api/Hotels
-	/// <summary>
-	/// Deletes a hotel
-	/// </summary>
-	/// <param name="Id">Unique identifier</param>
-	/// <returns>true if deletion succeed</returns>
-	/// <response code="404">Could not delete hotel!</response>
-	/// 
-	[Authorize(Roles = "Admin")]
+    //Only Admin
+    //DELETE: api/Hotels
+    /// <summary>
+    /// Deletes a hotel
+    /// </summary>
+    /// <param name="Id">Unique identifier</param>
+    /// <returns>true if deletion succeed</returns>
+    /// <response code="404">Could not delete hotel!</response>
+    /// 
+    [Authorize(Roles = "Admin")]
 	[HttpDelete]
     public async Task<IActionResult> DeleteHotel(int Id)
     {
@@ -146,5 +126,4 @@ public class HotelController : ControllerBase
 
         return Ok(deletedHotel);
     }
-
 }

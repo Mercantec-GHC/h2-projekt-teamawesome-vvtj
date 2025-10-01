@@ -1,6 +1,4 @@
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
   LogOut,
 } from "lucide-react"
@@ -78,14 +76,6 @@ export function NavUser({
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <BadgeCheck />
-              Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
-            </DropdownMenuItem>
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator />

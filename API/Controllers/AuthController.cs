@@ -73,9 +73,9 @@ public class AuthController : ControllerBase
 	{
 		try
 		{
-			if (_loginAttemptService.IsLockedOut(request.Email))
+			if (_loginAttemptService.IsLockedOut(request.Username))
 			{
-				var remainingSeconds = _loginAttemptService.GetRemainingLockoutSeconds(request.Email);
+				var remainingSeconds = _loginAttemptService.GetRemainingLockoutSeconds(request.Username);
 				return StatusCode(429, new
 				{
 					message = "Account temporarily locked due to too many failed login attempts.",
@@ -86,7 +86,7 @@ public class AuthController : ControllerBase
 			var result = await _authService.LoginUserAsync(request);
 			if (result == null)
 			{
-				var attemptsLeft = _loginAttemptService.RecordFailedAttempt(request.Email);
+				var attemptsLeft = _loginAttemptService.RecordFailedAttempt(request.Username);
 
 				return Unauthorized(new
 				{
@@ -95,7 +95,7 @@ public class AuthController : ControllerBase
 				});
 			}
 
-			_loginAttemptService.RecordSuccessfulLogin(request.Email);
+			_loginAttemptService.RecordSuccessfulLogin(request.Username);
 
 			var cookieOptions = new CookieOptions
 			{
@@ -115,7 +115,7 @@ public class AuthController : ControllerBase
 
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Login failed for email {Email}", request.Email);
+			_logger.LogError(ex, "Login failed for email {Username}", request.Username);
 			return StatusCode(500, "An internal error occurred. Please try again later.");
 		}
 	}
