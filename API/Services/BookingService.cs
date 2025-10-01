@@ -213,6 +213,7 @@ namespace API.Services
         {
             var userBookings = await _dbContext.Bookings
                 .Where(b => b.UserId == userId)
+                 .OrderByDescending(b => b.Id)
                 .Select(b => new BookingByUserDto
                 {
                     CreatedAt = b.CreatedAt,

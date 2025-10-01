@@ -132,11 +132,17 @@ public class BookingController : ControllerBase
     /// <response code="404">Not found – user with specified ID does not exist or has no bookings.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [Authorize]
-    [HttpGet("userId")]
+    [HttpGet("bookings")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
     {
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdStr == null)
+            return Unauthorized("UserId is not authorized.");
 
         var bookings = await _bookingService.GetBookingByUser(userId);
+        if (bookings == null || !bookings.Any())
+            return NotFound("No bookings found for this user.");
+
         return Ok(bookings);
     }
 
@@ -154,7 +160,6 @@ public class BookingController : ControllerBase
     ///  <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="404">Booking with the specified ID not found</response>
     /// <response code="500">Unexpected server error</response>
-    
     [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
