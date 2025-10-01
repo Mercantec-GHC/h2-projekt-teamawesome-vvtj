@@ -41,7 +41,7 @@
         cursor: default;
     }
 
-::deep #input-field-email {
+::deep #input-field-username {
     background-color: rgba(255, 255, 255, .8);
     border: 2px solid rgba(255, 255, 255, 1);
     box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.5);
@@ -51,11 +51,11 @@
     transition: background .8s ease-out;
 }
 
-    ::deep #input-field-email:hover {
+    ::deep #input-field-username:hover {
         background-color: rgba(255, 255, 255, 1);
     }
 
-    ::deep #input-field-email:active, ::deep #input-field-email:focus-within {
+    ::deep #input-field-username:active, ::deep #input-field-username:focus-within {
         outline: 2px solid #00c4c8;
         background-color: rgba(255, 255, 255, 1);
     }
