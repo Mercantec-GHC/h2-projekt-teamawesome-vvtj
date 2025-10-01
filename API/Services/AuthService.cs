@@ -88,11 +88,10 @@ public class AuthService : IAuthService
 		var ipAddress = httpContext?.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
 		var device = httpContext?.Request.Headers["User-Agent"].ToString() ?? string.Empty;
 
-		var normalizedEmail = request.Email.ToLowerInvariant();
 
 		var user = await _context.Users
 		.Include(u => u.UserRole)
-		.FirstOrDefaultAsync(u => u.Email == normalizedEmail);
+		.FirstOrDefaultAsync(u => u.UserName == request.Username);
 
 		if (user == null)
 		{
