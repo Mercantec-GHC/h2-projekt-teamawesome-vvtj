@@ -1,0 +1,74 @@
+﻿.bookings-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.booking-card {
+    width: 80%;
+    max-width: 700px;
+    padding: 1.5rem 2rem;
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+    .booking-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .booking-card h5 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        color: #204343;
+    }
+
+    .booking-card p {
+        margin: 0.3rem 0;
+        font-size: 1rem;
+        color: #333;
+    }
+
+::deep .btn.btn-custom {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    transition: background-image 0.3s ease-in-out;
+    color: #204343;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+::deep .btn.btn-outline {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    border-radius: 35px;
+    color: #3a9698;
+    font-weight: 600;
+    border: 2px solid #3a9698;
+    transition: background-image 0.3s ease-in-out;
+    margin-top: 1rem;
+}
+
+    ::deep .btn.btn-custom:hover,
+    ::deep .btn.btn-outline:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255, 255, 255, .5);
+    }
+
+::deep .btn.btn-custom:active,
+::deep .btn.btn-custom:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+}

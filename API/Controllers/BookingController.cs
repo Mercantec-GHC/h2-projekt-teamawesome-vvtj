@@ -96,7 +96,7 @@ public class BookingController : ControllerBase
     /// <summary>
     /// Get all available rooms in the specified hotel for a given period of time.  
     /// </summary>
-    /// <param name="hotelName">Hotel name (case sensitive).Choose one of the hotels: Nova Halo, Nova Eden, Nova Oasis</param>
+    /// <param name="hotelName">Hotel name (case sensitive).Choose one of the hotels: Halo, Eden, Oasis</param>
     /// <param name="from">Start date in format yyyy-MM-dd</param>
     /// <param name="to">End date in format yyyy-MM-dd</param>
     /// <returns>A list of available rooms with their IDs, numbers, hotel name, and room type id.</returns>
@@ -105,9 +105,9 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-   [Authorize(Roles = "Admin, Reception")]
+    [Authorize(Roles = "Admin, Reception")]
     [HttpGet("available")]
-    public async Task<ActionResult<IEnumerable<GetAvaliableRoomsDto>>> GetAvaliableRooms(
+    public async Task<ActionResult<IEnumerable<GetAvailableRoomsDto>>> GetAvailableRooms(
         [FromQuery] string hotelName,
         [FromQuery] DateOnly from,
         [FromQuery] DateOnly to)
@@ -117,7 +117,7 @@ public class BookingController : ControllerBase
         if (to <= from)
             return BadRequest("Invalid date range. Use yyyy-MM-dd and ensure 'to' is after 'from'.");
 
-        var rooms = await _bookingService.GetAvaliableRoomsAsync(hotelName, from, to);
+        var rooms = await _bookingService.GetAvailableRoomsAsync(hotelName, from, to);
         if (!rooms.Any())
         {
            
@@ -137,11 +137,17 @@ public class BookingController : ControllerBase
     /// <response code="404">Not found – user with specified ID does not exist or has no bookings.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
     [Authorize]
-    [HttpGet("userId")]
-    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser(int userId)
+    [HttpGet("bookings")]
+    public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByUser()
     {
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+            return Unauthorized("UserId is not authorized.");
 
         var bookings = await _bookingService.GetBookingByUser(userId);
+        if (bookings is null || !bookings.Any())
+            return NotFound("No bookings found for this user.");
+
         return Ok(bookings);
     }
 
@@ -159,7 +165,6 @@ public class BookingController : ControllerBase
     ///  <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="404">Booking with the specified ID not found</response>
     /// <response code="500">Unexpected server error</response>
-    
     [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
@@ -211,5 +216,34 @@ public class BookingController : ControllerBase
     {
         var bookings = await _bookingService.GetBookingByHotel(hotelId);
         return Ok(bookings);
+    }
+
+    /// <summary>
+    /// Deletes a booking belonging to the current user.
+    /// </summary>
+    /// <param name="id">The ID of the booking to delete.</param>
+    /// <returns>
+    /// <response code="204"> No Content if the booking was deleted successfully.</response>
+    /// <response code="400"> Bad Request if the booking cannot be deleted (does not exist, does not belong to the user, or has already started).</returns>
+    ///<response code="401">Unauthorized – the user is not authenticated.</response>
+    ///  <response code="500">Internal server error – an unexpected error occurred on the server.</response>
+    [Authorize]
+    [HttpDelete("user/bookings/{id}")]
+    public async Task<IActionResult> DeleteMyBooking(int id)
+    {
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized("User is not authorized.");
+        }
+
+        var success = await _bookingService.DeleteMyBooking(id, userId);
+
+        if (!success)
+        {
+            return BadRequest("Unable to delete booking. It may not exist, not belong to you, or has already started.");
+        }
+
+        return NoContent();
     }
 }

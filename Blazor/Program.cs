@@ -28,6 +28,7 @@ public class Program
        builder.Services.AddBlazoredSessionStorage();
 		builder.Services.AddCascadingAuthenticationState();
 
+
 		// Læs API endpoint fra miljøvariabler eller brug default
 		var envApiEndpoint = Environment.GetEnvironmentVariable("API_ENDPOINT");
        
