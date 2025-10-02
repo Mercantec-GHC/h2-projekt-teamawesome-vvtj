@@ -216,7 +216,7 @@ namespace API.Services
 
             var hotel = await _dbContext.Hotels
                 .AsNoTracking()
-                 .FirstOrDefaultAsync(h => h.HotelName == hotelName);
+                 .FirstOrDefaultAsync(h => h.HotelName.ToLower().Contains(hotelName.ToLower()));
             if (hotel == null)
                 return Enumerable.Empty<GetAvailableRoomsDto>();
 
@@ -227,14 +227,13 @@ namespace API.Services
               .Where(r => !_dbContext.Bookings.Any(b =>
             b.RoomId == r.Id &&
             b.CheckIn < to && b.CheckOut > from))
-                //.OrderBy(r => r.RoomNumber)
+                .OrderBy(r => r.RoomNumber)
                 .Select(r => new GetAvailableRoomsDto
                 {
                     RoomId = r.Id,
                     RoomNumber = r.RoomNumber,
                     HotelName = r.Hotel.HotelName,
-                    //RoomTypeName = ((RoomTypeEnum)r.TypeId).ToString()
-                  TypeofRoom = r.RoomType.TypeofRoom,
+                    RoomTypeName = ((RoomTypeEnum)r.TypeId).ToString()                 
                 })
                 .ToListAsync();
             return available;

@@ -96,7 +96,7 @@ public class BookingController : ControllerBase
     /// <summary>
     /// Get all available rooms in the specified hotel for a given period of time.  
     /// </summary>
-    /// <param name="hotelName">Hotel name (case sensitive).Choose one of the hotels: Nova Halo, Nova Eden, Nova Oasis</param>
+    /// <param name="hotelName">Hotel name (case sensitive).Choose one of the hotels: Halo, Eden, Oasis</param>
     /// <param name="from">Start date in format yyyy-MM-dd</param>
     /// <param name="to">End date in format yyyy-MM-dd</param>
     /// <returns>A list of available rooms with their IDs, numbers, hotel name, and room type id.</returns>
@@ -105,7 +105,7 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
- //  [Authorize(Roles = "Admin, Reception")]
+    [Authorize(Roles = "Admin, Reception")]
     [HttpGet("available")]
     public async Task<ActionResult<IEnumerable<GetAvailableRoomsDto>>> GetAvailableRooms(
         [FromQuery] string hotelName,

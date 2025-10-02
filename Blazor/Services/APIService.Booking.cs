@@ -79,42 +79,45 @@ namespace Blazor.Services
             }
 
         }
-        //public async Task<bool> DeleteMyBookingAsync(int Id)
-        //{
-        //    var response = await _httpClient.DeleteAsync($"/api/bookings/user/bookings/{Id}");
-        //    return response.IsSuccessStatusCode;
-        //}
+        public async Task<bool> DeleteMyBookingAsync(int Id)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/bookings/user/bookings/{Id}");
+            return response.IsSuccessStatusCode;
+        }
 
-        //public async Task<List<GetAvailableRoomsDto>> GetAvailableRoomsAsync(
-        //    string hotelName, DateOnly from, DateOnly to)
-        //{
-        //    try
-        //    {
-        //        var response = await _httpClient.GetAsync($"/api/bookings/available?hotelName={hotelName}&from={from}&to={to}");
+        public async Task<List<GetAvailableRoomsDto>> GetAvailableRoomsAsync(
+            string hotelName, DateOnly from, DateOnly to)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/bookings/available?hotelName={hotelName}&from={from}&to={to}");
 
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            var rooms = await response.Content
-        //                .ReadFromJsonAsync<List<GetAvailableRoomsDto>>();
-        //            return rooms ?? new List<GetAvailableRoomsDto>(); 
-        //        }
 
-        //        if (response.StatusCode == HttpStatusCode.NotFound)
-        //            return new List<GetAvailableRoomsDto>(); // empty list if rooms not found
+                if (response.IsSuccessStatusCode)
+                {
+                    var rooms = await response.Content
+                        .ReadFromJsonAsync<List<GetAvailableRoomsDto>>();
+                    return rooms ?? new List<GetAvailableRoomsDto>();
+                }
 
-        //        _logger.LogWarning("Failed to get available rooms. Status: {Status}", response.StatusCode);
-        //        return new List<GetAvailableRoomsDto>();
-        //    }
-        //    catch (HttpRequestException ex)
-        //    {
-        //        _logger.LogError(ex, "Network error getting available rooms.");
-        //        return new List<GetAvailableRoomsDto>();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogCritical(ex, "Unexpected error getting available rooms.");
-        //        throw;
-        //    }
-        //}
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return new List<GetAvailableRoomsDto>(); // empty list if rooms not found
+
+                _logger.LogWarning("Failed to get available rooms. Status: {Status}", response.StatusCode);
+                return new List<GetAvailableRoomsDto>();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error getting available rooms.");
+                return new List<GetAvailableRoomsDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Unexpected error getting available rooms.");
+                throw;
+            }
+        }
+
+       
     }
 }
