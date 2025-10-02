@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApiService } from "@/services/ApiService";
+import { useAuth } from "../login/AuthContext";
 
 interface CleaningForm {
   selectedHotelId: string;
@@ -24,10 +25,10 @@ export function Cleaning() {
   const [errorMarkedRooms, setErrorMarkedRooms] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+   const { token } = useAuth()
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const role = decoded?.role;
-  const hotelName = decoded?.Hotel;
+  const hotelName = decoded?.department; 
 
   useEffect(() => {
     if (!token) navigate("/login");
@@ -49,7 +50,8 @@ export function Cleaning() {
           setCleaningViewModel([]);
           return;
         }
-        filteredRooms = roomsToClean.filter(r => r.hotelId === String(hotel.id));
+        filteredRooms = roomsToClean.filter(r => parseInt(r.hotelId) === hotel.id);
+        hotels.splice(0, hotels.length, hotel); // keep only this hotel in the list
       }
 
       const mapped = filteredRooms.map((r: any) => {

@@ -172,6 +172,28 @@ export const ApiService = {
     }
   },
 
+getAllBookings: async (): Promise<BookingDto[] | null> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return null;
+      }
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        console.error("Failed to fetch rooms:", res.status, res.statusText);
+        return null;
+      }
+      return res.json();
+    } catch (err) {
+      console.error("Error fetching rooms:", err);
+      return null;
+    }
+  },
+
+
   updateBookingDates: async (
       id: number,
       checkIn: string,
