@@ -33,9 +33,58 @@ public class NotificationsController : ControllerBase
 	}
 
 	[HttpPost("send")]
-	public async Task<IActionResult> Send([FromBody] NotificationMessageDto dto)
+	public async Task<IActionResult> SendPushNotification([FromBody] NotificationMessageDto dto)
 	{
-		await _notificationService.SendNotificationAsync(dto);
+		await _notificationService.SendPushNotificationAsync(dto);
 		return Ok();
+	}
+
+	[HttpPost("save-contact-form-notification")]
+	public async Task<IActionResult> ContactFormNotification(EmailFormDto dto)
+	{
+		try
+		{
+			if (dto == null)
+			{
+				return BadRequest("Email form can not be null or empty.");
+			}
+
+			var result = await _notificationService.SaveEmailNotificationAsync(dto);
+			return Ok();
+		}
+		catch (Exception ex)
+		{
+			return StatusCode(500, $"Internal server error: {ex.Message}");
+		}
+	}
+
+	[Authorize]
+	[HttpPut("update-notification-status")]
+	public async Task<IActionResult> UpdateNotificationStatus(NotificationStatusDto dto)
+	{
+		try
+		{
+			var result = await _notificationService.UpdateNotificationStatusAsync(dto);
+			return Ok();
+		}
+		catch (Exception ex)
+		{
+			return StatusCode(500, $"Internal server error: {ex.Message}");
+		}
+	}
+
+	[Authorize]
+	[HttpGet("all-notifications")]
+	public async Task<IActionResult> GetAllNotifications()
+	{
+		try
+		{
+			var notifications = await _notificationService.GetAllNotificationsAsync();
+			return Ok(notifications);
+		}
+		catch (Exception ex)
+		{
+			return StatusCode(500, $"Internal server error: {ex.Message}");
+		}
 	}
 }

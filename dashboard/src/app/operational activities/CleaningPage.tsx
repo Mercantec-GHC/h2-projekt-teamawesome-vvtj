@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApiService } from "@/services/ApiService";
+import { useAuth } from "../login/AuthContext";
 
 interface CleaningForm {
   selectedHotelId: string;
@@ -24,9 +25,10 @@ export function Cleaning() {
   const [errorMarkedRooms, setErrorMarkedRooms] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+   const { token } = useAuth()
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
-  const isAdmin = decoded?.role === "Admin";
+  const role = decoded?.role;
+  const hotelName = decoded?.department; 
 
   useEffect(() => {
     if (!token) navigate("/login");
@@ -36,21 +38,30 @@ export function Cleaning() {
   const loadRooms = async () => {
     setLoading(true);
     try {
-      const roomsToClean = await ApiService.getAllRoomsToClean();
-      const hotels = await ApiService.getAllHotels();
-      setHotelDtos(hotels || []);
-      let mapped: { hotel: string; roomNumbers: number[] }[] = [];
+      const hotels = await ApiService.getAllHotels() ?? []; // only hotels for cleaning staff
+      const roomsToClean = await ApiService.getAllRoomsToClean() ?? []; // for cleaning staff, only rooms for their hotel
       
-       if (roomsToClean) {
-            mapped = roomsToClean.map((r: any) => {
-            const hotelName = hotels?.find((h: any) => h.id === r.hotelId)?.hotelName ?? "Unknown Hotel";
-            return { hotel: hotelName, roomNumbers: r.roomNumbers };
-            });
-        } else {
-            setErrorLoadData("Something went wrong. Rooms cannot be loaded.");
-        }
+      let filteredRooms = roomsToClean;
 
-        setCleaningViewModel(mapped);
+      if (role !== "Admin") {
+        const hotel = hotels.find(h => h.hotelName === hotelName);
+        if (!hotel) {
+          console.warn("No hotel found for this user");
+          setCleaningViewModel([]);
+          return;
+        }
+        filteredRooms = roomsToClean.filter(r => parseInt(r.hotelId) === hotel.id);
+        hotels.splice(0, hotels.length, hotel); // keep only this hotel in the list
+      }
+
+      const mapped = filteredRooms.map((r: any) => {
+      const hotelName = hotels.find((h: any) => h.id === r.hotelId)?.hotelName ?? "Unknown Hotel";
+      return { hotel: hotelName, roomNumbers: r.roomNumbers };
+      });
+
+      setCleaningViewModel(mapped);
+      setHotelDtos(hotels);
+
     } catch (err) {
       console.error(err);
       setErrorLoadData("Something went wrong. Rooms cannot be loaded.");
@@ -70,15 +81,6 @@ export function Cleaning() {
       setErrorMarkedRooms("Rooms not marked as cleaned.");
     }
   };
-
-  if (!isAdmin) {
-    return (
-      <Card className="mt-10 p-5 text-center">
-        <h4>You are not authorized 🚫</h4>
-        <Button onClick={() => navigate("/login")}>Go to Login</Button>
-      </Card>
-    );
-  }
 
   return (
     <div className="p-5 max-w-5xl mx-auto space-y-5">

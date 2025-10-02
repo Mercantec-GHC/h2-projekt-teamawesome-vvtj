@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Table,
   TableHeader,
@@ -16,68 +16,98 @@ import type { BookingDto } from "@/types/BookingDTO"
 import { ApiService } from "@/services/ApiService"
 
 export function BookingList() {
-  const { token } = useAuth()
-  const [bookings, setBookings] = useState<BookingDto[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [editValues, setEditValues] = useState<{ checkIn: string; checkOut: string }>({
-    checkIn: "",
-    checkOut: "",
-  })
-  const [hotelFilter, setHotelFilter] = useState("")
+    const { token } = useAuth()
+    const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+    
+    const userRole = decoded?.role;
+    const userHotelName = decoded?.department; 
 
-  useEffect(() => {
-    if (!token) return
-
-    fetch(`${import.meta.env.VITE_API_URL}/api/Booking`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const [bookings, setBookings] = useState<BookingDto[]>([])
+    const [loading, setLoading] = useState(true)
+    const [editingId, setEditingId] = useState<number | null>(null)
+    const [editValues, setEditValues] = useState<{ checkIn: string; checkOut: string }>({
+        checkIn: "",
+        checkOut: "",
     })
-      .then((res) => res.json())
-      .then((data: BookingDto[]) => setBookings(data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [token])
+    const [hotelFilter, setHotelFilter] = useState("")
 
-  if (loading) return <div>Loading bookings...</div>
-  if (!bookings.length) return <div>No bookings found</div>
+    useEffect(() => {
+        const fetchBookings = async () => {
+            setLoading(true);
+            try {
+                const data = await ApiService.getAllBookings(); 
+                if (data) {
+                    setBookings(data);
+                }
+            } catch (error) {
+                console.error("Error fetching bookings:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
-  const startEdit = (booking: BookingDto) => {
-    setEditingId(booking.id)
-    setEditValues({
-      checkIn: booking.checkIn.split("T")[0],
-      checkOut: booking.checkOut.split("T")[0],
-    })
-  }
+        if (token) {
+            fetchBookings();
+        } else {
+            setLoading(false);
+        }
+    }, [token])
 
-  const cancelEdit = () => {
-    setEditingId(null)
-    setEditValues({ checkIn: "", checkOut: "" })
-  }
+    const filteredBookings = useMemo(() => {
+        let currentBookings = bookings;
+        
+        if (userRole !== "Admin" && userHotelName) {
+             currentBookings = currentBookings.filter(b => b.hotelName === userHotelName);
+        }
+        
+        if (hotelFilter) {
+            currentBookings = currentBookings.filter(b => b.hotelName === hotelFilter);
+        }
 
-  const saveEdit = async (id: number) => {
-    const updatedBooking = await ApiService.updateBookingDates(
-      id,
-      editValues.checkIn,
-      editValues.checkOut,
-      token!
-    )
+        return currentBookings;
+    }, [bookings, userRole, userHotelName, hotelFilter]);
+    
+    const hotelNames = useMemo(() => {
+        return Array.from(new Set(bookings.map((b) => b.hotelName)));
+    }, [bookings]);
 
-    if (updatedBooking) {
-      setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, ...updatedBooking } : b))
-      )
-      setEditingId(null)
+    const startEdit = (booking: BookingDto) => {
+        setEditingId(booking.id)
+        setEditValues({
+            checkIn: booking.checkIn.split("T")[0],
+            checkOut: booking.checkOut.split("T")[0],
+        })
     }
-  }
 
-  const hotelNames = Array.from(new Set(bookings.map((b) => b.hotelName)))
+    const cancelEdit = () => {
+        setEditingId(null)
+        setEditValues({ checkIn: "", checkOut: "" })
+    }
 
-  const filteredBookings = hotelFilter
-    ? bookings.filter((b) => b.hotelName === hotelFilter)
-    : bookings
+    const saveEdit = async (id: number) => {
+        if (!token) return; 
+
+        const updatedBooking = await ApiService.updateBookingDates(
+            id,
+            editValues.checkIn,
+            editValues.checkOut,
+            token
+        )
+
+        if (updatedBooking) {
+            setBookings((prev) =>
+                prev.map((b) => (b.id === id ? { ...b, ...updatedBooking } : b))
+            )
+            setEditingId(null)
+        }
+    }
+
+    if (loading) return <div>Loading bookings...</div>
+    if (!bookings.length) return <div>No bookings found</div>
 
   return (
     <div className="flex flex-col gap-4">
+      {userRole === "Admin" && (
       <select
         value={hotelFilter}
         onChange={(e) => setHotelFilter(e.target.value)}
@@ -90,6 +120,7 @@ export function BookingList() {
           </option>
         ))}
       </select>
+      )}
 
       <Table>
         <TableHeader>
@@ -158,7 +189,7 @@ export function BookingList() {
                     className="ml-2"
                     onClick={async () => {
                       if (!token) return
-                      const confirmed = confirm("Видалити це бронювання?")
+                      const confirmed = confirm("Delete this booking?")
                       if (!confirmed) return
                       const success = await ApiService.deleteBooking(booking.id, token)
                       if (success) {
