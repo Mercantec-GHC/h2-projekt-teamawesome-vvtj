@@ -27,8 +27,7 @@ namespace API.Services
             .Select(h => _hotelMapping.ToHotelGETdto(h))
             .ToList();
         }
-        
-       
+
         //GET {Id}
         public async Task<HotelDto> GetHotelById(int id)
         {
@@ -62,8 +61,8 @@ namespace API.Services
                 SaturdayTime = hotelCreateDto.SaturdayTime,
                 HolidaysTime = hotelCreateDto.HolidaysTime
             };
-            _context.Hotels.Add(newHotel);
 
+            _context.Hotels.Add(newHotel);
             await _context.SaveChangesAsync();
 
             var createdHotel = _context.Hotels.FirstOrDefault(h => h.HotelName == newHotel.HotelName)

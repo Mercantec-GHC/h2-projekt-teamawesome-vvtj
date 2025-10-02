@@ -12,13 +12,13 @@ import { Label } from "@/components/ui/label"
 
 interface LoginFormProps {
   className?: string
-  email: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }
+  username: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }
   password: { value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }
   loading: boolean
   onSubmit: (e: React.FormEvent) => void
 }
 
-export function LoginForm({ className, email, password, loading, onSubmit }: LoginFormProps) {
+export function LoginForm({ className, username, password, loading, onSubmit }: LoginFormProps) {
   return (
     <div
       className={cn(
@@ -30,15 +30,15 @@ export function LoginForm({ className, email, password, loading, onSubmit }: Log
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back to hotels administration</CardTitle>
           <CardDescription>
-            Login with your employee email and password below.
+            Login with your employee username and password below.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="grid gap-6">
             <div className="grid gap-6">
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" {...email} required />
+                <Label htmlFor="email">Username</Label>
+                <Input id="username" type="text" placeholder="Username" {...username} required />
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
