@@ -17,6 +17,8 @@ import { ApiService } from "@/services/ApiService"
 
 export function RoomTypesList() {
   const { token } = useAuth()
+  const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+  const role = decoded?.role;
   const [roomTypes, setRoomTypes] = useState<RoomTypeDto[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -128,20 +130,26 @@ export function RoomTypesList() {
 
             <TableCell>
               {editingId === rt.id ? (
-                <>
-                  <Button size="sm" onClick={() => saveEdit(rt.id)}>
-                    Save
-                  </Button>
-                  <Button size="sm" variant="secondary" onClick={cancelEdit}>
-                    Cancel
-                  </Button>
-                </>
+                  role === "Admin" ? (
+                      <>
+                          <Button size="sm" onClick={() => saveEdit(rt.id)}>
+                              Save
+                          </Button>
+                          <Button size="sm" variant="secondary" onClick={cancelEdit}>
+                              Cancel
+                          </Button>
+                      </>
+                  ) : (
+                      <span className="text-gray-500">View Only</span>
+                  )
               ) : (
-                <Button size="sm" onClick={() => startEdit(rt)}>
-                  Edit
-                </Button>
-              )}
-            </TableCell>
+              role === "Admin" && (
+                  <Button size="sm" onClick={() => startEdit(rt)}>
+                      Edit
+                  </Button>
+        )
+    )}
+</TableCell>
           </TableRow>
         ))}
       </TableBody>
