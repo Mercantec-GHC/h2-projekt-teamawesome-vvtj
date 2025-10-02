@@ -65,21 +65,23 @@ namespace API.Services
 				.FirstOrDefaultAsync(r => r.RoleName == adUser.Role)
 					?? throw new ArgumentException($"Role '{adUser.Role}' was not found in the database");
 
-				 var adUserToDb = await _context.Users
-				 .Include(u => u.UserRole)
-				 .FirstOrDefaultAsync(u => u.UserName == adUser.SamAccountName);
-				 if (adUserToDb == null)
-				 {
-				 	adUserToDb = new User
-				 	{
-				 		UserName = adUser.SamAccountName,
-				 		Email = adUser.Email,
-				 		HashedPassword = "EXTERNALLY_MANAGED",
+				var adUserToDb = await _context.Users
+				.Include(u => u.UserRole)
+				.FirstOrDefaultAsync(u => u.UserName == adUser.SamAccountName);
+				if (adUserToDb == null)
+				{
+					adUserToDb = new User
+					{
+						UserName = adUser.SamAccountName,
+						Email = adUser.Email,
+						HashedPassword = "EXTERNALLY_MANAGED",
 						UserRole = roleEntity,
-				 	};
-				 	_context.Users.Add(adUserToDb);
-				 	await _context.SaveChangesAsync();
-				 }
+					};
+					_context.Users.Add(adUserToDb);
+					await _context.SaveChangesAsync();
+				}
+
+				_logger.LogInformation("Raw AD department value: '{Department}'", adUser.Department);
 
 				adUser.Department = await MapADUserDepartmentToHotelName(adUser.Department)
 				?? throw new ArgumentException($"Department '{adUser.Department}' does not match any known hotel in the system.");
@@ -93,7 +95,7 @@ namespace API.Services
 			{
 				throw;
 			}
-			
+
 		}
 
 		/// <summary>
@@ -162,17 +164,17 @@ namespace API.Services
 
 			if (searchResponse.Entries.Count == 0)
 			{
-				_logger.LogWarning("Ingen bruger fundet i AD for: {Username}", username);
+				_logger.LogWarning($"No users found in the AD with the name: {username}");
 				return null;
 			}
 
 			var entry = searchResponse.Entries[0];
 
 			// Debugging purposes: Log all available attributtes
-			_logger.LogInformation("Tilgængelige attributter for bruger:");
+			_logger.LogInformation("Available attribute for users:");
 			foreach (string attrName in entry.Attributes.AttributeNames)
 			{
-				_logger.LogInformation("Attribut: {AttrName}, Værdier: {Count}", attrName, entry.Attributes[attrName].Count);
+				_logger.LogInformation("Attribute: {AttrName}, Value: {Count}", attrName, entry.Attributes[attrName].Count);
 			}
 
 			//Map attributes to the ADUserInfo model
@@ -262,8 +264,10 @@ namespace API.Services
 			if (string.IsNullOrWhiteSpace(department))
 				return null;
 
+			var normalizedDept = department.Trim().ToLower();
+
 			var hotel = await _context.Hotels
-				.FirstOrDefaultAsync(h => h.HotelName.Equals(department.ToLower()));
+				.FirstOrDefaultAsync(h => h.HotelName.ToLower() == normalizedDept.ToLower());
 
 			return hotel?.HotelName;
 		}
