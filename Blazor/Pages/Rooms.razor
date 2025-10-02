@@ -1,8 +1,8 @@
 @page "/rooms"
 
-
+@inject NavigationManager NavigationManager
 @using BlazorBootstrap
-
+@using Microsoft.AspNetCore.Components.Authorization
 
 <PageTitle>Rooms</PageTitle>
 <div class="page-wrapper ">
@@ -30,6 +30,10 @@ else
                             <p class="card-text">@room.Description</p>
                             <p class="card-text text-muted">Max Capacity: @room.MaxCapacity</p>
                             <p class="card-text text-muted mt-auto">Price per night: @room.PricePerNight?.ToString("C")</p>
+                                <button class="btn btn-custom mt-3"
+                                        @onclick="() => NavigateToBooking(room.Id)">
+                                    Book 
+                                </button>
                         </div>
                     </div>
                 </div>
