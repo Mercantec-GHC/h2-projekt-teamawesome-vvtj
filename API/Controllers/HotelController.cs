@@ -75,7 +75,7 @@ public class HotelController : ControllerBase
     /// <response code="400">Could not create hotel!</response>
     /// 
     [Authorize(Roles = "Admin")]
-	[HttpPost]
+    [HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
     {
         try
@@ -89,64 +89,29 @@ public class HotelController : ControllerBase
         }
     }
 
-	//Only Admin
-	//PUT: api/Hotels
-	/// <summary>
-	/// Updates a specific hotel
-	/// </summary>
-	/// <param name="updateHotel">Contains hotel details to be updated</param>
-	/// <returns>Updated hotel</returns>
-	/// <response code="400">Could not update hotel!</response>
-	/// 
-	[Authorize(Roles = "Admin")]
-	[HttpPut]
+    //Only Admin
+    //PUT: api/Hotels
+    /// <summary>
+    /// Updates a specific hotel
+    /// </summary>
+    /// <param name="updateHotel">Contains hotel details to be updated</param>
+    /// <returns>Updated hotel</returns>
+    /// <response code="400">Could not update hotel!</response>
+    /// 
+    [Authorize(Roles = "Admin")]
+    [HttpPut]
     public async Task<ActionResult> PutHotel(HotelDto updateHotel)
     {
         try
         {
-            var _updatedHotel = await _hotelService.PutHotel(updateHotel);
-            await _context.SaveChangesAsync();
-
-            return Ok(_updatedHotel);
+            return Ok(await _hotelService.PutHotel(updateHotel));
         }
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);
         }
-        
     }
     
-    [HttpPatch("{hotelId}")]
-    public async Task<IActionResult> PatchHotel(int hotelId, [FromBody]HotelPutDto updateDto)
-    {
-        var hotel = await _context.Hotels.FindAsync(hotelId);
-        if (hotel == null) return NotFound();
-
-        if (updateDto.HotelName != null) hotel.HotelName = updateDto.HotelName;
-        if (updateDto.CityName != null) hotel.CityName = updateDto.CityName;
-        if (updateDto.Address != null) hotel.Address = updateDto.Address;
-        if (updateDto.Description != null) hotel.Description = updateDto.Description;
-
-        hotel.UpdatedAt = DateTime.UtcNow.AddHours(2);
-        await _context.SaveChangesAsync();
-
-        return Ok(hotel);
-        // var exitingHotel = await _context.Hotels.FindAsync(hotelId);
-
-        // var updatedHotel = new HotelPutDto
-        // {
-        //     HotelName = exitingHotel.HotelName,
-        //     CityName = exitingHotel.CityName,
-        //     Address = exitingHotel.Address,
-        //     Description = exitingHotel.Description,
-        // };
-        // patchDocumentHotel.ApplyTo(updatedHotel, ModelState);
-
-        // _hotelMapping.ToHotelPatchDto(exitingHotel, updatedHotel);
-
-        // await _context.SaveChangesAsync();
-        // return Ok(exitingHotel);
-    }
 
     //Only Admin
     //DELETE: api/Hotels
@@ -165,5 +130,4 @@ public class HotelController : ControllerBase
 
         return Ok(deletedHotel);
     }
-
 }

@@ -37,7 +37,7 @@ namespace API.Services
 			await _dbContext.SaveChangesAsync();
 		}
 
-		public async Task SendNotificationAsync(NotificationMessageDto dto)
+		public async Task SendPushNotificationAsync(NotificationMessageDto dto)
 		{
 			try
 			{
@@ -78,6 +78,80 @@ namespace API.Services
 			{
 				_logger.LogError(ex, "Error fetching subscriptions from database");
 			}
+		}
+
+		public async Task<bool> SaveEmailNotificationAsync(EmailFormDto dto)
+		{
+			try
+			{
+				Notifications email = new Notifications
+				{
+					Status = "New",
+					Resource = "Contact Form",
+					Name = dto.Name,
+					Email = dto.Email,
+					Message = dto.Message,
+					CreatedAt = DateTime.UtcNow
+				};
+				_dbContext.Notifications.Add(email);
+				await _dbContext.SaveChangesAsync();
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "[DB Log Error]: Failed to save new notification for {Email}", dto.Email);
+				return false;
+			}
+		}
+
+		public async Task<bool> UpdateNotificationStatusAsync(NotificationStatusDto dto)
+		{
+			try
+			{
+				var notification = await _dbContext.Notifications.FindAsync(dto.Id);
+
+				if (notification == null)
+				{
+					return true;
+				}
+
+				notification.Status = dto.Status.ToString();
+				notification.UpdatedAt = DateTime.UtcNow;
+				await _dbContext.SaveChangesAsync();
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError($"[DB Error] Failed to update notification status for ID {dto.Id}: {ex.Message}");
+				return false;
+			}
+		}
+
+		public Task<GetNotificationsDto> GetAllNotificationsAsync()
+		{
+			var notifications = _dbContext.Notifications
+				.OrderByDescending(n => n.Status == "New")
+				.ToList();
+
+			if(notifications == null)
+			{
+				return Task.FromResult(new GetNotificationsDto
+				{
+					Notifications = new List<Notifications>(),
+					NewCount = 0
+				});
+			}
+
+			var newCount = notifications.Count(n => n.Status == "New");
+			var result = new GetNotificationsDto
+			{
+				Notifications = notifications,
+				NewCount = newCount
+			};
+
+			return Task.FromResult(result);
+			
 		}
 	}
 }
