@@ -1,0 +1,74 @@
+﻿@* @page "/available-rooms"
+@attribute [Authorize(Roles = "Admin,Reception")]
+@inherits AvailableRoomsBase
+
+<h3>Available Rooms</h3>
+
+<div class="container">
+    <div class="col-md-10 mx-auto">
+        <Card>
+            <CardHeader class="py-3 text-center">
+                Check Availability
+            </CardHeader>
+
+            <CardBody>
+
+                @if (!string.IsNullOrWhiteSpace(Vm.Error))
+                {
+                    <div class="alert alert-danger">@Vm.Error</div>
+                }
+
+                <EditForm Model="Vm" OnValidSubmit="SearchAsync">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="grid2">
+                        <div>
+                            <label>Hotel</label>
+                            <InputText class="input" @bind-Value="Vm.HotelName" placeholder="Nova Eden / Nova Halo / Nova Oasis" />
+                        </div>
+
+                        <div>
+                            <label>From</label>
+                            <InputDate class="input" @bind-Value="Vm.From" />
+                        </div>
+
+                        <div>
+                            <label>To</label>
+                            <InputDate class="input" @bind-Value="Vm.To" />
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn btn-custom" disabled="@Vm.IsLoading">
+                            @(Vm.IsLoading ? "Loading..." : "Search")
+                        </button>
+                    </div>
+                </EditForm>
+
+                @if (Vm.IsLoading)
+                {
+                    <p class="mt-3">Loading...</p>
+                }
+                else if (Vm.Rooms?.Count > 0)
+                {
+                    <div class="results">
+                        @foreach (var r in Vm.Rooms)
+                        {
+                            <div class="booking-card">
+                                <h5>@r.HotelName — @r.TypeofRoom</h5>
+                                <p><b>Room #:</b> @r.RoomNumber</p>
+                                <p><b>Room Id:</b> @r.RoomId</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!Vm.IsLoading && Vm.Rooms != null)
+                {
+                    <p class="mt-3">No available rooms for the selected period.</p>
+                }
+
+            </CardBody>
+        </Card>
+    </div>
+</div> *@

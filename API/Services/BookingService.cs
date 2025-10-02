@@ -4,6 +4,7 @@ using DomainModels.Dto;
 using DomainModels.Enums;
 using DomainModels.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 namespace API.Services
@@ -207,17 +208,18 @@ namespace API.Services
         /// <param name="hotelName">The name of the hotel to search for available rooms.</param>
         /// <param name="from">The start date of the availability period.</param>
         /// <param name="to">The end date of the availability period.</param>
-        /// <returns>A collection of <see cref="GetAvaliableRoomsDto"/> representing available rooms for the given hotel and date range.</returns>
-        public async Task<IEnumerable<GetAvaliableRoomsDto>> GetAvaliableRoomsAsync(string hotelName, DateOnly from, DateOnly to)
+        /// <returns>A collection of <see cref="GetAvailableRoomsDto"/> representing available rooms for the given hotel and date range.</returns>
+        public async Task<IEnumerable<GetAvailableRoomsDto>> GetAvailableRoomsAsync(string hotelName, DateOnly from, DateOnly to)
         {
             if (to <= from)
-                return Enumerable.Empty<GetAvaliableRoomsDto>();
+                return Enumerable.Empty<GetAvailableRoomsDto>();
 
             var hotel = await _dbContext.Hotels
                 .AsNoTracking()
-                .FirstOrDefaultAsync(h => h.HotelName == hotelName);
+                 .FirstOrDefaultAsync(h => h.HotelName == hotelName);
             if (hotel == null)
-                return Enumerable.Empty<GetAvaliableRoomsDto>();
+                return Enumerable.Empty<GetAvailableRoomsDto>();
+
 
             var available = await _dbContext.Rooms
               .AsNoTracking()
@@ -225,16 +227,16 @@ namespace API.Services
               .Where(r => !_dbContext.Bookings.Any(b =>
             b.RoomId == r.Id &&
             b.CheckIn < to && b.CheckOut > from))
-                .OrderBy(r => r.RoomNumber)
-                .Select(r => new GetAvaliableRoomsDto
+                //.OrderBy(r => r.RoomNumber)
+                .Select(r => new GetAvailableRoomsDto
                 {
                     RoomId = r.Id,
                     RoomNumber = r.RoomNumber,
                     HotelName = r.Hotel.HotelName,
-                    RoomTypeName = ((RoomTypeEnum)r.TypeId).ToString()
+                    //RoomTypeName = ((RoomTypeEnum)r.TypeId).ToString()
+                  TypeofRoom = r.RoomType.TypeofRoom,
                 })
                 .ToListAsync();
-
             return available;
         }
 
@@ -383,9 +385,9 @@ namespace API.Services
         {
             var affected = await _dbContext.Bookings
                 .Where(b => b.Id == bookingId
-                            && b.UserId == userId               
-                            && b.CheckIn > DateOnly.FromDateTime(DateTime.UtcNow)) 
-                .ExecuteDeleteAsync(); 
+                            && b.UserId == userId
+                            && b.CheckIn > DateOnly.FromDateTime(DateTime.UtcNow))
+                .ExecuteDeleteAsync();
 
             return affected > 0;
         }

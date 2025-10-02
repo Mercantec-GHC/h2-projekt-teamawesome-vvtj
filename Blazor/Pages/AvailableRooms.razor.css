@@ -1,0 +1,113 @@
+﻿/*namespace Blazor.Pages 
+{
+    .container
+
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4rem;
+}
+
+::deep .card {
+    background-color: rgba(255, 255, 255, .6);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1rem 1.25rem;
+}
+
+::deep .card-header {
+    font-size: 4em;
+    font-weight: 600;
+    color: rgb(57 166 168);
+    text-shadow: 2px 1px 3px #ffff;
+    background-color: transparent;
+    border-bottom: .5px solid #dee2e6;
+}
+
+h5 {
+    color: #204343;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.input, ::deep input, ::deep select, ::deep .form-control {
+    background-color: rgba(255, 255, 255, .8);
+    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 0.8rem;
+    font-size: 1rem;
+    width: 100%;
+    transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+    .input:focus, ::deep input:focus, ::deep select:focus {
+        outline: none;
+        border-color: #00c4c8;
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem rgba(0,196,200,.5);
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+.actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+
+.results {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.booking-card {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.2rem 1.6rem;
+    background-color: rgba(255, 255, 255, .6); 
+    border-radius: 20px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+    .booking-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.25);
+    }
+
+
+::deep .btn.btn-custom {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #ffff;
+    transition: background-image 2s ease-in-out;
+    color: #204343;
+    font-weight: 600;
+}
+
+    ::deep .btn.btn-custom:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255, 255, 255, .5);
+    }
+
+    ::deep .btn.btn-custom:active,
+    ::deep .btn.btn-custom:focus {
+        box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #00c4c88c;
+    }
+
+}
+*/

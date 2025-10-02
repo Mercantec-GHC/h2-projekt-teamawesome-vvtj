@@ -105,9 +105,9 @@ public class BookingController : ControllerBase
     /// <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="403">Forbidden – the user does not have permission to access this resource.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
-   [Authorize(Roles = "Admin, Reception")]
+ //  [Authorize(Roles = "Admin, Reception")]
     [HttpGet("available")]
-    public async Task<ActionResult<IEnumerable<GetAvaliableRoomsDto>>> GetAvaliableRooms(
+    public async Task<ActionResult<IEnumerable<GetAvailableRoomsDto>>> GetAvailableRooms(
         [FromQuery] string hotelName,
         [FromQuery] DateOnly from,
         [FromQuery] DateOnly to)
@@ -117,7 +117,7 @@ public class BookingController : ControllerBase
         if (to <= from)
             return BadRequest("Invalid date range. Use yyyy-MM-dd and ensure 'to' is after 'from'.");
 
-        var rooms = await _bookingService.GetAvaliableRoomsAsync(hotelName, from, to);
+        var rooms = await _bookingService.GetAvailableRoomsAsync(hotelName, from, to);
         if (!rooms.Any())
         {
            
