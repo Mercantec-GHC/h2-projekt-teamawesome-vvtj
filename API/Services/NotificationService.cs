@@ -13,11 +13,13 @@ namespace API.Services
 		private readonly AppDBContext _dbContext;
 		private readonly ILogger<NotificationService> _logger;
 		private readonly IConfiguration _config;
-		public NotificationService(AppDBContext context, ILogger<NotificationService> logger, IConfiguration config)
+		private readonly IEmailService _emailService;
+		public NotificationService(AppDBContext context, ILogger<NotificationService> logger, IConfiguration config, IEmailService emailService)
 		{
 			_dbContext = context;
 			_logger = logger;
 			_config = config;
+			_emailService = emailService;
 		}
 
 		public async Task SaveSubscriptionAsync(NotificationSubscriptionDto subscription, string userId)
@@ -95,6 +97,9 @@ namespace API.Services
 				};
 				_dbContext.Notifications.Add(email);
 				await _dbContext.SaveChangesAsync();
+
+				await _emailService.SendTicketEmailAsync(dto, new NotificationStatusDto { Status = "New" });
+
 				return true;
 			}
 			catch (Exception ex)
@@ -106,24 +111,43 @@ namespace API.Services
 
 		public async Task<bool> UpdateNotificationStatusAsync(NotificationStatusDto dto)
 		{
+			var notification = await _dbContext.Notifications.FindAsync(dto.Id);
+
+			if (notification == null)
+			{
+				_logger.LogWarning($"Notification with ID {dto.Id} not found. No status update performed.");
+				return true;
+			}
+
 			try
 			{
-				var notification = await _dbContext.Notifications.FindAsync(dto.Id);
-
-				if (notification == null)
-				{
-					return true;
-				}
-
-				notification.Status = dto.Status.ToString();
+				notification.Status = dto.Status;
 				notification.UpdatedAt = DateTime.UtcNow;
+
 				await _dbContext.SaveChangesAsync();
+
+				var emailFormDto = new EmailFormDto
+				{
+					Name = notification.Name ?? "",
+					Email = notification.Email ?? "",
+					Message = notification.Message ?? "",
+				};
+
+				var statusUpdateResult = await _emailService.SendTicketEmailAsync(
+					emailFormDto,
+					new NotificationStatusDto { Status = dto.Status }
+				);
+
+				if (!statusUpdateResult)
+				{
+					_logger.LogWarning($"Failed to send ticket status email for Notification ID {dto.Id}.");
+				}
 
 				return true;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError($"[DB Error] Failed to update notification status for ID {dto.Id}: {ex.Message}");
+				_logger.LogError(ex, $"[DB/Service Error] Failed to update notification status for ID {dto.Id}.");
 				return false;
 			}
 		}
