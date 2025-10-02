@@ -12,7 +12,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [, setToken] = useState("");
@@ -27,10 +27,10 @@ export function Login() {
     setError(null);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/login`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ActiveDirectory/login-ad`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (!res.ok) {
@@ -114,10 +114,10 @@ export function Login() {
         <LoginForm
           className="w-96"
           onSubmit={handleLogin}
-          email={{
-            value: email,
+          username={{
+            value: username,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value),
+              setUsername(e.target.value),
           }}
           password={{
             value: password,

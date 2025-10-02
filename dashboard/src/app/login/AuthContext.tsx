@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type PropsWithChildren } from "react"
+import { createContext, useContext, useState, type PropsWithChildren } from "react"
 import type { UserDTO } from "../../types/UserDTO"
 
 type AuthContextType = {
@@ -19,25 +19,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setToken(null)
       localStorage.removeItem("token")
     }
-
-  useEffect(() => {
-    if (!token) return
-
-    fetch(`${import.meta.env.VITE_API_URL}/api/Users/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to get user")
-        return res.json()
-      })
-      .then((data: UserDTO) => setUser(data))
-      .catch((err) => {
-        console.error(err)
-        logout() 
-      })
-  }, [token])
 
   return (
     <AuthContext.Provider value={{ user, token, setToken, setUser, logout }}>
