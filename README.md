@@ -1,27 +1,36 @@
-# H2-Projekt {Indsæt gruppenavn}
+# Project Name: booking system for NOVA Hotels
 
-Projektet han findes her - [H2 Projekt forløb på Notion](https://mercantec.notion.site/h2f)
+A Blazor WebAssembly application built with .NET 9 and C# 13. It uses modern authentication, state management, and integrates with external APIs.
 
-Det er delt op i 4 mapper (3 hovedprojekter og Aspire)
 
-## [Blazor](/Blazor/)
+## Table of Contents
 
-Vi anbefaler at I bruger Blazor WebAssembly, da det er det vi underviser i. Den er koblet op på vores API gemmen APIService klassen i Blazor.
+- [Overview](#overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
 
-## [Domain Models](/DomainModels/)
+  
+## Overview
 
-Her er alle jeres klasser, som I skal bruge til jeres Blazor og API.
-Domain Models / Class Libary versionen er nu opdateret til .NET 9.0
+Briefly describe what your project does and its purpose.
 
-## [API](/API/)
+## Features
 
-Her er jeres API, den bruger vi til at forbinde sikkert til vores database og for at fodre data til vores Blazor Projekt.
-ASP.NET Core Web API versionen er nu opdateret til .NET 9.0
+- Blazor WebAssembly SPA
+- Authentication (custom state provider)
+- API integration with `HttpClient`
+- Local and session storage support
+- Toast notifications (BlazorBootstrap)
+- Environment-based API endpoint configuration
+- ......
 
-## [Aspire](/H2-Projekt.AppHost/)
+## Getting Started
 
-Aspire er vores hosting platform, den er koblet op til vores API og Blazor. Det er ikke obligatorisk at bruge Aspire, men det anbefales. Vi bruger Aspire med .NET 9.0
+### Prerequisites
 
-### Hosting
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- A modern web browser
 
-Vi udforsker forskellige hosting muligheder på H2 - men vil helst vores lokale datacenter. På H2 bruger vi Windows Server 2022 som platform - det introducerede vi senere i forløbet.
+### Setup
