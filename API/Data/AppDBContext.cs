@@ -18,6 +18,7 @@ public class AppDBContext : DbContext
 	public DbSet<Hotel> Hotels { get; set; }
 	public DbSet<NotificationSubscriptions> NotificationSubscriptions { get; set; }
 	public DbSet<RefreshToken> RefreshTokens { get; set; }
+	public DbSet<Notifications> Notifications { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

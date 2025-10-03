@@ -6,12 +6,12 @@ namespace DomainModels.Dto
     public class GetBookingsDto
     {
         public int Id { get; set; }
-        
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string UserName { get; set; }
         public int RoomId { get; set; }
-        
+
         public string HotelName { get; set; }
 
         public DateOnly CheckIn { get; set; }
@@ -19,13 +19,12 @@ namespace DomainModels.Dto
     }
 
 
-    public class GetAvaliableRoomsDto
+    public class GetAvailableRoomsDto
     {
 
-       public int RoomId { get; set; }
+        public int RoomId { get; set; }
         public string HotelName { get; set; } = string.Empty;
         public int RoomNumber { get; set; }
-
-        public string RoomTypeName { get; set; } = string.Empty;
+        public string RoomTypeName { get; set; } = string.Empty;        
     }
 }

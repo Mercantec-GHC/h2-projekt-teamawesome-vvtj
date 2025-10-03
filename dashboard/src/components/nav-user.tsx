@@ -1,6 +1,4 @@
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
   LogOut,
 } from "lucide-react"
@@ -23,21 +21,17 @@ import {
 import { useAuth } from "@/app/login/AuthContext"
 import { useNavigate } from "react-router-dom"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    role: string
-  }
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar()
  const { logout } = useAuth()
  const navigate = useNavigate() 
-  const name = user?.name || "Loading..."
-  const email = user?.email || ""
-  const role = user?.role || ""
+  const token = localStorage.getItem("token");
+  const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
+
+  const name = decoded?.username || "Loading..."
+  const email = decoded?.email || ""
+  const role = decoded?.role
+  const department = decoded?.department || ""
   const handleLogout = () => {
       logout()
       navigate("/login") 
@@ -55,7 +49,7 @@ export function NavUser({
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{name}</span>
               <span className="truncate text-xs">{email}</span>
-              <span className="truncate text-xs font-light">{role}</span>
+              <span className="truncate text-xs font-light">{role} - {department}</span>
             </div>
             <ChevronsUpDown className="ml-auto size-4" />
           </SidebarMenuButton>
@@ -69,23 +63,15 @@ export function NavUser({
         >
           <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex flex-col gap-1 px-2 py-2 text-left text-sm">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
-              <span className="truncate text-xs font-light">{user.role}</span>
+              <span className="truncate font-medium">{name}</span>
+              <span className="truncate text-xs">{email}</span>
+              <span className="truncate text-xs font-light">{role} - {department}</span>
             </div>
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <BadgeCheck />
-              Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
-            </DropdownMenuItem>
           </DropdownMenuGroup>
 
           <DropdownMenuSeparator />

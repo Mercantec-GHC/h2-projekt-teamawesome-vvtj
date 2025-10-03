@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using BlazorBootstrap
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
 
 <PageTitle>Home</PageTitle>
@@ -42,25 +43,35 @@
 
 		<div class="box-container bg-white text-center p-3">
 			<div class="mb-md-3 border-bottom">Choose hotel</div>
-			<Dropdown Color="DropdownColor.None">
-				<DropdownToggleButton>@(_selectedHotel ?? "Hotels")</DropdownToggleButton>
-				<DropdownMenu>
-					<DropdownItem>Hotel 1</DropdownItem>
-					<DropdownItem>Hotel 2</DropdownItem>
-					<DropdownItem>Hotel 3</DropdownItem>
-				</DropdownMenu>
-			</Dropdown>
-		</div>
+			<InputSelect class="form-select" @bind-Value="_selectedHotel">
+				<option value=""> Select hotel </option>
+				@foreach (var h in Hotels)
+				{
+					<option value="@h">@h</option>
+				}
+			</InputSelect>
+			
+		</div> 
+
+
 
 		<div class="box-container bg-white text-center justify-content-center p-3">
 			<div class="mb-md-3 border-bottom">Guests<span class="text-danger">*</span></div>
-			<NumberInput Class="number-input" TValue="int" @bind-Value="_amountGuests" />
+			<InputNumber TValue="int" @bind-Value="_amountGuests" Min="1" Max="6" />
 		</div>
 
 		<div class="py-4">
-			<Button Type="ButtonType.Submit" Class="btn btn-custom">
+			<Button Type="ButtonType.Button" Class="btn btn-custom" @onclick="NavigateToBooking">
 				<span class="fw-bolder fs-3 ">See options</span>
 			</Button>
 		</div>
+
+		<AuthorizeView Roles="Admin,Reception">
+			<div class="py-4">
+				<Button Type="ButtonType.Button" Class="btn btn-custom" @onclick="NavigateToAvailableRooms">
+					<span class="fw-bold fs-3">Available Rooms</span>
+				</Button>
+			</div>
+		</AuthorizeView>
 	</div>
 </div>

@@ -5,6 +5,7 @@ using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using DomainModels.Dto.AuthDto;
 using DomainModels.Dto.UserDto;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor.Services;
 
@@ -14,22 +15,23 @@ public class AuthService : IAuthService
 	private readonly APIService _apiService;
 	private readonly ILocalStorageService _localStorage;
 	private readonly ISessionStorageService _sessionStorage;
-	private readonly CustomAuthStateProvider _authStateProvider;
-	private const string _tokenKey = "authToken";
-
-	public AuthService(APIService apiService, ILocalStorageService localStorage, ISessionStorageService sessionStorage, CustomAuthStateProvider authStateProvider)
+	private readonly AuthenticationStateProvider _authStateProvider;
+	private readonly ITokenService _tokenService;
+	private const string TokenKey = "authToken";
+	public AuthService(APIService apiService, ILocalStorageService localStorage, ISessionStorageService sessionStorage, AuthenticationStateProvider authStateProvider, ITokenService tokenService)
 	{
 		_apiService = apiService;
 		_sessionStorage = sessionStorage;
 		_localStorage = localStorage;
 		_authStateProvider = authStateProvider;
+		_tokenService = tokenService;
 	}
 
-	public async Task<bool> LoginAsync(string email, string password, bool remember)
+	public async Task<bool> LoginAsync(string userName, string password, bool remember)
 	{
 		var loginDto = new UserLoginDto
 		{
-			Email = email,
+			Username = userName,
 			Password = password,
 			RememberMe = remember
 		};
@@ -44,12 +46,14 @@ public class AuthService : IAuthService
 
 		var token = result.AccessToken;
 
-		await _authStateProvider.SaveTokenAsync(token, remember);
-		_authStateProvider.NotifyUserAuthentication(token);
-		_apiService.SetBearerToken(token);
+		await _tokenService.SaveTokenAsync(token, remember);
+
+		var customProvider = _authStateProvider as CustomAuthStateProvider;
+		customProvider?.NotifyUserAuthentication(token);
+
 
 		// Send a message to admin dashboard about the login event
-		var message = $"User {loginDto.Email} has just logged in";
+		var message = $"User {loginDto.Username} has just logged in";
 		await _apiService.SendNotificationAsync(message);
 
 		return true;
@@ -82,10 +86,11 @@ public class AuthService : IAuthService
 
 	public async Task LogoutAsync()
 	{
-		await _localStorage.RemoveItemAsync("authToken");
-		await _sessionStorage.RemoveItemAsync("authToken");
-		_apiService.RemoveBearerToken();
-		_authStateProvider.NotifyUserLogout();
+		await _localStorage.RemoveItemAsync(TokenKey);
+		await _sessionStorage.RemoveItemAsync(TokenKey);
+
+		var customAuthStateProvider = _authStateProvider as CustomAuthStateProvider;
+		customAuthStateProvider?.NotifyUserLogout();
 	}
 
 	public async Task <bool> ChangePasswordAsync(string newPassword, string confirmNewPassword)

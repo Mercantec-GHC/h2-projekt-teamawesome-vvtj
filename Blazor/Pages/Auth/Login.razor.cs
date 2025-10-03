@@ -1,9 +1,7 @@
 ﻿using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
 using BlazorBootstrap;
-using DomainModels.Dto;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Blazor.Pages.Auth;
 
@@ -14,10 +12,6 @@ public partial class Login
 	[Inject] 
 	private NavigationManager _navigation{ get; set; } = null!;
 	[Inject]
-	private IJSRuntime JSRuntime {  get; set; } = null!;
-	[Inject]
-	private CustomAuthStateProvider _customAuthStateProvider { get; set; } = null!;
-	[Inject]
 	protected PreloadService PreloadService { get; set; } = default!;
 
 	private string _errorMessage = string.Empty;
@@ -27,7 +21,7 @@ public partial class Login
 	{
 		PreloadService.Show();
 		_errorMessage = string.Empty;
-		var result = await _authService.LoginAsync(_loginModel.Email, _loginModel.Password, _loginModel.RememberMe);
+		var result = await _authService.LoginAsync(_loginModel.Username, _loginModel.Password, _loginModel.RememberMe);
 		if (result)
 		{
 			_navigation.NavigateTo("/user/account");

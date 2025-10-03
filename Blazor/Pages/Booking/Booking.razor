@@ -1,0 +1,158 @@
+﻿@page "/booking"
+@attribute [Authorize]
+@using BlazorBootstrap
+@using Blazor.Models.ViewModels
+@using DomainModels.Enums
+@using Microsoft.AspNetCore.Components.Forms
+
+<PageTitle>Create Booking</PageTitle>
+
+<div class="container">
+    <div class="col-md-8 mx-auto">
+        <Card>
+            <CardHeader Class="py-3 text-center">
+                Create New Booking
+                <div>@User?.FirstName @User?.LastName</div>
+            </CardHeader>
+
+            <CardBody>
+                @if (!IsSuccess)
+                {
+                    <CardTitle Class="text-center mt-3">
+                        <h5>Please fill out the form below and we will find a perfect stay for you.</h5>
+                    </CardTitle>
+                    <hr />
+                }
+                @if (!string.IsNullOrEmpty(FormError))
+                {
+                    <div class="alert alert-danger">@FormError</div>
+                }
+                @if (!IsSuccess)
+{
+                <EditForm Model="@Vm" OnValidSubmit="@OnCreateClicked">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="grid2">
+                        <div>
+                            <label>Hotel</label>
+                            <InputSelect class="input"
+                                         @bind-Value="Vm.HotelName"
+                                         @onchange="OnHotelChanged">
+                                <option value=""> Select hotel </option>
+                                @foreach (var h in Hotels)
+                                {
+                                    <option value="@h">@h</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div>
+                            <label>Guests</label>
+                            <InputNumber class="input"
+                                         @bind-Value="Vm.GuestsCount"
+                                         @onchange="OnGuestsChanged" />
+                        </div>
+
+                        <div>
+                            <label>Room type</label>
+                            <InputSelect class="input"
+                                         TValue="int"
+                                         @bind-Value="Vm.RoomTypeId"
+                                         disabled="@(!IsRoomTypeEnabled)"
+                                         @onchange="OnRoomTypeChanged">
+                                <option value="0"> Select room type </option>
+                                @foreach (var rt in AllowedRoomTypes.Where(rt => rt.MaxCapacity >= Vm.GuestsCount))
+                                {
+                                    <option value="@rt.Id">@rt.TypeofRoom</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div>
+                            <label>Check-in</label>
+                            <InputDate class="input" @bind-Value="Vm.CheckIn" />
+                        </div>
+
+                        <div>
+                            <label>Check-out</label>
+                            <InputDate class="input" @bind-Value="Vm.CheckOut" />
+                        </div>
+                                             
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="Vm.IsBreakfast" id="breakfast-checkbox" />
+                            <label class="form-check-label" for="breakfast-checkbox">
+                                Breakfast for all nights
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-2 gap-md-5 mt-3">
+                       
+                        <Button Type="ButtonType.Button"
+                                Class="btn btn-custom"
+                                Disabled="@(!CanProceed || IsSubmitting)"
+                                @onclick="OnPreviewClicked">
+                            Preview
+                        </Button>
+
+                        @if (Quote != null)
+                        {
+                            <Button Type="ButtonType.Button"
+                                    Class="btn btn-custom"
+                                    Disabled="@(!CanProceed || IsSubmitting)"
+                                    @onclick="OnCreateClicked">
+                                Create
+                            </Button>
+                        }
+
+                        <Button Type="ButtonType.Button" Class="btn btn-outline" @onclick="CancelCreate">
+                            Cancel
+                        </Button>
+                    </div>
+
+                    @* Preview result appears in new box *@
+                    @if (Quote != null)
+                    {
+                        <div class="preview-box mt-3">
+                            <h5>Booking Preview</h5>
+                            <p><b>Hotel:</b> @Quote.HotelName</p>
+                            <p><b>Room:</b> @Quote.TypeOfRoom</p>
+                            <p><b>Guests:</b> @Quote.GuestsCount</p>
+                            <p><b>Dates:</b> @Quote.CheckIn.ToShortDateString() - @Quote.CheckOut.ToShortDateString()</p>
+                            <p><b>Nights:</b> @Quote.NightsCount</p>
+                            <p><b>Breakfast:</b> @(Quote.IsBreakfast ? "Yes" : "No")</p>
+                            <p><b>Total Price:</b> @Quote.TotalPrice DKK</p>
+                        </div>
+                    }
+                    </EditForm>
+                    }
+                    @if (IsSuccess && Quote != null)
+
+{
+    <div class="alert alert-success mt-3">
+        <h5> Booking Successful!</h5>
+        <p><b>Hotel:</b> @Quote.HotelName</p>
+        <p><b>Room:</b> @Quote.TypeOfRoom</p>
+        <p><b>Guests:</b> @Quote.GuestsCount</p>
+        <p><b>Dates:</b> @Quote.CheckIn.ToShortDateString() - @Quote.CheckOut.ToShortDateString()</p>
+        <p><b>Nights:</b> @Quote.NightsCount</p>
+        <p><b>Breakfast:</b> @(Quote.IsBreakfast ? "Yes" : "No")</p>
+        <p><b>Total Price:</b> @Quote.TotalPrice DKK</p>
+</div>   
+      
+     <div class="d-flex flex-column flex-sm-row align-items-center justify-content-around gap-2 gap-md-5 mt-3">
+
+                        <Button Type="ButtonType.Button"
+                                Class="btn btn-custom"
+                                @onclick="GoToMyBookings">
+                            Go to My Bookings
+                        </Button>
+</div>
+  
+}
+                
+            </CardBody>
+        </Card>
+    </div>
+</div>

@@ -15,6 +15,7 @@ import { useAuth } from "../login/AuthContext"
 import type { HotelDto } from "@/types/HotelDTO"
 import { ApiService } from "@/services/ApiService"
 
+// Hotel list component with edit and filter functionality
 export function HotelList() {
   const { token } = useAuth()
   const [hotels, setHotels] = useState<HotelDto[]>([])
@@ -24,6 +25,7 @@ export function HotelList() {
   const [editValues, setEditValues] = useState<Partial<HotelDto>>({})
 
   useEffect(() => {
+    // Fetch hotels when token is available
     const fetchHotels = async () => {
       setLoading(true)
       const hotelsData = await ApiService.getAllHotels()
@@ -38,21 +40,26 @@ export function HotelList() {
   if (loading) return <div>Loading hotels...</div>
   if (!hotels.length) return <div>No hotels found</div>
 
+  // Get unique city names for filter dropdown
   const cityNames = Array.from(new Set(hotels.map((h) => h.cityName)))
+  // Filter hotels by selected city
   const filteredHotels = cityFilter
     ? hotels.filter((h) => h.cityName === cityFilter)
     : hotels
 
+  // Start editing a hotel
   const startEdit = (hotel: HotelDto) => {
     setEditingId(hotel.id)
     setEditValues({ ...hotel })
   }
 
+  // Cancel editing
   const cancelEdit = () => {
     setEditingId(null)
     setEditValues({})
   }
 
+  // Save edited hotel details
   const saveEdit = async (id: number) => {
     if (!editValues.id) editValues.id = id
 
@@ -73,6 +80,7 @@ export function HotelList() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* City filter dropdown */}
       <select
         value={cityFilter}
         onChange={(e) => setCityFilter(e.target.value)}

@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace API;
 
@@ -38,6 +40,7 @@ public class Program
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
+
 		builder.Services.AddScoped<SeasonalPricingService>();
 		builder.Services.AddScoped<IJWTService, JWTService>();
 		builder.Services.AddHttpContextAccessor();

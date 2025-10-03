@@ -25,5 +25,6 @@ namespace DomainModels.Models
         public bool? HasMiniFridge { get; set; }
         public int? Area { get; set; }
         public bool? HasVault { get; set; }
+        public string? ImagePath { get; set; } //Not being used
     }
 }

@@ -17,12 +17,12 @@
 				<DataAnnotationsValidator />
 
 				<div class="floating-label-group m-3 my-md-4">
-					<InputText id="input-field-email"
-							   @bind-Value="_loginModel.Email"
+					<InputText id="input-field-username"
+							   @bind-Value="_loginModel.Username"
 							   class="form-control"
 							   placeholder=" " />
-					<label class="floating-label" for="input-field-email">Email</label>
-					<ValidationMessage For="@(() => _loginModel.Email)" />
+					<label class="floating-label" for="input-field-username">Username</label>
+					<ValidationMessage For="@(() => _loginModel.Username)" />
 				</div>
 
 				<div class="floating-label-group m-3 my-md-4">

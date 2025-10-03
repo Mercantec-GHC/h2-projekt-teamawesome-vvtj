@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
 namespace Blazor.Services;
@@ -75,16 +74,4 @@ public partial class APIService
 		}
 	}
 
-	//Helper methods to manage the Bearer token in the HttpClient by using the APIService
-	public void SetBearerToken(string token)
-	{
-		var cleanToken = token.Trim('"');
-		_httpClient.DefaultRequestHeaders.Authorization =
-			new AuthenticationHeaderValue("Bearer", cleanToken);
-	}
-
-	public void RemoveBearerToken()
-	{
-		_httpClient.DefaultRequestHeaders.Authorization = null;
-	}
 }
