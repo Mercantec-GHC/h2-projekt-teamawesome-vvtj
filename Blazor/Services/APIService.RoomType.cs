@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 namespace Blazor.Services
 {
@@ -22,12 +21,12 @@ namespace Blazor.Services
             }
             catch (HttpRequestException ex)
             {
-                Console.WriteLine($"Network error finding RoomTypes: {ex.Message}");
+                _logger.LogError($"Network error finding RoomTypes: {ex.Message}");
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unexpected error occured with call: {ex.Message}");
+                _logger.LogError($"Unexpected error occured with call: {ex.Message}");
                 throw;
             }
            

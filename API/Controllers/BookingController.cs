@@ -166,7 +166,7 @@ public class BookingController : ControllerBase
     /// <response code="404">Booking with the specified ID not found</response>
     /// <response code="500">Unexpected server error</response>
     [Authorize]
-    [HttpPut]
+    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

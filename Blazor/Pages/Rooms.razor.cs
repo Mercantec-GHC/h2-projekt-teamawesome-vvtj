@@ -18,7 +18,6 @@ namespace Blazor.Pages
         {
 
             IsLoading = true;
-            await Task.Delay(5000);
             System.Console.WriteLine("OnInitializedAsync: Getting room types");
             var result = await _aPIService.GetRoomTypeAsync()
                 ?? throw new ArgumentException("Error: No Room types were found");

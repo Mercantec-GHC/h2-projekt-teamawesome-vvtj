@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ export function Cleaning() {
   const [errorMarkedRooms, setErrorMarkedRooms] = useState<string | null>(null);
 
   const navigate = useNavigate();
-   const { token } = useAuth()
+  const { token } = useAuth()
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
   const role = decoded?.role;
   const hotelName = decoded?.department; 
@@ -35,11 +36,12 @@ export function Cleaning() {
     else loadRooms();
   }, []);
 
+  // Loads hotels and rooms to clean, filters by user role
   const loadRooms = async () => {
     setLoading(true);
     try {
-      const hotels = await ApiService.getAllHotels() ?? []; // only hotels for cleaning staff
-      const roomsToClean = await ApiService.getAllRoomsToClean() ?? []; // for cleaning staff, only rooms for their hotel
+      const hotels = await ApiService.getAllHotels() ?? [];
+      const roomsToClean = await ApiService.getAllRoomsToClean() ?? [];
       
       let filteredRooms = roomsToClean;
 
@@ -54,9 +56,10 @@ export function Cleaning() {
         hotels.splice(0, hotels.length, hotel); // keep only this hotel in the list
       }
 
+      // Map rooms to display model
       const mapped = filteredRooms.map((r: any) => {
-      const hotelName = hotels.find((h: any) => h.id === r.hotelId)?.hotelName ?? "Unknown Hotel";
-      return { hotel: hotelName, roomNumbers: r.roomNumbers };
+        const hotelName = hotels.find((h: any) => h.id === r.hotelId)?.hotelName ?? "Unknown Hotel";
+        return { hotel: hotelName, roomNumbers: r.roomNumbers };
       });
 
       setCleaningViewModel(mapped);
@@ -70,6 +73,7 @@ export function Cleaning() {
     }
   };
 
+  // Handles marking rooms as cleaned
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const roomNumbers = formModel.roomNumbersInput.split(",").map(r => parseInt(r.trim()));
@@ -128,33 +132,33 @@ export function Cleaning() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <Select
-            value={formModel.selectedHotelId}
-            onValueChange={val => setFormModel({ ...formModel, selectedHotelId: val })}
-            >
-            <SelectTrigger>
+          value={formModel.selectedHotelId}
+          onValueChange={val => setFormModel({ ...formModel, selectedHotelId: val })}
+        >
+          <SelectTrigger>
             <SelectValue placeholder="Select a hotel">
-                {formModel.selectedHotelId
+              {formModel.selectedHotelId
                 ? hotelDtos.find(h => String(h.id) === formModel.selectedHotelId)?.hotelName
                 : ""}
             </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
+          </SelectTrigger>
+          <SelectContent>
             {hotelDtos.map(h => (
-                <SelectItem key={h.id} value={h.id}>
+              <SelectItem key={h.id} value={h.id}>
                 {h.hotelName}
-                </SelectItem>
+              </SelectItem>
             ))}
-            </SelectContent>
+          </SelectContent>
         </Select>
 
         <Input
-            placeholder="Enter room numbers, comma separated"
-            value={formModel.roomNumbersInput}
-            onChange={e => setFormModel({ ...formModel, roomNumbersInput: e.target.value })}
+          placeholder="Enter room numbers, comma separated"
+          value={formModel.roomNumbersInput}
+          onChange={e => setFormModel({ ...formModel, roomNumbersInput: e.target.value })}
         />
 
         <Button type="submit">Mark as Cleaned</Button>
-        </form>
+      </form>
     </div>
   );
 }

@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+// React hooks for state and lifecycle management
+import { useEffect, useState } from "react"
+// UI table components
 import {
     Table,
     TableHeader,
@@ -9,31 +11,46 @@ import {
     TableHead,
     TableCell,
 } from "@/components/ui/table"
+// Custom authentication context
 import { useAuth } from "../login/AuthContext"
+// DTO type for notifications
 import type { GetNotificationsDto } from "@/types/GetNotificationsDTO"
+// API service for backend communication
 import { ApiService } from "@/services/ApiService"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog"
+// Dialog components for message viewing
+import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog"
 
+// Status mapping for notifications
 const availableStatuses: { [key: number]: string } = {
     1: "New",
     2: "Processed",
     3: "Done",
 }
+// Array of status options for dropdowns
 const statusOptions = Object.values(availableStatuses) 
 
 export function NotificationsPage() {
+    // Get authentication token
     const { token } = useAuth()
+    // State for notifications DTO
     const [notificationsDto, setNotificationsDto] = useState<GetNotificationsDto>({ newCount: 0, notifications: [] }) 
+    // Loading state
     const [loading, setLoading] = useState(true)
+    // Status filter for dropdown
     const [statusFilter, setStatusFilter] = useState("") 
+    // State to track which notification is being saved
     const [savingNotificationId, setSavingNotificationId] = useState<number | null>(null) 
 
+    // Extract notifications array from DTO
     const notifications = notificationsDto.notifications; 
 
+    // Fetch notifications when token changes
     useEffect(() => {
         const fetchNotifications = async () => {
             setLoading(true)
+            // Fetch all notifications from API
             const data = await ApiService.getAllNotifications() 
+            // Handle possible array response
             const dto = Array.isArray(data) ? data[0] : data;
             if (dto && dto.notifications) {
                 setNotificationsDto(dto)
@@ -48,18 +65,22 @@ export function NotificationsPage() {
         }
     }, [token])
 
+    // Handle status change for a notification
     const handleStatusChange = async (id: number, newStatus: string) => {
         setSavingNotificationId(id)
-        
-        try {
-            const success = await ApiService.updateNotificationStatus(id, newStatus)
             
+        try {
+            // Update notification status via API
+            const success = await ApiService.updateNotificationStatus(id, newStatus)
+                
             if (success) {
+                // Update local state after successful status change
                 setNotificationsDto((prev) => ({
                     ...prev,
                     notifications: prev.notifications.map((n) =>
                         n.id === id ? { ...n, status: newStatus } : n 
                     ),
+                    // Decrement newCount if status changes from "New" to another
                     newCount: prev.newCount - (prev.notifications.find(n => n.id === id)?.status === availableStatuses[1] && newStatus !== availableStatuses[1] ? 1 : 0)
                 }));
             } else {
@@ -72,14 +93,18 @@ export function NotificationsPage() {
         }
     }
 
+    // Show loading indicator
     if (loading) return <div className="p-4 text-lg font-medium">Loading notifications...</div>
+    // Show message if no notifications found
     if (!notifications.length) return <div className="p-4 text-lg font-medium">No notifications found</div>
 
+    // Main notifications table UI
     return (
         <div className="flex flex-col gap-4 p-4">
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Notifications ({notificationsDto.newCount} new)</h1>
-                
+                    
+                {/* Status filter dropdown */}
                 <select
                     value={statusFilter}
                     title="Notifications"
@@ -115,6 +140,7 @@ export function NotificationsPage() {
                             <TableCell>{n.resource}</TableCell>
                             <TableCell>{n.name}</TableCell>
                             <TableCell>{n.email}</TableCell>
+                            {/* Message cell with dialog for full view */}
                             <TableCell className="max-w-xs truncate">
                                 <Dialog>
                                     <DialogTrigger className="text-blue-500 underline ml-2">
@@ -125,19 +151,21 @@ export function NotificationsPage() {
                                         {n.message}
                                         </div>
                                     </DialogContent>
-                                    </Dialog>
+                                </Dialog>
                             </TableCell>
+                            {/* Created date */}
                             <TableCell>
                                 {n.createdAt
                                     ? new Date(n.createdAt).toLocaleString("da-DK") 
                                     : "N/A"}
-                                </TableCell>
-
-                                <TableCell>
+                            </TableCell>
+                            {/* Updated date (note: currently uses createdAt, may be a bug) */}
+                            <TableCell>
                                 {n.updatedAt
                                     ? new Date(n.createdAt).toLocaleString("da-DK") 
                                     : "N/A"}
-                                </TableCell>
+                            </TableCell>
+                            {/* Status dropdown */}
                             <TableCell>
                                 <select
                                     aria-label="Notification status"

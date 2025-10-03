@@ -3,7 +3,7 @@
 	public class Notifications
 	{
 		public int Id { get; set; }
-		public string Resource { get; set; }
+		public string? Resource { get; set; }
 		public string? Name { get; set; }
 		public string? Email { get; set; }
 		public string? Message { get; set; }

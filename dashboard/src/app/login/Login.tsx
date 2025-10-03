@@ -4,6 +4,7 @@ import { LoginForm } from "../../components/login-form";
 import { jwtDecode } from "jwt-decode";
 import type { NotificationSubscriptionDto } from "../../types/NotificationDTO";
 
+// Converts a base64 string to a Uint8Array (for VAPID key)
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -16,17 +17,18 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [, setToken] = useState("");
-  
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
+  // Handles login form submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
+      // Send login request
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/ActiveDirectory/login-ad`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,8 +45,10 @@ export function Login() {
       localStorage.setItem("token", data.accessToken);
       setToken(data.accessToken);
 
+      // Decode JWT to check user role
       const decoded: { role?: string } = jwtDecode(data.accessToken);
 
+      // If user is Admin, subscribe to push notifications
       if (decoded.role === "Admin") {
         try {
           if ("Notification" in window && "serviceWorker" in navigator) {
@@ -76,6 +80,7 @@ export function Login() {
                 ),
               };
 
+              // Send push subscription to backend
               await fetch(`${import.meta.env.VITE_API_URL}/api/Notifications/subscribe`, {
                 method: "POST",
                 headers: {
@@ -91,7 +96,7 @@ export function Login() {
         }
       }
 
-      navigate("/"); 
+      navigate("/"); // Redirect after login
     } catch (err) {
       setError("Can not connect to server, please try again later.");
       console.error(err);
@@ -99,7 +104,6 @@ export function Login() {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
