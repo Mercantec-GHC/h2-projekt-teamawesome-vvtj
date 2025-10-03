@@ -1,6 +1,7 @@
 
-using Microsoft.AspNetCore.Components;
 using Blazor.Services;
+using BootstrapBlazor.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Blazor.Pages
 {
@@ -9,6 +10,7 @@ namespace Blazor.Pages
     {
         [Inject]
         public APIService _aPIService { get; set; } = default!;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
         public IEnumerable<RoomTypeDto> roomTypes { get; set; } = new List<RoomTypeDto>();
         public bool IsLoading = false;
 
@@ -22,6 +24,10 @@ namespace Blazor.Pages
             roomTypes = result?.Where(r => r != null)!;
 
             IsLoading = false;
+        }
+        private void NavigateToBooking(int Id)
+        {
+            Nav.NavigateTo($"/booking?roomTypeId={Id}");
         }
     }
 }

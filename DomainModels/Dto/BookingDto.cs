@@ -39,6 +39,7 @@ namespace DomainModels.Dto
 
     public class BookingByUserDto
     {
+        public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
         public string UserName { get; set; }
         public string HotelName { get; set; }

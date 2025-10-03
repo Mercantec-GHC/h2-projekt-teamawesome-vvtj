@@ -20,5 +20,12 @@ namespace Blazor.Services
                 return null;
             }
         }
+    
+     public async Task<List<HotelDto>> GetHotelsAsync()
+        {
+            var resp = await _httpClient.GetAsync("/api/Hotel");
+            if (!resp.IsSuccessStatusCode) return new();
+            return await resp.Content.ReadFromJsonAsync<List<HotelDto>>() ?? new();
+        }
     }
 }

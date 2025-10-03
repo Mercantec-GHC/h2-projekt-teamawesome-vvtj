@@ -11,7 +11,6 @@ public partial class Booking : ComponentBase
 {
     [Inject] private Services.APIService Api { get; set; } = default!;
     [Inject] private NavigationManager Nav { get; set; } = default!;
-    [Inject] private PreloadService preloadService { get; set; } = default!;
 
     protected bool IsSubmitting { get; set; }
     protected string? FormError { get; set; }
@@ -26,13 +25,12 @@ public partial class Booking : ComponentBase
     protected bool IsSuccess { get; set; } = false;
     protected bool CanProceed =>
         Vm is not null &&
-        !string.IsNullOrWhiteSpace(Vm.HotelName) &&
-       // Vm.RoomTypeId is not null &&
+        !string.IsNullOrWhiteSpace(Vm.HotelName) &&      
         Vm.GuestsCount >= 1 &&
          Vm.GuestsCount <= 6 &&
         Vm.NightsCount > 0 &&
         Vm.CheckIn >= DateTime.Today;
-
+    
     protected override async Task OnInitializedAsync()
     {
 
@@ -83,11 +81,8 @@ public partial class Booking : ComponentBase
         if (int.TryParse(q.Get("guests"), out var guests) && guests > 0)
             Vm.GuestsCount = guests;
 
-        //if (Enum.TryParse<RoomTypeEnum>(q.Get("roomType"), true, out var rt))
-        //    Vm.RoomTypeId = (int)rt;
-        if (int.TryParse(q.Get("roomType"), out var rtId))
-            Vm.RoomTypeId = rtId;
-
+        if (int.TryParse(q.Get("roomTypeId"), out var Id))
+            Vm.RoomTypeId = Id;
         var hotel = q.Get("hotel");
         if (!string.IsNullOrWhiteSpace(hotel))
             Vm.HotelName = hotel;
@@ -97,6 +92,8 @@ public partial class Booking : ComponentBase
 
         if (DateTime.TryParse(q.Get("checkOut"), out var co))
             Vm.CheckOut = co.Date;
+
+      
 
         RecalcNights();
     }
