@@ -4,7 +4,6 @@ using DomainModels.Models;
 public class RoomsDto
 {
     public int Id { get; set; }
-    //public required int GuestCount { get; set; }
     public bool IsAvailable { get; set; }
     public bool IsBreakfast { get; set; }
     public DateTime AvailableFrom { get; set; }

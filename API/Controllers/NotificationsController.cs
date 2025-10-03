@@ -6,17 +6,29 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+/// <summary>
+/// Controller for managing notification-related endpoints.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class NotificationsController : ControllerBase   
+public class NotificationsController : ControllerBase
 {
-    INotificationService _notificationService;
+	INotificationService _notificationService;
 
-    public NotificationsController(INotificationService notificationService)
-    {
-        _notificationService = notificationService;
-    }
+	/// <summary>
+	/// Initializes a new instance of the <see cref="NotificationsController"/> class.
+	/// </summary>
+	/// <param name="notificationService">The notification service.</param>
+	public NotificationsController(INotificationService notificationService)
+	{
+		_notificationService = notificationService;
+	}
 
+	/// <summary>
+	/// Subscribes an admin user to notifications.
+	/// </summary>
+	/// <param name="subscription">The notification subscription details.</param>
+	/// <returns>Returns Ok if successful, Unauthorized if user is not authenticated, or Forbid if not admin.</returns>
 	[Authorize]
 	[HttpPost("subscribe")]
 	public async Task<IActionResult> Subscribe([FromBody] NotificationSubscriptionDto subscription)
@@ -32,6 +44,11 @@ public class NotificationsController : ControllerBase
 		return Ok(subscription);
 	}
 
+	/// <summary>
+	/// Sends a push notification.
+	/// </summary>
+	/// <param name="dto">The notification message details.</param>
+	/// <returns>Returns Ok if successful.</returns>
 	[HttpPost("send")]
 	public async Task<IActionResult> SendPushNotification([FromBody] NotificationMessageDto dto)
 	{
@@ -39,6 +56,11 @@ public class NotificationsController : ControllerBase
 		return Ok();
 	}
 
+	/// <summary>
+	/// Saves a contact form notification.
+	/// </summary>
+	/// <param name="dto">The email form details.</param>
+	/// <returns>Returns Ok if successful, BadRequest if input is null, or 500 on error.</returns>
 	[HttpPost("save-contact-form-notification")]
 	public async Task<IActionResult> ContactFormNotification(EmailFormDto dto)
 	{
@@ -58,6 +80,11 @@ public class NotificationsController : ControllerBase
 		}
 	}
 
+	/// <summary>
+	/// Updates the status of a notification.
+	/// </summary>
+	/// <param name="dto">The notification status details.</param>
+	/// <returns>Returns Ok if successful or 500 on error.</returns>
 	[Authorize]
 	[HttpPut("update-notification-status")]
 	public async Task<IActionResult> UpdateNotificationStatus(NotificationStatusDto dto)
@@ -73,6 +100,10 @@ public class NotificationsController : ControllerBase
 		}
 	}
 
+	/// <summary>
+	/// Gets all notifications for the authenticated user.
+	/// </summary>
+	/// <returns>Returns a list of notifications or 500 on error.</returns>
 	[Authorize]
 	[HttpGet("all-notifications")]
 	public async Task<IActionResult> GetAllNotifications()

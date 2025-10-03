@@ -6,8 +6,10 @@ using API.Services;
 using DomainModels.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
-
-
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using Azure;
+using DomainModels.Mapping;
 
 
 [ApiController]
@@ -16,6 +18,7 @@ public class HotelController : ControllerBase
 {
     private readonly AppDBContext _context;
     private readonly HotelService _hotelService;
+    private readonly HotelMapping _hotelMapping;
 
     public HotelController(AppDBContext context, HotelService hotelService)
     {
@@ -108,6 +111,7 @@ public class HotelController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+    
 
     //Only Admin
     //DELETE: api/Hotels
