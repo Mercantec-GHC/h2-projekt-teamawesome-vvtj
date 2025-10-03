@@ -1,6 +1,8 @@
 "use client"
 
+// React hooks for state and lifecycle
 import { useEffect, useMemo, useState } from "react"
+// UI components for table, button, input
 import {
   Table,
   TableHeader,
@@ -11,17 +13,21 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+// Auth context for user info
 import { useAuth } from "../login/AuthContext"
 import type { BookingDto } from "@/types/BookingDTO"
 import { ApiService } from "@/services/ApiService"
 
 export function BookingList() {
+    // Get JWT token from auth context
     const { token } = useAuth()
+    // Decode JWT to get user role and department (hotel name)
     const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
     
     const userRole = decoded?.role;
     const userHotelName = decoded?.department; 
 
+    // State for bookings, loading, editing, and hotel filter
     const [bookings, setBookings] = useState<BookingDto[]>([])
     const [loading, setLoading] = useState(true)
     const [editingId, setEditingId] = useState<number | null>(null)
@@ -31,6 +37,7 @@ export function BookingList() {
     })
     const [hotelFilter, setHotelFilter] = useState("")
 
+    // Fetch all bookings from API when token changes
     useEffect(() => {
         const fetchBookings = async () => {
             setLoading(true);
@@ -53,13 +60,16 @@ export function BookingList() {
         }
     }, [token])
 
+    // Filter bookings by user role and hotel filter
     const filteredBookings = useMemo(() => {
         let currentBookings = bookings;
         
+        // Non-admins only see their own hotel's bookings
         if (userRole !== "Admin" && userHotelName) {
              currentBookings = currentBookings.filter(b => b.hotelName === userHotelName);
         }
         
+        // Admins can filter by hotel
         if (hotelFilter) {
             currentBookings = currentBookings.filter(b => b.hotelName === hotelFilter);
         }
@@ -67,10 +77,12 @@ export function BookingList() {
         return currentBookings;
     }, [bookings, userRole, userHotelName, hotelFilter]);
     
+    // Get unique hotel names for filter dropdown
     const hotelNames = useMemo(() => {
         return Array.from(new Set(bookings.map((b) => b.hotelName)));
     }, [bookings]);
 
+    // Start editing a booking's dates
     const startEdit = (booking: BookingDto) => {
         setEditingId(booking.id)
         setEditValues({
@@ -79,11 +91,13 @@ export function BookingList() {
         })
     }
 
+    // Cancel editing
     const cancelEdit = () => {
         setEditingId(null)
         setEditValues({ checkIn: "", checkOut: "" })
     }
 
+    // Save edited dates to API and update state
     const saveEdit = async (id: number) => {
         if (!token) return; 
 
@@ -102,11 +116,13 @@ export function BookingList() {
         }
     }
 
+    // Show loading or empty state
     if (loading) return <div>Loading bookings...</div>
     if (!bookings.length) return <div>No bookings found</div>
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Hotel filter dropdown for Admins */}
       {userRole === "Admin" && (
       <select
         value={hotelFilter}
@@ -122,6 +138,7 @@ export function BookingList() {
       </select>
       )}
 
+      {/* Bookings table */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -142,6 +159,7 @@ export function BookingList() {
               <TableCell>{booking.id}</TableCell>
               <TableCell>{new Date(booking.createdAt).toLocaleString()}</TableCell>
               <TableCell>
+                {/* Show updated date or dash if not set */}
                 {booking.updatedAt !== "0001-01-01T00:00:00"
                   ? new Date(booking.updatedAt).toLocaleString()
                   : "-"}
@@ -150,6 +168,7 @@ export function BookingList() {
               <TableCell>{booking.roomId}</TableCell>
               <TableCell>{booking.hotelName}</TableCell>
 
+              {/* Editable check-in date */}
               <TableCell>
                 {editingId === booking.id ? (
                   <Input
@@ -162,6 +181,7 @@ export function BookingList() {
                 )}
               </TableCell>
 
+              {/* Editable check-out date */}
               <TableCell>
                 {editingId === booking.id ? (
                   <Input
@@ -174,6 +194,7 @@ export function BookingList() {
                 )}
               </TableCell>
 
+              {/* Edit and Delete actions */}
               <TableCell>
               {editingId === booking.id ? (
                 <>
