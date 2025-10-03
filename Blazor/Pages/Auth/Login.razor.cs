@@ -1,9 +1,7 @@
 ﻿using Blazor.Interfaces;
 using Blazor.Models.Dto.Auth;
 using BlazorBootstrap;
-using DomainModels.Dto;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Blazor.Pages.Auth;
 
@@ -13,10 +11,6 @@ public partial class Login
 	private IAuthService _authService { get; set; } = null!;
 	[Inject] 
 	private NavigationManager _navigation{ get; set; } = null!;
-	[Inject]
-	private IJSRuntime JSRuntime {  get; set; } = null!;
-	[Inject]
-	private CustomAuthStateProvider _customAuthStateProvider { get; set; } = null!;
 	[Inject]
 	protected PreloadService PreloadService { get; set; } = default!;
 

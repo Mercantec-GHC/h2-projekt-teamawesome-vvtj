@@ -44,7 +44,7 @@ public class AuthService : IAuthService
 			
 			if (await _context.Users.AnyAsync(u => u.Email == request.Email))
 			{
-				_logger.LogWarning("Registration failed: User with email {Email} already exists.", request.Email);
+				_logger.LogWarning("Registration failed: User with username {Username} or email {Email} already exists.", request.Email, request.Username);
 				return null; // User already exists
 			}
 
@@ -124,9 +124,13 @@ public class AuthService : IAuthService
 			}
 		}
 
-		// Avoid unnecessary allocation
-		if (user.RefreshTokens == null)
-			user.RefreshTokens = new List<RefreshToken>(1);
+		foreach (var token in existingTokens)
+		{
+			token.Revoked = DateTime.UtcNow;
+			token.ReplacedByToken = refreshToken.Token;
+		}
+
+		user.RefreshTokens ??= new List<RefreshToken>();
 		user.RefreshTokens.Add(refreshToken);
 
 		await _context.SaveChangesAsync();
