@@ -23,6 +23,7 @@ public partial class Home
     private List<string> Hotels { get; set; } = new();
     [Inject]
     private APIService APIService { get; set; } = null!;
+   
     protected override async Task OnInitializedAsync()
     {
 
@@ -96,7 +97,7 @@ public partial class Home
         [Required] public string? Hotel { get; set; }
         [Range(1, 6)] public int Guests { get; set; } = 1;
     }
-
+ 
     private void NavigateToRooms()
     {
         if (_startDate.HasValue && _endDate.HasValue && !string.IsNullOrEmpty(_selectedHotel))

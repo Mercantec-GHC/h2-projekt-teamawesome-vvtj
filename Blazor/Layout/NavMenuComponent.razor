@@ -19,7 +19,7 @@
 					</li>
 					<NavSeparatorComponent />
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-						<a class="nav-link text-white" href="#">Rooms</a>
+						<a class="nav-link text-white" href="rooms">Rooms</a>
 					</li>
 					<NavSeparatorComponent />
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
@@ -30,14 +30,14 @@
 						<a class="nav-link text-white" href="contact">Contact us</a>
 					</li>
 
-					@*TODO: <AuthorizeView>
+					<AuthorizeView Roles="Admin, Reception">
 						<Authorized>
 					<NavSeparatorComponent />
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">
-						<a class="nav-link text-white" href="#">Hotel Rooms</a>
+						<a class="nav-link text-white" href="available-rooms">Available Rooms</a>
 					</li>
 					</Authorized>
-					</AuthorizeView>*@
+					</AuthorizeView>
 
 					<NavSeparatorComponent />
 					<li class="nav-item py-2 py-sm-1 col-12 col-sm-auto">

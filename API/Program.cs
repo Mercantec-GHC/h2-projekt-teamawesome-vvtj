@@ -40,6 +40,7 @@ public class Program
 		builder.Services.AddScoped<IEmailService, EmailService>();
 		builder.Services.AddScoped<ActiveDirectoryService>();
 		builder.Services.AddScoped<INotificationService, NotificationService>();
+
 		builder.Services.AddScoped<SeasonalPricingService>();
 		builder.Services.AddScoped<IJWTService, JWTService>();
 		builder.Services.AddHttpContextAccessor();

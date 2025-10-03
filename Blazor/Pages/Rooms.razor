@@ -1,0 +1,45 @@
+@page "/rooms"
+
+@inject NavigationManager NavigationManager
+@using BlazorBootstrap
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Rooms</PageTitle>
+<div class="page-wrapper ">
+    <div class="container mt-4">
+@if(IsLoading)
+{
+    <div class="overlay d-flex justify-content-center align-items-center">
+    <Spinner Type="SpinnerType.Border"
+				 Size="SpinnerSize.Large" Color="SpinnerColor.Light " Visible="@IsLoading" />
+    </div>
+}
+
+else
+{
+    
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 ">
+
+            @foreach (var room in roomTypes)
+            {
+                <div class="col">
+                    <div class="card h-100">
+                            <img src="@room.ImagePath" class="card-img-top" alt="@room.TypeofRoom" />
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@room.TypeofRoom.</h5>
+                            <p class="card-text">@room.Description</p>
+                            <p class="card-text text-muted">Max Capacity: @room.MaxCapacity</p>
+                            <p class="card-text text-muted mt-auto">Price per night: @room.PricePerNight?.ToString("C")</p>
+                                <button class="btn btn-custom mt-3"
+                                        @onclick="() => NavigateToBooking(room.Id)">
+                                    Book 
+                                </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+  
+}
+  </div>
+</div>

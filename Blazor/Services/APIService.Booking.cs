@@ -51,7 +51,73 @@ namespace Blazor.Services
             }
             return new List<RoomTypeDto>();
         }
+
+        public async Task<List<BookingByUserDto>> GetBookingsByCurrentUserAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("/api/bookings/bookings");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var bookings = await response.Content.ReadFromJsonAsync<List<BookingByUserDto>>();
+                    return bookings ?? new List<BookingByUserDto>();
+                }
+
+                _logger.LogWarning("Failed to fetch bookings. Status: {StatusCode}", response.StatusCode);
+                return new List<BookingByUserDto>();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error fetching bookings.");
+                return new List<BookingByUserDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Unexpected error fetching bookings.");
+                throw;
+            }
+
+        }
+        public async Task<bool> DeleteMyBookingAsync(int Id)
+        {
+            var response = await _httpClient.DeleteAsync($"/api/bookings/user/bookings/{Id}");
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<GetAvailableRoomsDto>> GetAvailableRoomsAsync(
+            string hotelName, DateOnly from, DateOnly to)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"/api/bookings/available?hotelName={hotelName}&from={from}&to={to}");
+
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var rooms = await response.Content
+                        .ReadFromJsonAsync<List<GetAvailableRoomsDto>>();
+                    return rooms ?? new List<GetAvailableRoomsDto>();
+                }
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    return new List<GetAvailableRoomsDto>(); // empty list if rooms not found
+
+                _logger.LogWarning("Failed to get available rooms. Status: {Status}", response.StatusCode);
+                return new List<GetAvailableRoomsDto>();
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Network error getting available rooms.");
+                return new List<GetAvailableRoomsDto>();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Unexpected error getting available rooms.");
+                throw;
+            }
+        }
+
+       
     }
-
-
 }

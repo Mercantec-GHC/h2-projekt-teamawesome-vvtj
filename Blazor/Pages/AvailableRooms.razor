@@ -1,0 +1,71 @@
+﻿@page "/available-rooms"
+@attribute [Authorize(Roles = "Admin, Reception")]
+@inherits AvailableRoomsBase
+@using BlazorBootstrap
+
+<div class="available-rooms-page">
+    <h1 class="page-title">Available Rooms</h1>
+
+    <div class="form-container">
+        <h2 class="form-title">Check Availability</h2>
+
+        @if (!string.IsNullOrWhiteSpace(Vm.Error))
+        {
+            <div class="alert alert-danger">@Vm.Error</div>
+        }
+
+        <EditForm Model="Vm" OnValidSubmit="SearchAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-field">
+                <label>Hotel</label>
+                <InputSelect class="form-select" @bind-Value="Vm.HotelName">
+                    <option value="">Select hotel</option>
+                    @foreach (var h in Hotels)
+                    {
+                        <option value="@h.HotelName">@h.HotelName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="form-field">
+                <label>From</label>
+                <InputDate @bind-Value="Vm.From" class="form-control" />
+            </div>
+
+            <div class="form-field">
+                <label>To</label>
+                <InputDate @bind-Value="Vm.To" class="form-control" />
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-custom" disabled="@Vm.IsLoading">
+                    @(Vm.IsLoading ? "Loading..." : "Search")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+
+    @if (Vm.IsLoading)
+    {
+        <p class="mt-3">Loading...</p>
+    }
+    else if (Vm.Rooms?.Count > 0)
+    {
+        <div class="results">
+            @foreach (var r in Vm.Rooms)
+            {
+                <div class="booking-card">
+                    <h5>@r.HotelName — @r.RoomTypeName</h5>
+                    <p><b>Room #:</b> @r.RoomNumber</p>
+                    <p><b>Room Id:</b> @r.RoomId</p>
+                </div>
+            }
+        </div>
+    }
+    else if (!Vm.IsLoading && Vm.Rooms != null)
+    {
+        <p class="mt-3">No available rooms for the selected period.</p>
+    }
+</div>
