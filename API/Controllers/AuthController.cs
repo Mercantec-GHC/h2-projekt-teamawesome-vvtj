@@ -90,7 +90,7 @@ public class AuthController : ControllerBase
 
 				return Unauthorized(new
 				{
-					message = "Invalid email or password.",
+					message = "Invalid input.",
 					attempts_left = attemptsLeft + 1
 				});
 			}

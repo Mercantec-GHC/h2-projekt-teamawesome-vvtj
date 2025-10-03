@@ -124,9 +124,13 @@ public class AuthService : IAuthService
 			}
 		}
 
-		// Avoid unnecessary allocation
-		if (user.RefreshTokens == null)
-			user.RefreshTokens = new List<RefreshToken>(1);
+		foreach (var token in existingTokens)
+		{
+			token.Revoked = DateTime.UtcNow;
+			token.ReplacedByToken = refreshToken.Token;
+		}
+
+		user.RefreshTokens ??= new List<RefreshToken>();
 		user.RefreshTokens.Add(refreshToken);
 
 		await _context.SaveChangesAsync();

@@ -4,7 +4,7 @@ namespace DomainModels.Dto.AuthDto;
 
 public class LoginDto
 {
-	[Required(ErrorMessage = "Email is required")]
+	[Required(ErrorMessage = "Username is required")]
 	[Display(Name = "Username")]
 	public string Username { get; set; } = string.Empty;
 
