@@ -1,5 +1,7 @@
 @page "/about"
 
+@using BlazorBootstrap
+
 @* <PageTitle>About us</PageTitle>
 
  <h3>About us</h3>
@@ -15,11 +17,10 @@
 
 <PageTitle>About us</PageTitle>
 
-<div class="contact-container">
-
-    <h3>About Us</h3>
-
-    <div class="intro">
+<div class="about-container">
+    <h3 class="header">About Us</h3>
+    
+    <div class="content">
         <h3>
             Welcome to NOVA Hotels – Your Own Peace of Paradise
             At NOVA Hotels, we believe that every journey deserves a destination that feels like home—only better.
@@ -31,8 +32,29 @@
             NOVA Hotels invites you to experience the art of relaxation.
         </h3>
     </div>
-
-    <div class="contact-content">
-
-    </div>
 </div>
+
+@if (IsLoading)
+{
+    <div class="overlay d-flex justify-content-center align-items-center">
+    <Spinner Type="SpinnerType.Border"
+				 Size="SpinnerSize.Large" Color="SpinnerColor.Light " Visible="@IsLoading" />
+    </div>
+}
+else
+{
+    <div class="hotel-container">
+        @foreach (var hotel in Hotels)
+        {
+            <Card Class="mb-4 card w-75 mx-auto">
+                <img src="/images/CopilotHotel.png" alt="placeholder" class="mb4-img" />
+                <CardBody>
+                    <CardTitle>@hotel.HotelName</CardTitle>
+                    <CardSubTitle>@hotel.CityName</CardSubTitle>
+                    <CardText>@hotel.Description</CardText>
+                    <CardText Class="text-muted">Last updated 3 mins ago</CardText>
+                </CardBody>
+            </Card>
+        }
+    </div>
+}
