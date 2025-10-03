@@ -165,7 +165,7 @@ public class BookingController : ControllerBase
     ///  <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="404">Booking with the specified ID not found</response>
     /// <response code="500">Unexpected server error</response>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateDates(int id, UpdateDatesDto dto)
     {
@@ -210,7 +210,7 @@ public class BookingController : ControllerBase
     ///   <response code="401">Unauthorized – the user is not authenticated.</response>
     /// <response code="500">Internal server error – an unexpected error occurred on the server.</response>
 
-    [Authorize(Roles = "Admin, Receptionist")]
+    [Authorize(Roles = "Admin, Reception")]
     [HttpGet("hotel/{hotelId}")]
     public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByHotel(int hotelId)
     {

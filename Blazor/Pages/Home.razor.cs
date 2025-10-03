@@ -23,10 +23,7 @@ public partial class Home
     private List<string> Hotels { get; set; } = new();
     [Inject]
     private APIService APIService { get; set; } = null!;
-    private void NavigateToAvailableRooms()
-    {
-        NavigationManager.NavigateTo("/available-rooms");
-    }
+   
     protected override async Task OnInitializedAsync()
     {
 
