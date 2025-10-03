@@ -16,6 +16,7 @@ namespace DomainModels.Dto
 
         [Required(ErrorMessage = "Address is required")]
 		public required string Address { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public string? Description { get; set; }
         public string? Email { get; set; } 
         public string? Phone { get; set; }
