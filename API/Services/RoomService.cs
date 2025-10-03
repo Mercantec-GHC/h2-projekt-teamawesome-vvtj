@@ -64,6 +64,7 @@ namespace API.Services
                 RoomNumber = room.RoomNumber,
                 TypeId = type.Id,
                 HotelId = room.HotelId,
+                
             };
             _context.Rooms.Add(newRoom);
             await _context.SaveChangesAsync();

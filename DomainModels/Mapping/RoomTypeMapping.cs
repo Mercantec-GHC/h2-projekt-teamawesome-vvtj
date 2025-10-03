@@ -12,7 +12,8 @@ namespace DomainModels.Mapping
             return new RoomTypeDto
             {
                 Id = roomType.Id,
-                TypeofRoom = roomType.TypeofRoom.ToString(),
+                TypeofRoom = roomType.TypeofRoom,
+                RoomTypeName = roomType.TypeofRoom.ToString(),
                 MaxCapacity = roomType.MaxCapacity,
                 Description = roomType.Description,
                 HasBalcony = roomType.HasBalcony,
@@ -28,6 +29,7 @@ namespace DomainModels.Mapping
                 HasVault = roomType.HasVault,
                 Area = roomType.Area,
                 PricePerNight = roomType.PricePerNight,
+                ImagePath = roomType.ImagePath,
             };
         }
     }
