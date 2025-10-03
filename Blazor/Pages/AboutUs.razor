@@ -46,9 +46,9 @@ else
     <div class="hotel-container">
         @foreach (var hotel in Hotels)
         {
-            <Card Class="mb-4 card w-75 mx-auto">
+            <Card Class="card w-75 mx-auto custom-card">
                 <img src="/images/CopilotHotel.png" alt="placeholder" class="mb4-img" />
-                <CardBody>
+                <CardBody class="mb4-body">
                     <CardTitle>@hotel.HotelName</CardTitle>
                     <CardSubTitle>@hotel.CityName</CardSubTitle>
                     <CardText>@hotel.Description</CardText>

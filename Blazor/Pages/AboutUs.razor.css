@@ -24,7 +24,7 @@
     gap: 40px;
 }
 
-.mb-4 {
+::deep .custom-card{
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -33,8 +33,13 @@
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-
+    transition: transform 0.3s ease;
 }
+
+::deep .custom-card:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
+    }
 
 .mb4-img {
     width: 100%;
