@@ -211,7 +211,7 @@ export const ApiService = {
     token: string
   ): Promise<BookingDto | null> => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking?id=${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -237,7 +237,7 @@ export const ApiService = {
   // Delete a booking by ID
   deleteBooking: async (id: number, token: string) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
