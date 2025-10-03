@@ -7,7 +7,9 @@ import type { UserDTO } from "@/types/UserDTO";
 import type { BookingDto } from "@/types/BookingDTO";
 import type { GetNotificationsDto } from "@/types/GetNotificationsDTO";
 
+// Centralized API service for all backend requests
 export const ApiService = {
+  // Fetch all rooms that need cleaning
   getAllRoomsToClean: async (): Promise<RoomToCleanDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
@@ -22,6 +24,7 @@ export const ApiService = {
     }
   },
 
+  // Mark selected rooms as cleaned
   markRoomsAsCleaned: async (rooms: RoomToCleanDto[]): Promise<boolean> => {
     if (!rooms || rooms.length === 0) return false;
 
@@ -42,6 +45,7 @@ export const ApiService = {
     }
   },
 
+  // Fetch all rooms in the hotel
   getAllRooms: async (): Promise<RoomDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
@@ -63,6 +67,7 @@ export const ApiService = {
     }
   },
 
+  // Fetch all room types
   getAllRoomTypes: async (): Promise<RoomTypeDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
@@ -83,7 +88,9 @@ export const ApiService = {
       return null;
     }
   },
-    updateUserRole: async (userId: number, newRole: string): Promise<boolean> => {
+
+  // Update a user's role
+  updateUserRole: async (userId: number, newRole: string): Promise<boolean> => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -114,7 +121,8 @@ export const ApiService = {
     }
   },
 
-   updateRoomType: async (id: number, updatedData: RoomTypeUpdateDto): Promise<boolean> => {
+  // Update a room type's details
+  updateRoomType: async (id: number, updatedData: RoomTypeUpdateDto): Promise<boolean> => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -143,7 +151,8 @@ export const ApiService = {
     }
   },
 
-   updateHotel: async (updatedData: HotelDto): Promise<boolean> => {
+  // Update hotel details
+  updateHotel: async (updatedData: HotelDto): Promise<boolean> => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -172,7 +181,8 @@ export const ApiService = {
     }
   },
 
-getAllBookings: async (): Promise<BookingDto[] | null> => {
+  // Fetch all bookings
+  getAllBookings: async (): Promise<BookingDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -193,36 +203,38 @@ getAllBookings: async (): Promise<BookingDto[] | null> => {
     }
   },
 
-
+  // Update booking dates for a specific booking
   updateBookingDates: async (
-      id: number,
-      checkIn: string,
-      checkOut: string,
-      token: string
-    ): Promise<BookingDto | null> => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking?id=${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ checkIn, checkOut }),
-        })
+    id: number,
+    checkIn: string,
+    checkOut: string,
+    token: string
+  ): Promise<BookingDto | null> => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ checkIn, checkOut }),
+      });
 
-        if (!res.ok) {
-          const errorText = await res.text()
-          console.error("Failed to update booking dates:", errorText)
-          return null
-        }
-
-        const updatedBooking: BookingDto = await res.json()
-        return updatedBooking
-      } catch (error) {
-        console.error("Error updating booking:", error)
-        return null
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Failed to update booking dates:", errorText);
+        return null;
       }
-    },
+
+      const updatedBooking: BookingDto = await res.json();
+      return updatedBooking;
+    } catch (error) {
+      console.error("Error updating booking:", error);
+      return null;
+    }
+  },
+
+  // Delete a booking by ID
   deleteBooking: async (id: number, token: string) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Booking/${id}`, {
@@ -230,20 +242,22 @@ getAllBookings: async (): Promise<BookingDto[] | null> => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
       if (!res.ok) {
-        const errorText = await res.text()
-        console.error("Failed to delete booking:", errorText)
-        return false
+        const errorText = await res.text();
+        console.error("Failed to delete booking:", errorText);
+        return false;
       }
 
-      return true
+      return true;
     } catch (error) {
-      console.error(error)
-      return false
+      console.error(error);
+      return false;
     }
   },
+
+  // Fetch all hotels
   getAllHotels: async (): Promise<HotelDto[] | null> => {
     try {
       const token = localStorage.getItem("token");
@@ -258,8 +272,9 @@ getAllBookings: async (): Promise<BookingDto[] | null> => {
     }
   },
 
+  // Fetch all users
   getAllUsers: async (): Promise<UserDTO[] | null> => {
-     try {
+    try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Users`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -272,8 +287,9 @@ getAllBookings: async (): Promise<BookingDto[] | null> => {
     }
   },
 
+  // Fetch all notifications
   getAllNotifications: async (): Promise<GetNotificationsDto[] | null> => {
-     try {
+    try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Notifications/all-notifications`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -286,10 +302,10 @@ getAllBookings: async (): Promise<BookingDto[] | null> => {
     }
   },
 
+  // Update the status of a notification
   updateNotificationStatus: async (id: number, newStatus: string ): Promise<boolean> => {
     try {
       const token = localStorage.getItem("token");
-      
       if (!token) {
         console.error("Authentication token is missing.");
         return false;
