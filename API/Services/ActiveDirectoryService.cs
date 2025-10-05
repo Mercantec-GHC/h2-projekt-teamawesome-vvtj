@@ -106,7 +106,6 @@ namespace API.Services
 		/// <returns>ADUserInfo containing user details if authentication is successful; otherwise, null</returns>
 		public async Task<ADUserInfo?> AuthenticateUserAsync(string username, string password)
 		{
-
 			// Create LDAP connection
 			using var connection = new LdapConnection(new LdapDirectoryIdentifier(_server, _port));
 			connection.SessionOptions.ProtocolVersion = 3; //Standard
@@ -222,9 +221,9 @@ namespace API.Services
 		/// <param name="connection">An active LDAP connection</param>
 		/// <param name="userDN">User we want checked</param>
 		/// <returns>The group(s)</returns>
-		private List<string> GetGroupsByUser(LdapConnection connection, string? userDN)
+		private List<ADGroup> GetGroupsByUser(LdapConnection connection, string? userDN)
 		{
-			List<string> groups = new List<string>();
+			List<ADGroup> groups = new List<ADGroup>();
 			var groupSearch = new SearchRequest(
 					$"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
 					$"(member={userDN})",
@@ -242,8 +241,11 @@ namespace API.Services
 					var desc = entry.Attributes["description"]?[0]?.ToString() ?? string.Empty;
 					if (!string.IsNullOrEmpty(name))
 					{
-						groups.Add(name);
-						groups.Add(desc);
+						groups.Add(new ADGroup
+						{
+							Name = name,
+							Description = desc
+						});
 					}
 				}
 			}
@@ -259,7 +261,7 @@ namespace API.Services
 		/// </summary>
 		/// <param name="adGroups">The group(s) we want mapped</param>
 		/// <returns>A role that matched with a group, or unknown if non matched</returns>
-		private RoleEnum MapADGroupToRole(List<string> adGroups)
+		private RoleEnum MapADGroupToRole(List<ADGroup> adGroups)
 		{
 			//Map AD groups to our RoleEnum
 			Dictionary<string, RoleEnum> GroupToRoleMap = new(StringComparer.OrdinalIgnoreCase) //Case sensitive
@@ -269,9 +271,9 @@ namespace API.Services
 				{"CleaningStaff", RoleEnum.CleaningStaff}
 			};
 
-			foreach (var description in adGroups)
+			foreach (var group in adGroups)
 			{
-				if (GroupToRoleMap.TryGetValue(description, out var role))
+				if (GroupToRoleMap.TryGetValue(group.Name, out var role))
 					return role;
 			}
 
@@ -302,7 +304,7 @@ namespace API.Services
 		{
 			public string Name { get; set; } = string.Empty;
 			public string Description { get; set; } = string.Empty;
-			public List<string> Members { get; set; } = new List<string>();
+	
 		}
 
 		public class ADUser
@@ -341,7 +343,7 @@ namespace API.Services
 			public string DistinguishedName { get; set; } = string.Empty;
 			public RoleEnum Role { get; set; } = RoleEnum.Unknown;
 			//List of AD groups the user belongs to
-			public List<string> Groups { get; set; } = new List<string>();
+			public List<ADGroup> Groups { get; set; } = new List<ADGroup>();
 		}
 	}
 }
