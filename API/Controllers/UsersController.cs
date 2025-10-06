@@ -9,6 +9,7 @@ namespace API.Controllers;
 
 /// <summary>
 /// Provides API endpoints for managing user accounts.
+/// <para>Some endpoints require authentication and/or specific roles as noted in their documentation.</para>
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -23,6 +24,7 @@ public class UsersController : ControllerBase
 	/// </summary>
 	/// <param name="userService">The user service for user operations.</param>
 	/// <param name="logger">The logger instance for logging errors and information.</param>
+	/// <param name="context">The database context.</param>
 	public UsersController(IUserService userService, ILogger<UsersController> logger, AppDBContext context)
 	{
 		_userService = userService;
@@ -32,14 +34,12 @@ public class UsersController : ControllerBase
 
 	/// <summary>
 	/// Retrieves all users.
+	/// <para><b>Authorization:</b> Required. Only users with the <c>Admin</c> role can access this endpoint.</para>
 	/// </summary>
 	/// <returns>
 	/// An <see cref="ActionResult{T}"/> containing a list of <see cref="UserDto"/> objects if users exist;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
-	/// <remarks>
-	/// Requires authentication and Admin role.
-	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpGet]
 	public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
@@ -62,15 +62,13 @@ public class UsersController : ControllerBase
 
 	/// <summary>
 	/// Retrieves a user by their unique identifier.
+	/// <para><b>Authorization:</b> Required. Only users with the <c>Admin</c> role can access this endpoint.</para>
 	/// </summary>
 	/// <param name="id">The unique identifier of the user.</param>
 	/// <returns>
 	/// An <see cref="ActionResult{T}"/> containing the <see cref="UserDto"/> if found;
 	/// otherwise, a 404 Not Found response or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
-	/// <remarks>
-	/// Requires authentication and Admin role.
-	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpGet("{id:int}")]
 	public async Task<ActionResult<UserDto>> GetUserById(int id)
@@ -93,16 +91,16 @@ public class UsersController : ControllerBase
 
 	/// <summary>
 	/// Retrieves the profile of the currently authenticated user.
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
 	/// </summary>
 	/// <remarks>
 	/// The user's identifier is extracted from the authentication token.
-	/// Requires a valid JWT.
 	/// </remarks>
 	/// <returns>
 	/// An <see cref="ActionResult{T}"/> containing:
 	/// <list type="bullet">
 	///   <item>
-	///     <description><see cref="UserDto"/> if the user is found.</description>
+	///     <description><see cref="UserDtoUnsafe"/> if the user is found.</description>
 	///   </item>
 	///   <item>
 	///     <description><see cref="UnauthorizedResult"/> if the user ID claim is missing.</description>
@@ -132,15 +130,13 @@ public class UsersController : ControllerBase
 
 	/// <summary>
 	/// Deletes a user by their email address.
+	/// <para><b>Authorization:</b> Required. Only users with the <c>Admin</c> role can access this endpoint.</para>
 	/// </summary>
 	/// <param name="email">The email address of the user to delete.</param>
 	/// <returns>
 	/// A 204 No Content response if successful; 400 Bad Request if email is missing; 404 Not Found if user does not exist;
 	/// or a 500 Internal Server Error if an exception occurs.
 	/// </returns>
-	/// <remarks>
-	/// Requires authentication and Admin role.
-	/// </remarks>
 	[Authorize(Roles = "Admin")]
 	[HttpDelete("{email}")]
 	public async Task<IActionResult> DeleteUserByEmail(string email)

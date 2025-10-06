@@ -9,18 +9,36 @@ using static API.Services.ActiveDirectoryService;
 
 namespace API.Services;
 
+/// <summary>
+/// Provides functionality for generating JWT access tokens for both application and Active Directory users.
+/// Used for authentication and session management in Blazor WebAssembly applications.
+/// </summary>
 public class JWTService : IJWTService
 {
 	private readonly ILogger<JWTService> _logger;
 	private readonly IConfiguration _configuration;
 	private readonly AppDBContext _context;
-	public JWTService(ILogger<JWTService> logger, IConfiguration configuration, AppDBContext appDBContext)
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="JWTService"/> class.
+	/// </summary>
+	/// <param name="logger">Logger for recording token generation events and errors.</param>
+	/// <param name="configuration">Application configuration for retrieving JWT settings.</param>
+	public JWTService(ILogger<JWTService> logger, IConfiguration configuration)
 	{
 		_logger = logger;
 		_configuration = configuration;
 		_context = appDBContext;
 	}
 
+	/// <summary>
+	/// Generates a JWT access token for a standard application user.
+	/// The token includes user claims and roles for secure authentication.
+	/// </summary>
+	/// <param name="user">The application user for whom the token is generated.</param>
+	/// <returns>
+	/// A JWT token string representing the authenticated user.
+	/// </returns>
 	public string CreateToken(User user)
 	{
 		try
@@ -40,6 +58,14 @@ public class JWTService : IJWTService
 		}
 	}
 
+	/// <summary>
+	/// Generates a JWT access token for an Active Directory user.
+	/// The token includes AD user claims and group memberships for secure authentication.
+	/// </summary>
+	/// <param name="adUser">The Active Directory user information.</param>
+	/// <returns>
+	/// A JWT token string representing the authenticated AD user.
+	/// </returns>
 	public string CreateToken(ADUserInfo adUser)
 	{
 		try
@@ -63,6 +89,14 @@ public class JWTService : IJWTService
 		}
 	}
 
+	/// <summary>
+	/// Generates a JWT token string from the provided claims.
+	/// Used internally to create tokens for both application and AD users.
+	/// </summary>
+	/// <param name="claims">A collection of claims to include in the token.</param>
+	/// <returns>
+	/// A JWT token string containing the specified claims.
+	/// </returns>
 	public string GenerateToken(IEnumerable<Claim> claims)
 	{
 		var tokenHandler = new JwtSecurityTokenHandler();

@@ -1,13 +1,30 @@
 ﻿<CascadingAuthenticationState>
 	<Router AppAssembly="@typeof(App).Assembly">
 		<Found Context="routeData">
-			<AuthorizeRouteView RouteData="routeData" DefaultLayout="@typeof(MainLayoutComponent)" />
+			<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayoutComponent)">
+				<NotAuthorized>
+					<div class="min-vh-100 d-flex justify-content-center align-items-center">
+							<div class="col-6 bg-warning bg-opacity-75 rounded-3 py-4 text-center">
+								<p role="alert">It seams like you are not authorized to access this content.</p>
+								<p>
+									Please <a href="/login">log in</a> to continue.
+								</p>
+								<p>
+									Don't have an account yet? You can <a href="/register">register</a> here.
+								</p>
+							</div>
+					</div>
+				</NotAuthorized>
+				<Authorizing>
+					<p>Checking your authorization status...</p>
+				</Authorizing>
+			</AuthorizeRouteView>
 			<FocusOnNavigate RouteData="@routeData" Selector="h1" />
 		</Found>
 		<NotFound>
 			<PageTitle>Not found</PageTitle>
 			<LayoutView Layout="@typeof(MainLayoutComponent)">
-				<p role="alert">Sorry, there's nothing at this address.</p>
+				<p role="alert">Sorry, there's nothing to see here yet...</p>
 			</LayoutView>
 		</NotFound>
 	</Router>
