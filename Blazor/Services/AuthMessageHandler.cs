@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor.Services;
 
+/// <summary>
+/// A delegating HTTP message handler that automatically attaches and refreshes JWT access tokens for outgoing HTTP requests.
+/// Handles proactive token refresh, silent refresh on 401 responses, and user logout on refresh failure.
+/// Designed for use in Blazor WebAssembly applications with authentication.
+/// </summary>
 public class AuthMessageHandler : DelegatingHandler
 {
 	private readonly AuthenticationStateProvider _authStateProvider;
@@ -21,6 +26,16 @@ public class AuthMessageHandler : DelegatingHandler
 		_logger = logger;
 	}
 
+	/// <summary>
+	/// Sends an HTTP request with an attached JWT access token if available.
+	/// Proactively refreshes the token if it is about to expire, and attempts a silent refresh and retry on 401 Unauthorized responses.
+	/// Logs the user out if token refresh fails.
+	/// </summary>
+	/// <param name="request">The HTTP request message to send.</param>
+	/// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+	/// <returns>
+	/// A <see cref="HttpResponseMessage"/> representing the HTTP response from the backend.
+	/// </returns>
 	protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
 	{
 		// Get the token from the storage
@@ -29,7 +44,6 @@ public class AuthMessageHandler : DelegatingHandler
 		// If we have a token, attach it to the request headers
 		if (!string.IsNullOrWhiteSpace(token))
 		{
-			// Check if token will expire in next 60 seconds → refresh proactively
 			if (WillExpireSoon(token))
 			{
 				_logger.LogInformation("Access token is about to expire. Attempting proactive refresh...");
@@ -70,6 +84,14 @@ public class AuthMessageHandler : DelegatingHandler
 		return response;
 	}
 
+	/// <summary>
+	/// Determines whether the provided JWT access token will expire within the next 60 seconds.
+	/// Used to trigger proactive token refresh before sending a request.
+	/// </summary>
+	/// <param name="token">The JWT access token string.</param>
+	/// <returns>
+	/// <c>true</c> if the token will expire soon or is invalid; otherwise, <c>false</c>.
+	/// </returns>
 	private bool WillExpireSoon(string token)
 	{
 		try
@@ -83,5 +105,4 @@ public class AuthMessageHandler : DelegatingHandler
 			return true; // invalid token -> treat as expiring
 		}
 	}
-
 }

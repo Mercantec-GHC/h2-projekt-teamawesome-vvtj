@@ -1,8 +1,14 @@
 ﻿.btn-wrapper .login {
     color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: large;
 }
 
-::deep .btn-wrapper:hover, .login:hover {
+.login:hover {
+    color: #3a9698;
+}
+
+::deep .btn-wrapper:hover, ::deep .btn:hover {
     transform: scale(1.2);
     background-color: rgba(255,255,255,0.1);
     color: #3a9698;
