@@ -28,7 +28,7 @@ export function NavUser() {
   const token = localStorage.getItem("token");
   const decoded = token ? JSON.parse(atob(token.split(".")[1])) : null;
 
-  const name = decoded?.username || "Loading..."
+  const name = decoded?.unique_name || "Loading..."
   const email = decoded?.email || ""
   const role = decoded?.role
   const department = decoded?.department || ""

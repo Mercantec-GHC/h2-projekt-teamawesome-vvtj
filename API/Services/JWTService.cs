@@ -24,7 +24,7 @@ public class JWTService : IJWTService
 	/// </summary>
 	/// <param name="logger">Logger for recording token generation events and errors.</param>
 	/// <param name="configuration">Application configuration for retrieving JWT settings.</param>
-	public JWTService(ILogger<JWTService> logger, IConfiguration configuration)
+	public JWTService(ILogger<JWTService> logger, IConfiguration configuration, AppDBContext appDBContext)
 	{
 		_logger = logger;
 		_configuration = configuration;
