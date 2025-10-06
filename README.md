@@ -37,13 +37,13 @@ The goal of the project is to create a fully functional hotel booking system tha
 •	Cloud-Ready Configuration: Designed for deployment to Azure with environment-based settings.
 
 
-### Technologies used
+## Technologies used
 
 •	Frontend: Blazor WebAssembly (.NET 9)
 
 •	Backend: ASP.NET Core Web API
 
-•	Database: Entity Framework Core (SQL Server or SQLite)
+•	Database: Entity Framework Core (Postgresql)
 
 •	Authentication: JSON Web Tokens (JWT)
 
@@ -51,7 +51,8 @@ The goal of the project is to create a fully functional hotel booking system tha
 
 •	Documentation: Swagger / OpenAPI
 
-### Project Structure
+
+## Project Structure
 
 /ActiveDirectory
 
@@ -147,7 +148,7 @@ The goal of the project is to create a fully functional hotel booking system tha
 
 •	ServiceDefaults: Common service configuration and defaults.
 
-### Learning Outcomes
+## Learning Outcomes
 
 Through the development of this project, the following learning goals were achieved:
 
@@ -166,7 +167,7 @@ Through the development of this project, the following learning goals were achie
 This hands-on development experience strengthened our understanding of software development practices, team collaboration, and real-world problem-solving in web application development.
 
 
-### Conclusion
+## Conclusion
 
 The NOVA Hotels Booking System successfully demonstrates how a modern, cloud-ready booking platform can be developed using Microsoft’s .NET ecosystem.
 
