@@ -17,7 +17,11 @@ namespace API.Services
             _context = context;
         }
 
-        //GET
+        /// <summary>
+        /// Retrieves all the hotels fom the database
+        /// </summary>
+        /// <returns>The hotels</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<IEnumerable<HotelDto>> GetHotel()
         {
             var hotels = await _context.Hotels.ToListAsync()
@@ -28,7 +32,12 @@ namespace API.Services
             .ToList();
         }
 
-        //GET {Id}
+        /// <summary>
+        /// View one specific hotel by id
+        /// </summary>
+        /// <param name="id">unique identifier for the hotel</param>
+        /// <returns>The specified hotel</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<HotelDto> GetHotelById(int id)
         {
             if (id == 0)
@@ -39,14 +48,21 @@ namespace API.Services
 
             return _hotelMapping.ToHotelGETdto(hotel);
         }
-
+        
+        /// <summary>
+        /// Creates a new hotel
+        /// </summary>
+        /// <param name="hotelCreateDto">Details for the new hotel</param>
+        /// <returns>The new created hotel</returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="Exception"></exception>
         //Use type Hotel instead of HotelDto, as we want the new hotel into the DB
         public async Task<Hotel> PostHotel(HotelDto hotelCreateDto)
         {
             //Check if hotel.name already exists in our database
             if (await _context.Hotels.AnyAsync(h => h.HotelName == hotelCreateDto.HotelName))
                 throw new ArgumentException($"Hotel already exist: {hotelCreateDto.HotelName}");
-            
+
             var newHotel = new Hotel
             {
                 HotelName = hotelCreateDto.HotelName,
@@ -66,7 +82,7 @@ namespace API.Services
             await _context.SaveChangesAsync();
 
             var createdHotel = _context.Hotels.FirstOrDefault(h => h.HotelName == newHotel.HotelName)
-                ?? throw new Exception("Something went wrong saving the hotel to the database!");
+                ?? throw new ArgumentException("Something went wrong saving the hotel to the database!");
 
             //Return new Hotel into db
             return createdHotel;
