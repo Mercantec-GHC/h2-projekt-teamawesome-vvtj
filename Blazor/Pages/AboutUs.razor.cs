@@ -8,12 +8,17 @@ namespace Blazor.Pages
     {
         public List<HotelDto> Hotels { get; set; } = new();
         public bool IsLoading = false;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
 
         protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
             Hotels = (await ApiService.GetAllHotelsAsync())?.ToList() ?? new List<HotelDto>();
             IsLoading = false;
+        }
+        private void NavigateToBooking(string hotel)
+        {
+            Nav.NavigateTo($"/booking?hotel={hotel}");
         }
     }
     

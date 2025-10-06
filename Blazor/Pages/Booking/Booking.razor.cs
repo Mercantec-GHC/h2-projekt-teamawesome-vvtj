@@ -68,9 +68,15 @@ public partial class Booking : ComponentBase
 	public void PrefillFromQuery()
 	{
 		if (Vm is null) return;
-
+		
 		var uri = Nav.ToAbsoluteUri(Nav.Uri);
 		var q = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+        if (int.TryParse(q.Get("roomTypeId"), out var Id))
+			Vm.RoomTypeId = Id;
+        var hotel = q.Get("hotel");
+        if (!string.IsNullOrWhiteSpace(hotel))
+            Vm.HotelName = hotel;
 
 		if (int.TryParse(q.Get("guests"), out var guests) && guests > 0)
 			Vm.GuestsCount = guests;
