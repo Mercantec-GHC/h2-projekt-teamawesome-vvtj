@@ -19,6 +19,11 @@ namespace API.Services
         {
             _context = context;
         }
+        /// <summary>
+        /// Retrieves all the roomtypes from the database
+        /// </summary>
+        /// <returns>Lists of all the roomtypes</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<IEnumerable<RoomTypeDto?>> GetRoomTypes()
         {
             var roomtypes = await _context.RoomTypes.ToListAsync()
@@ -27,7 +32,13 @@ namespace API.Services
             return roomtypes
               .Select(rt => _mapping.ToRoomTypeGETdto(rt));
         }
-
+        
+        /// <summary>
+        /// View a single roomtype with unique id
+        /// </summary>
+        /// <param name="roomtypeId">The roomtype to view</param>
+        /// <returns>The chosen roomtype</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<RoomTypeDto?> GetSpecificRoomType(int roomtypeId)
         {
             if (roomtypeId == 0)
@@ -35,14 +46,18 @@ namespace API.Services
 
             var roomtype = await _context.RoomTypes.FindAsync(roomtypeId)
             ?? throw new ArgumentException($"No roomtype was found with the given ID: {roomtypeId}");
-            
+
             return _mapping.ToRoomTypeGETdto(roomtype);
         }
-        
-        /// <summary>
-        /// Returns RoomType (Model), as we want to see the entire
-        /// roomtype model, with the updated fields
-        /// </summary>
+
+       /// <summary>
+       /// Returns RoomType (Model), as we want to see the entire
+       /// roomtype model, with the updated fields
+       /// </summary>
+       /// <param name="roomtypeId"> The roomtype we want updated</param>
+       /// <param name="roomTypePutDto">What we want updated</param>
+       /// <returns>Updated roomtype</returns>
+       /// <exception cref="ArgumentException"></exception>
         public async Task<RoomType?> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
         {
             if (roomtypeId == 0)
