@@ -81,12 +81,6 @@ public partial class Booking : ComponentBase
 		if (int.TryParse(q.Get("guests"), out var guests) && guests > 0)
 			Vm.GuestsCount = guests;
 
-		if (int.TryParse(q.Get("roomTypeId"), out var Id))
-			Vm.RoomTypeId = Id;
-		var hotel = q.Get("hotel");
-		if (!string.IsNullOrWhiteSpace(hotel))
-			Vm.HotelName = hotel;
-
 		if (DateTime.TryParse(q.Get("checkIn"), out var ci))
 			Vm.CheckIn = ci.Date;
 
