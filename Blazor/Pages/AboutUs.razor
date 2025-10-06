@@ -2,19 +2,6 @@
 
 @using BlazorBootstrap
 
-@* <PageTitle>About us</PageTitle>
-
- <h3>About us</h3>
-<div class="container d-flex justify-content-middle>"
-
-    <div class="content">
-        <p>
-        </p>
-    </div>
-
-</div> *@
-
-
 <PageTitle>About us</PageTitle>
 
 <div class="about-container">
@@ -52,7 +39,9 @@ else
                     <CardTitle>@hotel.HotelName</CardTitle>
                     <CardSubTitle>@hotel.CityName</CardSubTitle>
                     <CardText>@hotel.Description</CardText>
-                    <CardText Class="text-muted">Last updated 3 mins ago</CardText>
+                    <button class="btn btn-custom mt-3" @onclick="() => NavigateToBooking(hotel.Id)">
+                        Book
+                    </button>
                 </CardBody>
             </Card>
         }

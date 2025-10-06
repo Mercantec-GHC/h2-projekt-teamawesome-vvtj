@@ -54,6 +54,30 @@
     gap: 0.5rem;
 }
 
+.btn-custom {
+    width: 250px;
+    max-width: 200px;
+    height: fit-content;
+    background-image: linear-gradient(to bottom right, #00c4c8, #e5e0ad);
+    background-color: #00c4c8;
+    border-radius: 35px;
+    border: 2px solid #fff;
+    transition: background-image 2s ease-in-out;
+    color: #204343;
+    font-weight: 600;
+}
+
+    .btn-custom:hover,
+    .btn-outline:hover {
+        background-image: linear-gradient(to top left, #00c4c8, #e5e0ad);
+        border: 2px solid rgba(255,255,255,.5);
+    }
+
+    .btn-custom:active,
+    .btn-custom:focus {
+        box-shadow: 0 0 0 .1rem white, 0 0 0 .25rem #00c4c8c8;
+    }
+
 
 
 
