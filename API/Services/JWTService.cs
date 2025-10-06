@@ -1,9 +1,10 @@
-﻿using API.Interfaces;
-using DomainModels.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API.Data;
+using API.Interfaces;
+using DomainModels.Models;
+using Microsoft.IdentityModel.Tokens;
 using static API.Services.ActiveDirectoryService;
 
 namespace API.Services;
@@ -16,16 +17,18 @@ public class JWTService : IJWTService
 {
 	private readonly ILogger<JWTService> _logger;
 	private readonly IConfiguration _configuration;
+	private readonly AppDBContext _context;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="JWTService"/> class.
 	/// </summary>
 	/// <param name="logger">Logger for recording token generation events and errors.</param>
 	/// <param name="configuration">Application configuration for retrieving JWT settings.</param>
-	public JWTService(ILogger<JWTService> logger, IConfiguration configuration)
+	public JWTService(ILogger<JWTService> logger, IConfiguration configuration, AppDBContext appDBContext)
 	{
 		_logger = logger;
 		_configuration = configuration;
+		_context = appDBContext;
 	}
 
 	/// <summary>
@@ -67,15 +70,15 @@ public class JWTService : IJWTService
 	{
 		try
 		{
+			var user = _context.Users.FirstOrDefault(u => u.UserName == adUser.SamAccountName);
+
 			return GenerateToken(new List<Claim> {
-			new Claim(ClaimTypes.NameIdentifier, adUser.SamAccountName),
-				new Claim(ClaimTypes.Email, adUser.Email),
-				new Claim("userId", adUser.SamAccountName),
-				new Claim("username", adUser.SamAccountName),
+				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+				new Claim(ClaimTypes.Email, user.Email),
+				new Claim(ClaimTypes.Name, user.UserName),
+				new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString()),
 				new Claim("adUser", "true"), //Indicate that the user is AD-authenticated
                 new Claim("adGroups", string.Join(",", adUser.Groups)),
-				new Claim("adDistinguishedName", adUser.DistinguishedName),
-				new Claim("role", adUser.Role.ToString()),
 				new Claim("department", adUser.Department)
 		});
 		}
