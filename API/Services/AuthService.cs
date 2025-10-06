@@ -12,6 +12,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
+/// <summary>
+/// Provides authentication and user account management logic for Blazor WebAssembly applications.
+/// Handles registration, login, token management, and password changes.
+/// </summary>
 public class AuthService : IAuthService
 {
 	private readonly AppDBContext _context;
@@ -21,6 +25,14 @@ public class AuthService : IAuthService
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly IEmailService _emailService;
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="AuthService"/> class.
+	/// </summary>
+	/// <param name="context">The database context for user and token data.</param>
+	/// <param name="logger">Logger for authentication events and errors.</param>
+	/// <param name="jwtService">Service for generating JWT tokens.</param>
+	/// <param name="httpContextAccessor">Accessor for HTTP context, used for IP and device info.</param>
+	/// <param name="emailService">Service for sending emails (e.g., welcome emails).</param>
 	public AuthService(AppDBContext context, ILogger<AuthService> logger, IJWTService jwtService, IHttpContextAccessor httpContextAccessor, IEmailService emailService)
 	{
 		_context = context;
@@ -30,6 +42,14 @@ public class AuthService : IAuthService
 		_emailService = emailService;
 	}
 
+	/// <summary>
+	/// Registers a new user account using the provided registration details.
+	/// Intended for unauthenticated users during the registration process.
+	/// </summary>
+	/// <param name="request">The registration information, including email, username, and password.</param>
+	/// <returns>
+	/// A <see cref="UserDto"/> containing the newly created user's details if registration succeeds; otherwise, <c>null</c>.
+	/// </returns>
 	public async Task<UserDto?> RegisterUserAsync(RegisterDto request)
 	{
 		try
@@ -82,6 +102,14 @@ public class AuthService : IAuthService
 		}
 	}
 
+	/// <summary>
+	/// Authenticates a user and returns JWT access and refresh tokens if credentials are valid.
+	/// Intended for unauthenticated users during the login process.
+	/// </summary>
+	/// <param name="request">The login credentials are username and password.</param>
+	/// <returns>
+	/// A <see cref="TokenResponseDto"/> containing the access and refresh tokens if authentication is successful; otherwise, <c>null</c>.
+	/// </returns>
 	public async Task<TokenResponseDto?> LoginUserAsync(LoginDto request)
 	{
 		var httpContext = _httpContextAccessor.HttpContext;
@@ -142,6 +170,15 @@ public class AuthService : IAuthService
 		};
 	}
 
+	/// <summary>
+	/// Creates a refresh token for session renewal, binding it to the user's IP address and device.
+	/// Used internally after successful authentication to maintain user sessions securely.
+	/// </summary>
+	/// <param name="ipAddress">The IP address from which the refresh token is requested.</param>
+	/// <param name="device">A string identifying the user's device.</param>
+	/// <returns>
+	/// A <see cref="RefreshToken"/> object containing the token and associated metadata.
+	/// </returns>
 	public async Task<RefreshToken?> CreateRefreshTokenAsync(string ipAddress, string device)
 	{
 		return new RefreshToken
@@ -154,6 +191,10 @@ public class AuthService : IAuthService
 		};
 	}
 
+	/// <summary>
+	/// Generates a secure random string to be used as a refresh token.
+	/// </summary>
+	/// <returns>A base64-encoded random string suitable for use as a refresh token.</returns>
 	public string GenerateRefreshToken()
 	{
 		var randomNumber = new byte[64];
@@ -162,6 +203,16 @@ public class AuthService : IAuthService
 		return Convert.ToBase64String(randomNumber);
 	}
 
+	/// <summary>
+	/// Refreshes the JWT access token using a valid refresh token.
+	/// Used by authenticated users to renew their session.
+	/// </summary>
+	/// <param name="token">The refresh token string.</param>
+	/// <param name="ipAddress">The IP address from which the refresh is requested.</param>
+	/// <param name="device">A string identifying the user's device.</param>
+	/// <returns>
+	/// A <see cref="TokenResponseDto"/> containing new access and refresh tokens if successful; otherwise, <c>null</c>.
+	/// </returns>
 	public async Task<TokenResponseDto?> RefreshTokenAsync(string token, string ipAddress, string device)
 	{
 		// Find the existing refresh token
@@ -195,6 +246,16 @@ public class AuthService : IAuthService
 		};
 	}
 
+	/// <summary>
+	/// Changes the password for a user identified by their email address.
+	/// Intended for administrative password resets or recovery scenarios.
+	/// Should be called by users with administrative privileges.
+	/// </summary>
+	/// <param name="userEmail">The email address of the user whose password will be changed.</param>
+	/// <param name="newPassword">The new password to set for the user.</param>
+	/// <returns>
+	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
+	/// </returns>
 	public async Task<bool> ChangeUserPasswordAsync(string userEmail, string newPassword)
 	{
 		try
@@ -219,6 +280,16 @@ public class AuthService : IAuthService
 		}
 	}
 
+	/// <summary>
+	/// Allows a user to change their own password by providing their user ID (read from JWT), new password, and confirmation.
+	/// Should be called by authenticated users wishing to update their own password.
+	/// </summary>
+	/// <param name="userId">The unique identifier of the user requesting the password change.</param>
+	/// <param name="newPassword">The new password to set.</param>
+	/// <param name="confirmNewPassword">The confirmation of the new password.</param>
+	/// <returns>
+	/// <c>true</c> if the password was changed successfully; otherwise, <c>false</c>.
+	/// </returns>
 	public async Task<bool> ChangeOwnPasswordAsync(string userId, string newPassword, string confirmNewPassword)
 	{
 		try

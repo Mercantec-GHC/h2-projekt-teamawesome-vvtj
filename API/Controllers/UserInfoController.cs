@@ -11,6 +11,7 @@ namespace API.Controllers;
 
 /// <summary>
 /// Provides API endpoints for managing user profile information.
+/// <para>All endpoints require authentication unless otherwise specified.</para>
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -27,13 +28,13 @@ public class UserInfoController : ControllerBase
 
 	/// <summary>
 	/// Retrieves user profile information by user ID.
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
 	/// </summary>
 	/// <param name="userId">The unique identifier of the user.</param>
 	/// <returns>
 	/// An <see cref="IActionResult"/> containing the user profile information if found;
 	/// otherwise, a 404 Not Found response.
 	/// </returns>
-	/// 
 	[Authorize]
 	[HttpGet("{userId}")]
 	public async Task<IActionResult> GetUserInfoByUserId(int userId)
@@ -46,6 +47,14 @@ public class UserInfoController : ControllerBase
 		return Ok(userInfo);
 	}
 
+	/// <summary>
+	/// Retrieves the profile information for the currently authenticated user.
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
+	/// </summary>
+	/// <returns>
+	/// An <see cref="ActionResult{UserInfoGetDto}"/> containing the current user's profile information if found;
+	/// otherwise, a 404 Not Found or 401 Unauthorized response.
+	/// </returns>
 	[Authorize]
 	[HttpGet("info")]
 	public async Task<ActionResult<UserInfoGetDto>> GetCurrentUserInfo()
@@ -69,12 +78,13 @@ public class UserInfoController : ControllerBase
 	//for updating UserInfo I am using service _userInfoService, but for creating UserInfo I am not using services.
 
 	/// <summary>
-	/// Updates user profile information for a specific user.
+	/// Updates user profile information for the currently authenticated user.
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
 	/// </summary>
 	/// <param name="dto">The updated user profile data.</param>
 	/// <returns>
 	/// An <see cref="IActionResult"/> containing the updated user profile information if successful;
-	/// otherwise, a 404 Not Found response.
+	/// otherwise, a 404 Not Found or 401 Unauthorized response.
 	/// </returns>
 	[Authorize]
 	[HttpPut("update-my-profile")]
@@ -105,6 +115,7 @@ public class UserInfoController : ControllerBase
 
 	/// <summary>
 	/// Creates a user profile for the currently authenticated user.
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
 	/// </summary>
 	/// <param name="newInfo">The profile information to create for the user.</param>
 	/// <returns>
