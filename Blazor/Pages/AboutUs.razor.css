@@ -23,6 +23,9 @@
     text-shadow: none;
     gap: 40px;
 }
+.content-h1{
+    text-align: center;
+}
 
 ::deep .custom-card{
     display: flex;
@@ -41,13 +44,13 @@
     filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
     }
 
-.mb4-img {
+.img {
     width: 100%;
     height: 180px;           
     object-fit: cover;
 }
 
-.mb4-body {
+.body {
     padding: 1rem;
     display: flex;
     flex-direction: column;

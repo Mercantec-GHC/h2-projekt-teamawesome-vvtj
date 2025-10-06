@@ -86,6 +86,11 @@ public partial class Booking : ComponentBase
         var hotel = q.Get("hotel");
         if (!string.IsNullOrWhiteSpace(hotel))
             Vm.HotelName = hotel;
+        var hotelId = q.Get("hotelId");
+        if (!string.IsNullOrWhiteSpace(hotelId) && int.TryParse(hotelId, out var hid))
+        {
+            Vm.HotelId = hotelId;
+        }
 
         if (DateTime.TryParse(q.Get("checkIn"), out var ci))
             Vm.CheckIn = ci.Date;

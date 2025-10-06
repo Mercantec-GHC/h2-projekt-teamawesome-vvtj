@@ -7,17 +7,18 @@
 <div class="about-container">
     <h3 class="header">About Us</h3>
     
-    <div class="content">
-        <h3>
+    <div class="content d-flex flex-column">
+        <h1>
             Welcome to NOVA Hotels – Your Own Peace of Paradise
-            At NOVA Hotels, we believe that every journey deserves a destination that feels like home—only better.
+        </h1>
+        <p>At NOVA Hotels, we believe that every journey deserves a destination that feels like home—only better.
             Our chain of three distinct hotels offers a seamless blend of luxury, tranquility, and personalized
-            hospitality,
-            each nestled in a setting designed to help you unwind, recharge, and reconnect.
-            Whether you're lounging by the pool under swaying palm trees,
+            hospitality, each nestled in a setting designed to help you unwind, recharge, and reconnect.
+        </p>
+        <p> Whether you're lounging by the pool under swaying palm trees,
             sipping cocktails at sunset, or waking up to the sound of the ocean breeze,
             NOVA Hotels invites you to experience the art of relaxation.
-        </h3>
+        </p>
     </div>
 </div>
 
@@ -34,12 +35,12 @@ else
         @foreach (var hotel in Hotels)
         {
             <Card Class="card w-75 mx-auto custom-card">
-                <img src="/images/CopilotHotel.png" alt="placeholder" class="mb4-img" />
-                <CardBody class="mb4-body">
+                <img src="/images/CopilotHotel.png" alt="placeholder" class="img" />
+                <CardBody class="body">
                     <CardTitle>@hotel.HotelName</CardTitle>
                     <CardSubTitle>@hotel.CityName</CardSubTitle>
                     <CardText>@hotel.Description</CardText>
-                    <button class="btn btn-custom mt-3" @onclick="() => NavigateToBooking(hotel.Id)">
+                    <button class="btn btn-custom mt-3" @onclick="() => NavigateToBooking(hotel.HotelName)">
                         Book
                     </button>
                 </CardBody>

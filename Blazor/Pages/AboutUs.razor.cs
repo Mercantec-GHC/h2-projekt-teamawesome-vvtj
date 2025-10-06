@@ -16,9 +16,9 @@ namespace Blazor.Pages
             Hotels = (await ApiService.GetAllHotelsAsync())?.ToList() ?? new List<HotelDto>();
             IsLoading = false;
         }
-        private void NavigateToBooking(int Id)
+        private void NavigateToBooking(string hotelName)
         {
-            Nav.NavigateTo($"/booking?roomTypeId={Id}");
+            Nav.NavigateTo($"/booking?hotelId={hotelName}");
         }
     }
     
