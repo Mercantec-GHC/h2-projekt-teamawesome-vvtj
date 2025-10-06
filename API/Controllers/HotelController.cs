@@ -94,17 +94,18 @@ public class HotelController : ControllerBase
     /// <summary>
     /// Updates a specific hotel
     /// </summary>
+    /// <param name="id">Identifier for the hotel we want to update</param>
     /// <param name="updateHotel">Contains hotel details to be updated</param>
     /// <returns>Updated hotel</returns>
     /// <response code="400">Could not update hotel!</response>
-    /// 
+   
     [Authorize(Roles = "Admin")]
     [HttpPut]
-    public async Task<ActionResult> PutHotel(HotelDto updateHotel)
+    public async Task<ActionResult> PutHotel(int id, HotelDto updateHotel)
     {
         try
         {
-            return Ok(await _hotelService.PutHotel(updateHotel));
+            return Ok(await _hotelService.PutHotel(id, updateHotel));
         }
         catch (ArgumentException ex)
         {
