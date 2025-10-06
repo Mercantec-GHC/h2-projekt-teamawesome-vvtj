@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers;
 
 /// <summary>
-/// Provides endpoints for user authentication, registration, profile retrieval and password changing.
+/// Provides endpoints for user authentication, registration, token management, and password changes.
+/// Some endpoints require authentication or specific roles as noted in their documentation.
 /// </summary>
 
 [Route("api/[controller]")]
@@ -38,7 +39,8 @@ public class AuthController : ControllerBase
 
 	/// <summary>
 	/// Registers a new user account.
-	/// Validates input and returns user data if successful, or a bad request if the user already exists.
+	/// 
+	/// <para><b>Authorization:</b> Not required. Public endpoint.</para>
 	/// </summary>
 	/// <param name="request">The registration details including email, username, password, and role.</param>
 	/// <returns>
@@ -60,6 +62,8 @@ public class AuthController : ControllerBase
 	/// <summary>
 	/// Authenticates a user and returns JWT access and refresh tokens if credentials are valid.
 	/// Handles lockout for repeated failed attempts and logs authentication events.
+	/// 
+	/// <para><b>Authorization:</b> Not required. Public endpoint.</para>
 	/// </summary>
 	/// <param name="request">The login details including email and password.</param>
 	/// <returns>
@@ -123,8 +127,9 @@ public class AuthController : ControllerBase
 	/// <summary>
 	/// Refreshes the JWT access token using a valid refresh token.
 	/// Validates the refresh token from the request and the cookie, then issues new tokens if valid.
+	/// 
+	/// <para><b>Authorization:</b> Not required. Public endpoint, but requires a valid refresh token cookie.</para>
 	/// </summary>
-	/// <param name="request">The refresh token request containing the refresh token string.</param>
 	/// <returns>
 	/// <see cref="OkObjectResult"/> with new access and refresh tokens if successful;
 	/// <see cref="BadRequestObjectResult"/> if the refresh token is missing or does not match the cookie;
@@ -159,7 +164,6 @@ public class AuthController : ControllerBase
 			};
 			Response.Cookies.Append("refreshToken", result.RefreshToken, cookieOptions);
 
-			// Only return the access token in JSON
 			return Ok(new TokenResponseDto
 			{
 				AccessToken = result.AccessToken
@@ -174,6 +178,8 @@ public class AuthController : ControllerBase
 
 	/// <summary>
 	/// Changes the password for a specified user.
+	/// 
+	/// <para><b>Authorization:</b> Required. Only users with the <c>Admin</c> role can access this endpoint.</para>
 	/// </summary>
 	/// <param name="email">The email address of the user whose password is to be changed.</param>
 	/// <param name="request">The new password details.</param>
@@ -215,6 +221,8 @@ public class AuthController : ControllerBase
 	/// <summary>
 	/// Allows the currently authenticated user to change their own password.
 	/// Validates input and ensures the new password and confirmation match.
+	/// 
+	/// <para><b>Authorization:</b> Required. The user must be authenticated.</para>
 	/// </summary>
 	/// <param name="changePassword">The new password and confirmation details.</param>
 	/// <returns>
