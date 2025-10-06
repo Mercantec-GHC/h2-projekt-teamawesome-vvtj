@@ -12,6 +12,10 @@ namespace API.Services
     {
         private readonly AppDBContext _context;
         private readonly HotelMapping _hotelMapping = new();
+        /// <summary>
+        /// Constructor for the HotelService class
+        /// </summary>
+        /// <param name="context">Database context</param>
         public HotelService(AppDBContext context)
         {
             _context = context;
@@ -55,67 +59,45 @@ namespace API.Services
         /// <param name="hotelCreateDto">Details for the new hotel</param>
         /// <returns>The new created hotel</returns>
         /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="Exception"></exception>
-        //Use type Hotel instead of HotelDto, as we want the new hotel into the DB
-        public async Task<Hotel> PostHotel(HotelDto hotelCreateDto)
+        public async Task<HotelDto> PostHotel(HotelDto hotelCreateDto)
         {
             //Check if hotel.name already exists in our database
             if (await _context.Hotels.AnyAsync(h => h.HotelName == hotelCreateDto.HotelName))
                 throw new ArgumentException($"Hotel already exist: {hotelCreateDto.HotelName}");
 
-            var newHotel = new Hotel
-            {
-                HotelName = hotelCreateDto.HotelName,
-                CityName = hotelCreateDto.CityName,
-                Address = hotelCreateDto.Address,
-                Description = hotelCreateDto.Description,
-                CreatedAt = DateTime.UtcNow.AddHours(2),
-                UpdatedAt = DateTime.UtcNow.AddHours(2),
-                Email = hotelCreateDto.Email,
-                Phone = hotelCreateDto.Phone,
-                WeekdayTime = hotelCreateDto.WeekdayTime,
-                SaturdayTime = hotelCreateDto.SaturdayTime,
-                HolidaysTime = hotelCreateDto.HolidaysTime
-            };
+            var newHotel = _hotelMapping.ToHotelPOSTDto(hotelCreateDto);
 
             _context.Hotels.Add(newHotel);
             await _context.SaveChangesAsync();
 
-            var createdHotel = _context.Hotels.FirstOrDefault(h => h.HotelName == newHotel.HotelName)
-                ?? throw new ArgumentException("Something went wrong saving the hotel to the database!");
 
-            //Return new Hotel into db
-            return createdHotel;
+            return _hotelMapping.ToHotelGETdto(newHotel);
         }
 
         /// <summary>
-        /// Returns HotelDto, as we want the "tailored" version
+        /// Updates an hotel
         /// </summary>
-        public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)
+        /// <param name="id">The identifier of the hotel we want updated</param>
+        /// <param name="updatedHotel">The details of hotel we want updated</param>
+        /// <returns>The new updated hotel</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<HotelDto?> PutHotel(int id, HotelDto updatedHotel)
         {
-            var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id)
-                ?? throw new ArgumentException($"Couldn't find hotel by ID: {updatedHotel.Id}");
+            var currentHotel = await _context.Hotels.FindAsync(id)
+                ?? throw new ArgumentException($"Couldn't find hotel by ID: {id}");
 
             _hotelMapping.TohotelPUTDto(currentHotel, updatedHotel);
 
             await _context.SaveChangesAsync();
 
-            // Return the updated hotel as DTO
-            return new HotelDto
-            {
-                Id = currentHotel.Id,
-                HotelName = currentHotel.HotelName,
-                CityName = currentHotel.CityName,
-                Address = currentHotel.Address,
-                Description = currentHotel.Description,
-                Email = currentHotel.Email,
-                Phone = currentHotel.Phone,
-                WeekdayTime = currentHotel.WeekdayTime,
-                SaturdayTime = currentHotel.SaturdayTime,
-                HolidaysTime = currentHotel.HolidaysTime
-            };
+            return _hotelMapping.ToHotelGETdto(currentHotel);
         }
 
+        /// <summary>
+        /// Deletes an hotel
+        /// </summary>
+        /// <param name="id">Id of the hotel we want deleted</param>
+        /// <returns>True, if the hotel was deleted</returns>
         public async Task<bool> DeleteHotel(int id)
         {
             var hotel = await _context.Hotels.FindAsync(id);
