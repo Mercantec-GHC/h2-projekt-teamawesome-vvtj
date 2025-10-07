@@ -15,6 +15,7 @@ namespace Blazor.Models.ViewModels
         [Required] public DateTime CheckOut { get; set; }
 
         [Range(1, 6)] public int GuestsCount { get; set; } = 1;
+        public string HotelId { get; set; } = string.Empty;
 
         public int NightsCount { get; set; }
         public bool IsBreakfast { get; set; }

@@ -1,0 +1,50 @@
+@page "/about"
+
+@using BlazorBootstrap
+
+<PageTitle>About us</PageTitle>
+
+<div class="about-container">
+    <h3 class="header">About Us</h3>
+    
+    <div class="content d-flex flex-column">
+        <h1>
+            Welcome to NOVA Hotels – Your Own Peace of Paradise
+        </h1>
+        <p>At NOVA Hotels, we believe that every journey deserves a destination that feels like home—only better.
+            Our chain of three distinct hotels offers a seamless blend of luxury, tranquility, and personalized
+            hospitality, each nestled in a setting designed to help you unwind, recharge, and reconnect.
+        </p>
+        <p> Whether you're lounging by the pool under swaying palm trees,
+            sipping cocktails at sunset, or waking up to the sound of the ocean breeze,
+            NOVA Hotels invites you to experience the art of relaxation.
+        </p>
+    </div>
+</div>
+
+@if (IsLoading)
+{
+    <div class="overlay d-flex justify-content-center align-items-center">
+    <Spinner Type="SpinnerType.Border"
+				 Size="SpinnerSize.Large" Color="SpinnerColor.Light " Visible="@IsLoading" />
+    </div>
+}
+else
+{
+    <div class="hotel-container">
+        @foreach (var hotel in Hotels)
+        {
+            <Card Class="card w-75 mx-auto custom-card">
+                <img src="/images/CopilotHotel.png" alt="placeholder" class="img" />
+                <CardBody class="body">
+                    <CardTitle>@hotel.HotelName</CardTitle>
+                    <CardSubTitle>@hotel.CityName</CardSubTitle>
+                    <CardText>@hotel.Description</CardText>
+                    <button class="btn btn-custom mt-3" @onclick="() => NavigateToBooking(hotel.HotelName)">
+                        Book
+                    </button>
+                </CardBody>
+            </Card>
+        }
+    </div>
+}

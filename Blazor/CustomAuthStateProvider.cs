@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Blazor;
 
-// This class provides custom authentication logic for Blazor WebAssembly.
-// It manages authentication state using JWT tokens stored in browser storage.
+/// <summary>
+/// Provides custom authentication state management for Blazor WebAssembly applications.
+/// Handles authentication state using JWT tokens stored in browser storage, supports token refresh,
+/// and notifies the application of authentication state changes.
+/// </summary>
 public class CustomAuthStateProvider : AuthenticationStateProvider
 {
 	private readonly ILocalStorageService _localStorage;
@@ -25,8 +28,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		_tokenService = tokenService;
 	}
 
-	// This method is called by Blazor to get the current authentication state.
-	// It checks for a JWT token in session storage first, then local storage.
+	/// <summary>
+	/// Gets the current authentication state for the application.
+	/// Checks for a JWT token in session storage first, then local storage.
+	/// If the token is expired, attempts to refresh it. Returns an anonymous user if no valid token is found.
+	/// </summary>
+	/// <returns>
+	/// An <see cref="AuthenticationState"/> representing the current user's authentication state.
+	/// </returns>
 	public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 	{
 		// Try to get the token from session storage; if not found, check local storage.
@@ -59,8 +68,14 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		return GetAuthenticatedState(savedToken);
 	}
 
-	// This helper method creates an AuthenticationState from a JWT token.
-	// It parses the token, extracts claims, and builds a ClaimsPrincipal.
+	/// <summary>
+	/// Creates an <see cref="AuthenticationState"/> from a JWT token.
+	/// Parses the token, extracts claims, and builds a <see cref="ClaimsPrincipal"/>.
+	/// </summary>
+	/// <param name="jwt">The JWT access token string.</param>
+	/// <returns>
+	/// An <see cref="AuthenticationState"/> for the authenticated user, or an anonymous user if the token is invalid.
+	/// </returns>
 	private AuthenticationState GetAuthenticatedState(string jwt)
 	{
 		try
@@ -85,15 +100,20 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
 		}
 	}
 
-	// Call this method when a user successfully logs in.
-	// It notifies Blazor that the authentication state has changed.
+	/// <summary>
+	/// Notifies the application that the user has successfully authenticated.
+	/// Triggers a re-evaluation of the authentication state with the provided token.
+	/// </summary>
+	/// <param name="token">The JWT access token for the authenticated user.</param>
 	public void NotifyUserAuthentication(string token)
 	{
 		NotifyAuthenticationStateChanged(Task.FromResult(GetAuthenticatedState(token)));
 	}
 
-	// Call this method when a user logs out.
-	// It notifies Blazor that the user is now anonymous.
+	/// <summary>
+	/// Notifies the application that the user has logged out.
+	/// Triggers a re-evaluation of the authentication state as anonymous.
+	/// </summary>
 	public void NotifyUserLogout()
 	{
 		// Create an anonymous ClaimsPrincipal (no identity)
