@@ -26,13 +26,15 @@ public class HotelController : ControllerBase
         _hotelService = hotelService;
     }
 
-    //Everybody (?)
+
     // GET: api/Hotels
     /// <summary>
     /// Shows all hotels
     /// </summary>
     /// <returns>A list of the hotels</returns>
+    /// <response code="200">Hotels successfully found</response>
     /// <response code="404"> Hotels not found! </response>
+    /// <response code="500">Internal server error</response>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<HotelDto>>> GetHotels()
     {
@@ -51,17 +53,24 @@ public class HotelController : ControllerBase
     /// </summary>
     /// <param name="id">Unique identifier for hotels</param>
     /// <returns>A hotel</returns>
-    /// <response code="404"> Hotels not found! </response>
+    /// <response code="200">Hotel successfully found!</response>
+    /// <response code="400">Invalid input</response>
+    /// <response code="404"> Hotel not found! </response>
+    /// <response code="500">Internal server error</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<HotelDto>> GetSpecificHotel(int id)
     {
         try
         {
-            return await _hotelService.GetHotelById(id);
+            return Ok(await _hotelService.GetHotelById(id));
         }
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexpected error occured");
         }
     }
 
@@ -72,8 +81,9 @@ public class HotelController : ControllerBase
     /// </summary>
     /// <param name="hotelcreateDto">Contains hotel details to be created</param>
     /// <returns>The newly created hotel</returns>
+    /// <response code="204">Successful"</response>
     /// <response code="400">Could not create hotel!</response>
-    /// 
+    /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> CreateHotel(HotelDto hotelcreateDto)
@@ -87,6 +97,10 @@ public class HotelController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexpected error occured");
+        }
     }
 
     //Only Admin
@@ -97,8 +111,10 @@ public class HotelController : ControllerBase
     /// <param name="id">Identifier for the hotel we want to update</param>
     /// <param name="updateHotel">Contains hotel details to be updated</param>
     /// <returns>Updated hotel</returns>
-    /// <response code="400">Could not update hotel!</response>
-   
+    /// <response code="200">Hotel succssesfully updated!</response>
+    /// <response code="400">Invalid input</response>
+    /// <response code="404">Could not find hotel!</response>
+    /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
     [HttpPut]
     public async Task<ActionResult> PutHotel(int id, HotelDto updateHotel)
@@ -111,8 +127,12 @@ public class HotelController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexpected error occurd");
+        }
     }
-    
+
 
     //Only Admin
     //DELETE: api/Hotels
@@ -121,14 +141,28 @@ public class HotelController : ControllerBase
     /// </summary>
     /// <param name="Id">Unique identifier</param>
     /// <returns>true if deletion succeed</returns>
-    /// <response code="404">Could not delete hotel!</response>
-    /// 
+    /// <response code="200">Hotel succssefullt deleted</response>
+    /// <response code="400">Invalid input</response>
+    /// <response code="404">Could not find hotel!</response>
+    /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
-	[HttpDelete]
+    [HttpDelete]
     public async Task<IActionResult> DeleteHotel(int Id)
     {
-        var deletedHotel = await _hotelService.DeleteHotel(Id);
+        try
+        {
+            var deletedHotel = await _hotelService.DeleteHotel(Id);
 
-        return Ok(deletedHotel);
+            return Ok(deletedHotel);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexcpected error occured");
+        }
+        
     }
 }

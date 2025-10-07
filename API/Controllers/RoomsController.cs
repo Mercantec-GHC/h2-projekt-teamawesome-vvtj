@@ -21,7 +21,6 @@ public class RoomsController : ControllerBase
         _roomService = roomService;
     }
 
-    //Everybody  -> Guests shouldn't be able to see rooms, so not everybody
     /// <summary>
     /// Shows all rooms
     /// </summary>
@@ -55,7 +54,7 @@ public class RoomsController : ControllerBase
     /// <returns>A room</returns>
     /// <response code="200">Room succsessfully found!</response>
     /// <response code="400">Invalid input</response>
-    /// <response code="404">Rooms not found!</response>
+    /// <response code="404">Room not found!</response>
     /// <response code="500">Internal server errot</response>
     [Authorize(Roles = "Admin,Reception,CleaningStaff")]
     [HttpGet("{id}")]
@@ -80,8 +79,7 @@ public class RoomsController : ControllerBase
     /// <param name="createRoom">Identifier for the new room</param>
     /// <returns>The newly created room</returns>
     /// <response code="204">Succssesful!</response>
-    /// <response code="400">Invalid input</response>
-    /// <response code="404">Room could not be created!</response>
+    /// <response code="404">Not found!</response>
     /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
     [HttpPost]

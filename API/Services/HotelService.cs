@@ -83,6 +83,9 @@ namespace API.Services
         /// <exception cref="ArgumentException"></exception>
         public async Task<HotelDto?> PutHotel(int id, HotelDto updatedHotel)
         {
+             if (id == 0)
+                throw new ArgumentException("Id can't be 0");
+                
             var currentHotel = await _context.Hotels.FindAsync(id)
                 ?? throw new ArgumentException($"Couldn't find hotel by ID: {id}");
 
@@ -100,11 +103,13 @@ namespace API.Services
         /// <returns>True, if the hotel was deleted</returns>
         public async Task<bool> DeleteHotel(int id)
         {
+             if (id == 0)
+                throw new ArgumentException("Id can't be 0");
+
             var hotel = await _context.Hotels.FindAsync(id);
             if (hotel == null)
-            {
-                return false;
-            }
+                throw new ArgumentException($"Cound't find hotel with the Id: {id}");
+            
             _context.Hotels.Remove(hotel);
             await _context.SaveChangesAsync();
 
