@@ -84,10 +84,10 @@ namespace API.Services
             return newRoom;
         }
         /// <summary>
-        /// 
+        /// Shows all the rooms with the specific roomtype
         /// </summary>
-        /// <param name="roomTypeId"></param>
-        /// <returns></returns>
+        /// <param name="roomTypeId">Identifier for the roomtype</param>
+        /// <returns>All the rooms with said roomtype</returns>
         /// <exception cref="ArgumentException"></exception>
         public async Task<IEnumerable<RoomsDto>> GetRoomsByRoomType(int roomTypeId)
         {
