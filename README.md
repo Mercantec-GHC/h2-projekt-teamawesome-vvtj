@@ -36,6 +36,8 @@ The goal of the project is to create a fully functional hotel booking system tha
 
 •	Cloud-Ready Configuration: Designed for deployment to Azure with environment-based settings.
 
+• Admin dashboard 
+
 
 ## Technologies used
 
@@ -50,6 +52,8 @@ The goal of the project is to create a fully functional hotel booking system tha
 •	Cloud Integration: Azure Key Vault, Azure App Configuration
 
 •	Documentation: Swagger / OpenAPI
+
+• Admin dashboard: React
 
 
 ## Project Structure
