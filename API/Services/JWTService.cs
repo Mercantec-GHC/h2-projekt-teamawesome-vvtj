@@ -78,7 +78,7 @@ public class JWTService : IJWTService
 				new Claim(ClaimTypes.Name, user.UserName),
 				new Claim(ClaimTypes.Role, user.UserRole.RoleName.ToString()),
 				new Claim("adUser", "true"), //Indicate that the user is AD-authenticated
-                new Claim("adGroups", string.Join(",", adUser.Groups)),
+                new Claim("adGroups", ConvertHelper(adUser.Groups)),
 				new Claim("department", adUser.Department)
 		});
 		}
@@ -87,6 +87,16 @@ public class JWTService : IJWTService
 			_logger.LogError(ex, "Error creating token for AD user {SamAccountName}", adUser.SamAccountName);
 			throw;
 		}
+	}
+	
+	/// <summary>
+	/// Converts a list of ADGroup objects into a semicolon-delimited string for JWT claims.
+	/// </summary>
+	/// <param name="groups">List of ADGroup objects</param>
+	/// <returns>Formatted string like "Admin:System access;Reception:Front desk"</returns>
+	public string ConvertHelper(List<ADGroup> groups)
+	{
+		return string.Join(";", groups.Select(g => $"{g.Name}:{g.Description}"));
 	}
 
 	/// <summary>

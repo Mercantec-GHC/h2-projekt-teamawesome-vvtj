@@ -60,7 +60,8 @@ namespace API.Services
 				var adUser = await AuthenticateUserAsync(username, password);
 				if (adUser == null)
 					return null;
-
+				
+				//Adds the users role 
 				var roleEntity = await _context.Roles
 				.FirstOrDefaultAsync(r => r.RoleName == adUser.Role)
 					?? throw new ArgumentException($"Role '{adUser.Role}' was not found in the database");
@@ -81,8 +82,7 @@ namespace API.Services
 					await _context.SaveChangesAsync();
 				}
 
-				_logger.LogInformation("Raw AD department value: '{Department}'", adUser.Department);
-
+				_logger.LogInformation($"Raw AD department value: '{adUser.Department}'");
 				adUser.Department = await MapADUserDepartmentToHotelName(adUser.Department)
 				?? throw new ArgumentException($"Department '{adUser.Department}' does not match any known hotel in the system.");
 
@@ -106,10 +106,9 @@ namespace API.Services
 		/// <returns>ADUserInfo containing user details if authentication is successful; otherwise, null</returns>
 		public async Task<ADUserInfo?> AuthenticateUserAsync(string username, string password)
 		{
-
 			// Create LDAP connection
 			using var connection = new LdapConnection(new LdapDirectoryIdentifier(_server, _port));
-			connection.SessionOptions.ProtocolVersion = 3;
+			connection.SessionOptions.ProtocolVersion = 3; //Standard
 			connection.SessionOptions.SecureSocketLayer = false;
 			connection.SessionOptions.VerifyServerCertificate = (conn, cert) => true;
 
@@ -128,9 +127,11 @@ namespace API.Services
 			// Test users credentials
 			var userCredentials = new NetworkCredential(userInfo.SamAccountName, password, _domain);
 			using var userConnection = new LdapConnection(new LdapDirectoryIdentifier(_server, _port));
-			userConnection.SessionOptions.ProtocolVersion = 3;
+			//Is this neccessary again?
+			userConnection.SessionOptions.ProtocolVersion = 3; 
 			userConnection.SessionOptions.SecureSocketLayer = false;
 			userConnection.SessionOptions.VerifyServerCertificate = (conn, cert) => true;
+			//-----------------------------------
 			userConnection.Credential = userCredentials;
 
 			// Test authentification
@@ -139,6 +140,7 @@ namespace API.Services
 
 			return userInfo;
 		}
+
 		/// <summary>
 		/// Searches for a user in Active Directory using sAMAccountName, email, or userPrincipalName
 		/// </summary>
@@ -161,13 +163,12 @@ namespace API.Services
 
 			//Executes the search asynchronously
 			var searchResponse = await Task.Run(() => (SearchResponse)connection.SendRequest(searchRequest));
-
 			if (searchResponse.Entries.Count == 0)
 			{
 				_logger.LogWarning($"No users found in the AD with the name: {username}");
 				return null;
 			}
-
+			
 			var entry = searchResponse.Entries[0];
 
 			// Debugging purposes: Log all available attributtes
@@ -197,6 +198,12 @@ namespace API.Services
 			return userInfo;
 
 		}
+		/// <summary>
+		/// Checks whether an attribute exists, or not.
+		/// </summary>
+		/// <param name="entry">Represents the found user</param>
+		/// <param name="attributeName">Attribute to be checked</param>
+		/// <returns>the entry's attributes, or an empty string if no attributes were found</returns>
 		private string GetAttributeValue(SearchResultEntry entry, string attributeName)
 		{
 			//Checks if an attribute exists and has at least one value
@@ -207,16 +214,22 @@ namespace API.Services
 			//If not found or emoty, return empty string
 			return string.Empty;
 		}
-
-		private List<string> GetGroupsByUser(LdapConnection connection, string? userDN)
-        {
-            List<string> groups = new List<string>();
-            var groupSearch = new SearchRequest(
-                    $"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
-                    $"(member={userDN})",
-                    SearchScope.Subtree,
-                    "cn", "description"
-                );
+		
+		/// <summary>
+		/// Finds the group(s) which the AD user is member of
+		/// </summary>
+		/// <param name="connection">An active LDAP connection</param>
+		/// <param name="userDN">User we want checked</param>
+		/// <returns>The group(s)</returns>
+		private List<ADGroup> GetGroupsByUser(LdapConnection connection, string? userDN)
+		{
+			List<ADGroup> groups = new List<ADGroup>();
+			var groupSearch = new SearchRequest(
+					$"DC={_domain.Split('.')[0]},DC={_domain.Split('.')[1]}",
+					$"(member={userDN})",
+					SearchScope.Subtree,
+					"cn", "description"
+				);
 			try
 			{
 				var groupResponse = (SearchResponse)connection.SendRequest(groupSearch);
@@ -228,8 +241,11 @@ namespace API.Services
 					var desc = entry.Attributes["description"]?[0]?.ToString() ?? string.Empty;
 					if (!string.IsNullOrEmpty(name))
 					{
-						groups.Add(name);
-						groups.Add(desc);
+						groups.Add(new ADGroup
+						{
+							Name = name,
+							Description = desc
+						});
 					}
 				}
 			}
@@ -240,7 +256,12 @@ namespace API.Services
 			return groups;
 		}
 
-		private RoleEnum MapADGroupToRole(List<string> adGroups)
+		/// <summary>
+		/// Maps the AD users group(s) to out role enum
+		/// </summary>
+		/// <param name="adGroups">The group(s) we want mapped</param>
+		/// <returns>A role that matched with a group, or unknown if non matched</returns>
+		private RoleEnum MapADGroupToRole(List<ADGroup> adGroups)
 		{
 			//Map AD groups to our RoleEnum
 			Dictionary<string, RoleEnum> GroupToRoleMap = new(StringComparer.OrdinalIgnoreCase) //Case sensitive
@@ -250,15 +271,20 @@ namespace API.Services
 				{"CleaningStaff", RoleEnum.CleaningStaff}
 			};
 
-			foreach (var description in adGroups)
+			foreach (var group in adGroups)
 			{
-				if (GroupToRoleMap.TryGetValue(description, out var role))
+				if (GroupToRoleMap.TryGetValue(group.Name, out var role))
 					return role;
 			}
 
 			return RoleEnum.Unknown;
 		}
-
+		/// <summary>
+		/// Maps which department an AD user is apart of,
+		/// to a existing hotel in our database
+		/// </summary>
+		/// <param name="department">The department we want mapped</param>
+		/// <returns>A matched hotel name</returns>
 		private async Task<string?> MapADUserDepartmentToHotelName(string department)
 		{
 			if (string.IsNullOrWhiteSpace(department))
@@ -272,13 +298,15 @@ namespace API.Services
 			return hotel?.HotelName;
 		}
 
+		
+
 		//-----------------------------------------------------------------------------//
 		// Models for AD objects
 		public class ADGroup
 		{
 			public string Name { get; set; } = string.Empty;
 			public string Description { get; set; } = string.Empty;
-			public List<string> Members { get; set; } = new List<string>();
+
 		}
 
 		public class ADUser
@@ -317,7 +345,7 @@ namespace API.Services
 			public string DistinguishedName { get; set; } = string.Empty;
 			public RoleEnum Role { get; set; } = RoleEnum.Unknown;
 			//List of AD groups the user belongs to
-			public List<string> Groups { get; set; } = new List<string>();
+			public List<ADGroup> Groups { get; set; } = new List<ADGroup>();
 		}
 	}
 }

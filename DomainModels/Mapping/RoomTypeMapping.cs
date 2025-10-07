@@ -32,5 +32,31 @@ namespace DomainModels.Mapping
                 ImagePath = roomType.ImagePath,
             };
         }
+
+        public RoomTypePutDto ToRoomTypePUTdto(RoomType roomType)
+        {
+            return new RoomTypePutDto
+            {
+                Description = roomType.Description,
+                Price = roomType.PricePerNight,
+                UpdatedAt = DateTime.UtcNow.AddHours(2)
+            };
+        }
+
+        public void ApplyRoomTypePutdto(RoomTypePutDto roomTypePutDto, RoomType roomType)
+        {
+            //Only update if there's a new value
+            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description) && roomTypePutDto.Description != "string")
+                roomType.Description = roomTypePutDto.Description;
+
+            //Only update if there's a new value
+            if (roomTypePutDto.Price > 0)
+                roomType.PricePerNight = roomTypePutDto.Price;
+
+            roomType.UpdatedAt = DateTime.UtcNow.AddHours(2);
+        }
+
     }
 }
+
+

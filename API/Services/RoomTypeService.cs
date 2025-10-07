@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using DomainModels.Enums;
 using DomainModels.Mapping;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Esf;
 
 namespace API.Services
 {
@@ -19,6 +20,11 @@ namespace API.Services
         {
             _context = context;
         }
+        /// <summary>
+        /// Retrieves all the roomtypes from the database
+        /// </summary>
+        /// <returns>Lists of all the roomtypes</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<IEnumerable<RoomTypeDto?>> GetRoomTypes()
         {
             var roomtypes = await _context.RoomTypes.ToListAsync()
@@ -27,7 +33,13 @@ namespace API.Services
             return roomtypes
               .Select(rt => _mapping.ToRoomTypeGETdto(rt));
         }
-
+        
+        /// <summary>
+        /// View a single roomtype with unique id
+        /// </summary>
+        /// <param name="roomtypeId">The roomtype to view</param>
+        /// <returns>The chosen roomtype</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<RoomTypeDto?> GetSpecificRoomType(int roomtypeId)
         {
             if (roomtypeId == 0)
@@ -35,15 +47,18 @@ namespace API.Services
 
             var roomtype = await _context.RoomTypes.FindAsync(roomtypeId)
             ?? throw new ArgumentException($"No roomtype was found with the given ID: {roomtypeId}");
-            
+
             return _mapping.ToRoomTypeGETdto(roomtype);
         }
-        
-        /// <summary>
-        /// Returns RoomType (Model), as we want to see the entire
-        /// roomtype model, with the updated fields
-        /// </summary>
-        public async Task<RoomType?> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
+
+       /// <summary>
+       ///  Updates a specific roomtype
+       /// </summary>
+       /// <param name="roomtypeId"> The roomtype we want updated</param>
+       /// <param name="roomTypePutDto">What we want updated</param>
+       /// <returns>Updated roomtype</returns>
+       /// <exception cref="ArgumentException"></exception>
+        public async Task<RoomTypePutDto?> UpdateRoomType(int roomtypeId, RoomTypePutDto roomTypePutDto)
         {
             if (roomtypeId == 0)
                 throw new ArgumentException("ID cannot be 0");
@@ -51,21 +66,11 @@ namespace API.Services
             var existingRoomType = await _context.RoomTypes.FirstOrDefaultAsync(rt => rt.Id == roomtypeId)
             ?? throw new ArgumentException($"Could not find room type with ID:{roomtypeId}");
 
-            //Only update if there's a new value
-            if (!string.IsNullOrWhiteSpace(roomTypePutDto.Description) && roomTypePutDto.Description != "string")
-                existingRoomType.Description = roomTypePutDto.Description;
-
-            //Only update if there's a new value
-            if (roomTypePutDto.Price > 0)
-                existingRoomType.PricePerNight = roomTypePutDto.Price;
-
-
-            existingRoomType.UpdatedAt = DateTime.UtcNow.AddHours(2);
-
+            _mapping.ApplyRoomTypePutdto(roomTypePutDto, existingRoomType);
             await _context.SaveChangesAsync();
-            return existingRoomType;
-        }
 
+            return _mapping.ToRoomTypePUTdto(existingRoomType);
+        }
     }
 }
    
