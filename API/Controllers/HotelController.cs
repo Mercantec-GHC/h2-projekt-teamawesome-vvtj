@@ -117,11 +117,11 @@ public class HotelController : ControllerBase
     /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
     [HttpPut]
-    public async Task<ActionResult> PutHotel(int id, HotelDto updateHotel)
+    public async Task<ActionResult> PutHotel(HotelDto updateHotel)
     {
         try
         {
-            return Ok(await _hotelService.PutHotel(id, updateHotel));
+            return Ok(await _hotelService.PutHotel(updateHotel));
         }
         catch (ArgumentException ex)
         {

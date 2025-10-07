@@ -77,23 +77,30 @@ namespace API.Services
         /// <summary>
         /// Updates an hotel
         /// </summary>
-        /// <param name="id">The identifier of the hotel we want updated</param>
         /// <param name="updatedHotel">The details of hotel we want updated</param>
         /// <returns>The new updated hotel</returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<HotelDto?> PutHotel(int id, HotelDto updatedHotel)
+        public async Task<HotelDto?> PutHotel(HotelDto updatedHotel)
         {
-             if (id == 0)
-                throw new ArgumentException("Id can't be 0");
-                
-            var currentHotel = await _context.Hotels.FindAsync(id)
-                ?? throw new ArgumentException($"Couldn't find hotel by ID: {id}");
+            var currentHotel = await _context.Hotels.FindAsync(updatedHotel.Id)
+                ?? throw new ArgumentException($"Couldn't find hotel by ID: {updatedHotel.Id}");
 
             _hotelMapping.TohotelPUTDto(currentHotel, updatedHotel);
 
             await _context.SaveChangesAsync();
-
-            return _hotelMapping.ToHotelGETdto(currentHotel);
+            return new HotelDto
+            {
+                Id = currentHotel.Id,
+                HotelName = currentHotel.HotelName,
+                CityName = currentHotel.CityName,
+                Address = currentHotel.Address,
+                Description = currentHotel.Description,
+                Email = currentHotel.Email,
+                Phone = currentHotel.Phone,
+                WeekdayTime = currentHotel.WeekdayTime,
+                SaturdayTime = currentHotel.SaturdayTime,
+                HolidaysTime = currentHotel.HolidaysTime
+            };
         }
 
         /// <summary>
@@ -103,13 +110,13 @@ namespace API.Services
         /// <returns>True, if the hotel was deleted</returns>
         public async Task<bool> DeleteHotel(int id)
         {
-             if (id == 0)
+            if (id == 0)
                 throw new ArgumentException("Id can't be 0");
 
             var hotel = await _context.Hotels.FindAsync(id);
             if (hotel == null)
                 throw new ArgumentException($"Cound't find hotel with the Id: {id}");
-            
+
             _context.Hotels.Remove(hotel);
             await _context.SaveChangesAsync();
 
