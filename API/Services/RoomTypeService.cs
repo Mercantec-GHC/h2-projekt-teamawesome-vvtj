@@ -52,8 +52,7 @@ namespace API.Services
         }
 
        /// <summary>
-       /// Returns RoomType (Model), as we want to see the entire
-       /// roomtype model, with the updated fields
+       ///  Updates a specific roomtype
        /// </summary>
        /// <param name="roomtypeId"> The roomtype we want updated</param>
        /// <param name="roomTypePutDto">What we want updated</param>

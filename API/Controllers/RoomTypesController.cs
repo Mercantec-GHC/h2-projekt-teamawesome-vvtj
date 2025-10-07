@@ -21,7 +21,9 @@ public class RoomTypesController : ControllerBase
     /// Shows all room types
     /// </summary>
     /// <returns>A list of room types</returns>
+    /// <response code="200">Roomtypes successfully found!</response>
     /// <response code="404">Room types not found!</response>
+    /// <response code="500">Internal server error</response>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomTypeDto>>> GetRoomTypes()
     {
@@ -33,6 +35,10 @@ public class RoomTypesController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexcepted error occured");
+        }
     }
 
     //Everybody
@@ -41,7 +47,10 @@ public class RoomTypesController : ControllerBase
     /// </summary>
     /// <param name="id">Unique identifier for room types</param>
     /// <returns>A room type</returns>
+    /// <response code="200">Roomtype successfully found!</response>
+    /// <response code="400">Invalid input error</response>
     /// <response code="404">Room type not found!</response>
+    /// <response code="500">Internal server error</response>
     [HttpGet("{id}")]
     public async Task<ActionResult<RoomTypeDto>> GetSpecificRoomtype(int id)
     {
@@ -53,6 +62,10 @@ public class RoomTypesController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch (Exception)
+        {
+            return StatusCode(500, "An unexcepted error occured");
+        }
     }
 
     /// <summary>
@@ -62,10 +75,12 @@ public class RoomTypesController : ControllerBase
     /// <param name="roomTypePutDto">The updated roomtype data</param>
     /// <returns>Updated roomtype</returns>
     /// <response code="200">Room type successfully updated.</response>
+    /// <response code="400">Invalid input error</response>
     /// <response code="404">Room type not found.</response>
+    /// <response code="500">Internal server error</response>
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
-     public async Task<ActionResult> UpdateRoomType(int id, RoomTypePutDto roomTypePutDto)
+    public async Task<ActionResult> UpdateRoomType(int id, RoomTypePutDto roomTypePutDto)
     {
         try
         {
@@ -74,6 +89,10 @@ public class RoomTypesController : ControllerBase
         catch (ArgumentException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error occured");
         }
     }
 }
